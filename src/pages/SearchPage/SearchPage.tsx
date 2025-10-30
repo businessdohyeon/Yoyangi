@@ -14,7 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
 import SearchHeader from './SearchHeader';
-import { NaverMapView } from '@mj-studio/react-native-naver-map';
+
+const LIMIT = 10;
 
 export default function SearchPage() {
     const navigation = useNavigation();
@@ -23,6 +24,23 @@ export default function SearchPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [facilityArray, setFacilityArray] = useState([]);
     const [isMapShown, setIsMapShown] = useState(false);
+    const [page, setPage] = useState(1);
+    const [kind, setKind] = useState('요양병원');
+
+    const getMore = () => {
+        setIsLoading(true);
+
+        fetch(
+            `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
+        )
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                setFacilityArray((cur) => [...cur, ...json.Response]);
+                setPage((cur) => cur + 1);
+                setIsLoading(false);
+            });
+    };
 
     useEffect(() => {
         // Geolocation.getCurrentPosition((info) => {
@@ -41,17 +59,20 @@ export default function SearchPage() {
         //         });
         // });
 
-        // fetch(apis.urls.facilities)
-        //     .then((res) => res.json())
-        //     .then((json) => {
-        //         console.log(json);
-        //         setFacilityArray(json.Response);
-        //         setIsLoading(false);
-        //     });
+        fetch(
+            `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
+        )
+            .then((res) => res.json())
+            .then((json) => {
+                console.log(json);
+                setFacilityArray(json.Response);
+                setPage((cur) => cur + 1);
+                setIsLoading(false);
+            });
 
-        const res = apis.mock.getFacilities();
-        setFacilityArray(res.Response);
-        setIsLoading(false);
+        // const res = apis.mock.getFacilities();
+        // setFacilityArray(res.Response);
+        // setIsLoading(false);
     }, []);
 
     console.log(facilityArray);
@@ -90,24 +111,24 @@ export default function SearchPage() {
             >
                 {/* 목록 */}
                 <View style={{ padding: 10, gap: 10 }}>
-                    {isLoading ? (
+                    {facilityArray.map((facilityData) => {
+                        return (
+                            <SearchResult
+                                key={facilityData.id}
+                                facilityData={facilityData}
+                            />
+                        );
+                    })}
+                    {isLoading && (
                         <ActivityIndicator
                             animating={true}
                             color={theme.colors.primary}
+                            style={{ marginVertical: 30 }}
                         />
-                    ) : (
-                        facilityArray.map((facilityData) => {
-                            return (
-                                <SearchResult
-                                    key={facilityData.id}
-                                    facilityData={facilityData}
-                                />
-                            );
-                        })
                     )}
                     {/* 검색결과 컴포넌트 */}
                 </View>
-                <MoreButton />
+                <MoreButton onPress={getMore} />
             </ScrollView>
             <FAB
                 icon="map"
@@ -267,7 +288,7 @@ function SearchResult({ facilityData }) {
     );
 }
 
-function MoreButton() {
+function MoreButton({ onPress }) {
     return (
         <View
             style={{
@@ -276,12 +297,7 @@ function MoreButton() {
                 paddingHorizontal: 10,
             }}
         >
-            <Button
-                mode="outlined"
-                onPress={() => {
-                    // TODO
-                }}
-            >
+            <Button mode="outlined" onPress={onPress}>
                 더보기
             </Button>
         </View>
