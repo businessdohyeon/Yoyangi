@@ -14,15 +14,15 @@ import apis from '../../apis';
 // import { showBorder } from "./common.js"
 
 // TODO: 어느정도되면 Map, FacilityList 컴포넌트 분리, 각각 상태 가져가서 그에 따라 display설정하는 것 잊지말고
+// -> 한번 한 컴포넌트로 합치고 분리하는 게 나을 듯
 
-export default function SearchHeader({setFacilityArray}) {
+export default function SearchHeader({ setFacilityArray, kind, setKind }) {
     const navigation = useNavigation();
     const theme = useTheme();
 
     const { width, height } = useWindowDimensions();
 
     const [searchQuery, setSearchQuery] = useState('');
-
 
     const onSearchQuerySubmit = async () => {
         console.log(`${apis.urls.facilities}?keyword=${searchQuery}`);
@@ -36,6 +36,9 @@ export default function SearchHeader({setFacilityArray}) {
 
         console.log('onSubmit', json);
     };
+
+    console.log({kind});
+    console.log(kind === "요양병원");
 
     return (
         <Appbar.Header
@@ -59,6 +62,7 @@ export default function SearchHeader({setFacilityArray}) {
                     // ...showBorder
                 }}
                 onSubmitEditing={onSearchQuerySubmit}
+                // autoFocus={true}
             />
             {/* 검색관련 */}
             <View style={{}}>
@@ -110,17 +114,27 @@ export default function SearchHeader({setFacilityArray}) {
                     }}
                 >
                     <Chip
-                        icon="hospital"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            setKind("요양병원")
+                        }}
+                        selected={kind === "요양병원"}
                     >
                         요양병원
                     </Chip>
-                    <Chip icon="forest" onPress={() => console.log('Pressed')}>
+
+                    <Chip
+                        onPress={() => {
+                            setKind("요양원")
+                        }}
+                        selected={kind === "요양원"}
+                    >
                         요양원
                     </Chip>
                     <Chip
-                        icon="sun-clock-outline"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            setKind("주간데이케어센터")
+                        }}
+                        selected={kind === "주간데이케어센터"}
                     >
                         주간데이케어센터
                     </Chip>

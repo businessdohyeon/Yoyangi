@@ -17,6 +17,8 @@ import SearchHeader from './SearchHeader';
 
 const LIMIT = 10;
 
+// TODO: 라우팅 파라미터로 받아서 하는 게 좋나...?
+// TODO: 앱바에서 검색버튼 클릭해서 들어오는 경우엔 searchbar에 autofocus?
 export default function SearchPage() {
     const navigation = useNavigation();
     const theme = useTheme();
@@ -26,6 +28,29 @@ export default function SearchPage() {
     const [isMapShown, setIsMapShown] = useState(false);
     const [page, setPage] = useState(1);
     const [kind, setKind] = useState('요양병원');
+
+    // kind가 바뀌면 초기세팅으로 되돌려서 다시 fetch
+    useEffect(() => {
+        console.log('kind changed');
+
+        setPage(1);
+        setIsLoading(true);
+
+        // fetch(
+        //     `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
+        // )
+        //     .then((res) => res.json())
+        //     .then((json) => {
+        //         console.log(json);
+        //         setFacilityArray(json.Response);
+        //         setPage((cur) => cur + 1);
+        //         setIsLoading(false);
+        //     });
+
+        const res = apis.mock.getFacilities();
+        setFacilityArray(res.Response);
+        setIsLoading(false);
+    }, [kind]);
 
     const getMore = () => {
         setIsLoading(true);
@@ -43,6 +68,8 @@ export default function SearchPage() {
     };
 
     useEffect(() => {
+        console.log('plain useEffect');
+
         // Geolocation.getCurrentPosition((info) => {
         //     console.log(info);
         //     const { coords } = info;
@@ -59,23 +86,23 @@ export default function SearchPage() {
         //         });
         // });
 
-        fetch(
-            `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
-        )
-            .then((res) => res.json())
-            .then((json) => {
-                console.log(json);
-                setFacilityArray(json.Response);
-                setPage((cur) => cur + 1);
-                setIsLoading(false);
-            });
+        // fetch(
+        //     `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
+        // )
+        //     .then((res) => res.json())
+        //     .then((json) => {
+        //         console.log(json);
+        //         setFacilityArray(json.Response);
+        //         setPage((cur) => cur + 1);
+        //         setIsLoading(false);
+        //     });
 
-        // const res = apis.mock.getFacilities();
-        // setFacilityArray(res.Response);
-        // setIsLoading(false);
+        const res = apis.mock.getFacilities();
+        setFacilityArray(res.Response);
+        setIsLoading(false);
     }, []);
 
-    console.log(facilityArray);
+    // console.log(facilityArray);
 
     // Geolocation.getCurrentPosition(info => console.log(info));
 
@@ -83,7 +110,11 @@ export default function SearchPage() {
 
     return (
         <>
-            <SearchHeader setFacilityArray={setFacilityArray} />
+            <SearchHeader
+                setFacilityArray={setFacilityArray}
+                kind={kind}
+                setKind={setKind}
+            />
             {/* <View
                 style={{
                     display: isMapShown ? 'flex' : 'none',
@@ -206,7 +237,7 @@ function SearchResult({ facilityData }) {
                                 <Text>{`${facilityData.sggu_name} ${facilityData.sido_name}`}</Text>
                             </View>
                             <View style={{ marginRight: 10 }}>
-                                <Text>요양병원</Text>
+                                <Text>{facilityData.kind}</Text>
                             </View>
                         </View>
                         <View style={{}}>
