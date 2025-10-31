@@ -19,6 +19,33 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
 import { LoginTokenContext } from '../../Context';
 
+// dent_doctor_count
+// dent_gn_count
+// dent_resdnt_count
+// dent_sp_count
+// doctor_count
+
+// 한방
+// hb_doctor_count
+// hb_gn_count
+// hb_intn_count
+// hb_resdnt_count
+// hb_sp_count
+// id
+
+// man_patients_count
+// manager_count
+// medc_doctor_count
+// medc_gn_count
+// medc_intn_count
+// medc_resdnt_count
+// medc_sp_count
+// total_patients_count
+// updated_at
+
+// user_capacity
+// woman_patients_count
+
 const tileData = [
     [
         {
@@ -113,44 +140,22 @@ const FacilityDetailPage = ({ route }) => {
     const [facilityData, setFacilityData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [reviews, setReview] = useState([]);
-    const [value, setValue] = useState('walk');
 
     const [tabIndex, setTabIndex] = useState(0);
 
     const scrollRef = useRef<ScrollView>();
-
     const { id } = route.params;
-    console.log('loginToken', loginToken);
 
-    // 그냥 상태 하나 잡고 아예 랜더링 하는 항목을 바꾸거나 할까...
-    useEffect(() => {
-        console.log('value', value);
+    console.group('[rerender]: FacilityDetailPage');
+    console.log({ loginToken });
+    console.log({ route });
+    console.log({ reviews });
+    console.groupEnd();
 
-        if (value === 'walk') {
-            scrollRef.current?.scrollTo({
-                y: 0 * viewportWidth,
-                animated: true,
-            });
-        } else if (value === 'train') {
-            scrollRef.current?.scrollTo({
-                y: 1 * viewportWidth,
-                animated: true,
-            });
-        } else if (value === 'drive') {
-            scrollRef.current?.scrollTo({
-                y: 2 * viewportWidth,
-                animated: true,
-            });
-        } else {
-            // no nothin'
-        }
-    }, [value]);
+    const fetchFacilityData = async () => {
+        // setOsloading(ture) ??
 
-    console.log(route.params);
-    console.log(reviews);
-
-    const tmp = async () => {
-        {
+        try {
             // const res = await fetch(apis.urls.getFacilityById(id));
             // const json = await res.json();
             // console.log(json);
@@ -158,6 +163,13 @@ const FacilityDetailPage = ({ route }) => {
             const json = apis.mock.getFacilityById();
             console.log('getFacilityById', json);
             setFacilityData(json);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+
+        {
         }
 
         // {
@@ -166,12 +178,10 @@ const FacilityDetailPage = ({ route }) => {
         //     console.log(json);
         //     setReview(json.Reviews);
         // }
-
-        setIsLoading(false);
     };
 
     useEffect(() => {
-        tmp();
+        fetchFacilityData();
     }, []);
 
     return (
@@ -384,7 +394,10 @@ const FacilityDetailPage = ({ route }) => {
                         <ScrollView
                             pagingEnabled
                             horizontal={true}
-                            style={{ backgroundColor: '#eeeeee' }}
+                            style={{
+                                backgroundColor: '#eeeeee',
+                                paddingBottom: 10,
+                            }}
                             ref={scrollRef}
                         >
                             {/* 병원정보 */}
@@ -392,7 +405,7 @@ const FacilityDetailPage = ({ route }) => {
                                 <View
                                     style={{
                                         width: viewportWidth,
-                                        gap: 20,
+                                        gap: 10,
                                     }}
                                 >
                                     {/* 인력정보 */}
@@ -404,11 +417,11 @@ const FacilityDetailPage = ({ route }) => {
                                         }}
                                     >
                                         <View style={{ marginVertical: 10 }}>
-                                            <Text variant="bodyLarge">
+                                            <Text variant="titleMedium">
                                                 인력정보
                                             </Text>
                                         </View>
-                                        <View style={{}}>
+                                        <View style={{ flex: 1 }}>
                                             <View
                                                 style={{
                                                     flex: 1,
@@ -419,12 +432,22 @@ const FacilityDetailPage = ({ route }) => {
                                                     style={{
                                                         flex: 1,
                                                         flexDirection: 'row',
-                                                        justifyContent:
-                                                            'space-around',
                                                     }}
                                                 >
-                                                    <Text>일반의</Text>
-                                                    <Text>{`${facilityData.facility_status.doctor_count}명`}</Text>
+                                                    <Text
+                                                        variant="bodyMedium"
+                                                        style={{
+                                                            marginRight: 10,
+                                                        }}
+                                                    >
+                                                        일반의
+                                                    </Text>
+                                                    <Text
+                                                        variant="bodyMedium"
+                                                        style={{
+                                                            marginRight: 10,
+                                                        }}
+                                                    >{`${facilityData.facility_status.doctor_count}명`}</Text>
                                                 </View>
                                                 <View
                                                     style={{
@@ -434,8 +457,12 @@ const FacilityDetailPage = ({ route }) => {
                                                             'space-around',
                                                     }}
                                                 >
-                                                    <Text>전공의</Text>
-                                                    <Text>00명</Text>
+                                                    <Text variant="bodyMedium">
+                                                        전공의
+                                                    </Text>
+                                                    <Text variant="bodyMedium">
+                                                        00명
+                                                    </Text>
                                                 </View>
                                             </View>
                                             <View
@@ -448,12 +475,24 @@ const FacilityDetailPage = ({ route }) => {
                                                     style={{
                                                         flex: 1,
                                                         flexDirection: 'row',
-                                                        justifyContent:
-                                                            'space-around',
                                                     }}
                                                 >
-                                                    <Text>요양보호사</Text>
-                                                    <Text>00명</Text>
+                                                    <Text
+                                                        variant="bodyMedium"
+                                                        style={{
+                                                            marginRight: 10,
+                                                        }}
+                                                    >
+                                                        요양보호사
+                                                    </Text>
+                                                    <Text
+                                                        variant="bodyMedium"
+                                                        style={{
+                                                            marginRight: 10,
+                                                        }}
+                                                    >
+                                                        00명
+                                                    </Text>
                                                 </View>
                                                 <View
                                                     style={{
@@ -469,19 +508,32 @@ const FacilityDetailPage = ({ route }) => {
                                             backgroundColor:
                                                 theme.colors.background,
                                             padding: 10,
+                                            gap: 10,
                                         }}
                                     >
                                         <View style={{}}>
-                                            <Text>진료시간</Text>
+                                            <Text variant="titleMedium">
+                                                진료시간
+                                            </Text>
                                         </View>
-                                        <View style={{}}>
-                                            <Text>
+                                        <View
+                                            style={{
+                                                backgroundColor:
+                                                    theme.colors.errorContainer,
+                                                paddingHorizontal: 10,
+                                                paddingVertical: 5,
+                                                borderRadius: 10,
+                                            }}
+                                        >
+                                            <Text variant="bodyMedium">
                                                 오늘의 진료는 종료했어요
                                             </Text>
                                         </View>
                                         <View
                                             style={{
                                                 flexDirection: 'row',
+                                                paddingHorizontal: 10,
+                                                paddingVertical: 5,
                                             }}
                                         >
                                             <View style={{ flex: 1 }}>
@@ -490,14 +542,18 @@ const FacilityDetailPage = ({ route }) => {
                                                         flex: 1,
                                                     }}
                                                 >
-                                                    <Text>오늘(화요일)</Text>
+                                                    <Text variant="bodyMedium">
+                                                        오늘(화요일)
+                                                    </Text>
                                                 </View>
                                                 <View
                                                     style={{
                                                         flex: 1,
                                                     }}
                                                 >
-                                                    <Text>0700-2100</Text>
+                                                    <Text variant="bodyMedium">
+                                                        0700-2100
+                                                    </Text>
                                                 </View>
                                             </View>
                                             <View style={{ flex: 1 }}>
@@ -506,18 +562,31 @@ const FacilityDetailPage = ({ route }) => {
                                                         flex: 1,
                                                     }}
                                                 >
-                                                    <Text>점심시간</Text>
+                                                    <Text variant="bodyMedium">
+                                                        점심시간
+                                                    </Text>
                                                 </View>
                                                 <View
                                                     style={{
                                                         flex: 1,
                                                     }}
                                                 >
-                                                    <Text>0700-2100</Text>
+                                                    <Text variant="bodyMedium">
+                                                        0700-2100
+                                                    </Text>
                                                 </View>
                                             </View>
                                         </View>
-                                        <View style={{ ...showBorder }}>
+                                        <View
+                                            style={{
+                                                paddingVertical: 5,
+                                                paddingHorizontal: 10,
+                                                backgroundColor: '#eeeeee',
+                                                gap: 10,
+                                                borderRadius: 10,
+                                            }}
+                                        >
+                                            {/* TODO: 어후 코드냄새... map이용한 걸로 좀 바꾸자 */}
                                             <View
                                                 style={{
                                                     flexDirection: 'row',
@@ -822,10 +891,21 @@ const FacilityDetailPage = ({ route }) => {
                                             backgroundColor:
                                                 theme.colors.background,
                                             padding: 10,
+                                            gap: 10,
                                         }}
                                     >
+                                        <View style={{}}>
+                                            <Text variant="titleMedium">
+                                                병원 위치
+                                            </Text>
+                                        </View>
                                         {/* // TODO: 지도임배딩 */}
                                         <View style={{ ...showBorder }}>
+                                            <Text>일단지도</Text>
+                                            <Text>일단지도</Text>
+                                            <Text>일단지도</Text>
+                                            <Text>일단지도</Text>
+                                            <Text>일단지도</Text>
                                             <Text>일단지도</Text>
                                         </View>
                                         <View
@@ -833,18 +913,36 @@ const FacilityDetailPage = ({ route }) => {
                                                 flexDirection: 'row',
                                             }}
                                         >
-                                            <View style={{ flex: 6 }}>
+                                            <View
+                                                style={{
+                                                    flex: 5,
+                                                    flexDirection: 'row',
+                                                    gap: 5,
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <Icon
+                                                    source={'map-marker'}
+                                                    size={20}
+                                                />
                                                 <Text>
                                                     {facilityData.address}
                                                 </Text>
                                             </View>
                                             <View
                                                 style={{
-                                                    ...showBorder,
                                                     flex: 1,
                                                 }}
                                             >
-                                                <Text>복사</Text>
+                                                <Button
+                                                    onPress={() => {
+                                                        // TODO: copy
+                                                        console.log('copied!');
+                                                    }}
+                                                    icon={'content-copy'}
+                                                >
+                                                    복사
+                                                </Button>
                                             </View>
                                         </View>
                                     </View>
@@ -854,10 +952,16 @@ const FacilityDetailPage = ({ route }) => {
                                             backgroundColor:
                                                 theme.colors.background,
                                             padding: 10,
+                                            gap: 10,
                                         }}
                                     >
+                                        <View style={{}}>
+                                            <Text variant="titleMedium">
+                                                병원 위치
+                                            </Text>
+                                        </View>
                                         <View style={{ flex: 1 }}>
-                                            <Text>
+                                            <Text variant="bodyMedium">
                                                 밑의 전화걸기를 클릭하면 바로
                                                 전화를 걸 수 있어요
                                             </Text>
@@ -868,11 +972,36 @@ const FacilityDetailPage = ({ route }) => {
                                                 flexDirection: 'row',
                                             }}
                                         >
-                                            <View style={{ flex: 6 }}>
-                                                <Text>도로명</Text>
+                                            <View
+                                                style={{
+                                                    flex: 5,
+                                                    flexDirection: 'row',
+                                                    gap: 5,
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <Icon
+                                                    source={'phone'}
+                                                    size={20}
+                                                />
+                                                <Text>
+                                                    {facilityData.telno}
+                                                </Text>
                                             </View>
-                                            <View style={{ flex: 1 }}>
-                                                <Text>복사</Text>
+                                            <View
+                                                style={{
+                                                    flex: 1,
+                                                }}
+                                            >
+                                                <Button
+                                                    onPress={() => {
+                                                        // TODO: copy
+                                                        console.log('copied!');
+                                                    }}
+                                                    icon={'content-copy'}
+                                                >
+                                                    복사
+                                                </Button>
                                             </View>
                                         </View>
                                     </View>
@@ -1551,13 +1680,23 @@ const FacilityDetailPage = ({ route }) => {
                             )}
                         </ScrollView>
                         {/* 버그신고등등등 */}
-                        <View style={{ ...showBorder }}>
-                            <View style={{ ...showBorder }}>
+                        <View2
+                            style={{ paddingBottom: 50, paddingHorizontal: 10 }}
+                        >
+                            <TouchableRipple
+                                onPress={() => {
+                                    console.log('bla');
+                                }}
+                            >
                                 <Text>알고계신 병원 정보와 다른가요?</Text>
-                            </View>
-                            <View style={{ ...showBorder }}>
+                            </TouchableRipple>
+                            <TouchableRipple
+                                onPress={() => {
+                                    console.log('bla');
+                                }}
+                            >
                                 <Text>이 병원의 관계자이신가요?</Text>
-                            </View>
+                            </TouchableRipple>
                         </View>
                     </>
                 )}
