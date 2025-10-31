@@ -26,87 +26,48 @@ export default function SearchPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [facilityArray, setFacilityArray] = useState([]);
     const [isMapShown, setIsMapShown] = useState(false);
+    // query params
     const [page, setPage] = useState(1);
     const [kind, setKind] = useState('요양병원');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [latitude, setLatitude] = useState(null);
+    const [longitude, setLongitude] = useState(null);
 
-    // kind가 바뀌면 초기세팅으로 되돌려서 다시 fetch
-    useEffect(() => {
-        console.log('kind changed');
+    console.group('SearchPage rerendered');
+    console.log({ facilityArray });
+    console.groupEnd();
 
-        setPage(1);
+    const fetchFacilites = async (targetPage: number, resetFlag: boolean) => {
         setIsLoading(true);
 
-        // fetch(
-        //     `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
-        // )
-        //     .then((res) => res.json())
-        //     .then((json) => {
-        //         console.log(json);
-        //         setFacilityArray(json.Response);
-        //         setPage((cur) => cur + 1);
-        //         setIsLoading(false);
-        //     });
+        try {
+            // const res = await fetch(`${apis.urls.facilities}?limit=${LIMIT}&page=${targetPage}&kind=${kind}`);
+            // const json = await res.json();
 
-        const res = apis.mock.getFacilities();
-        setFacilityArray(res.Response);
-        setIsLoading(false);
-    }, [kind]);
+            const json = apis.mock.getFacilities();
+
+            const {Response} = json;
+
+            setFacilityArray(cur => resetFlag ? Response : [...cur, ...Response]);
+            setPage(targetPage+1);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const getMore = () => {
-        setIsLoading(true);
-
-        fetch(
-            `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
-        )
-            .then((res) => res.json())
-            .then((json) => {
-                console.log(json);
-                setFacilityArray((cur) => [...cur, ...json.Response]);
-                setPage((cur) => cur + 1);
-                setIsLoading(false);
-            });
+        fetchFacilites(page, false);
     };
 
     useEffect(() => {
-        console.log('plain useEffect');
+        console.group('plain useEffect');
 
-        // Geolocation.getCurrentPosition((info) => {
-        //     console.log(info);
-        //     const { coords } = info;
-        //     const { latitude, longitude } = coords;
+        fetchFacilites(1, true);
 
-        //     console.log([latitude, longitude]);
-        //     fetch(
-        //         `${apis.urls.server}/facilities?latitude=${latitude}&longitude=${longitude}`,
-        //     )
-        //         .then((res) => res.json())
-        //         .then((json) => {
-        //             console.log("walalalaal")
-        //             console.log(json)
-        //         });
-        // });
-
-        // fetch(
-        //     `${apis.urls.facilities}?limit=${LIMIT}&page=${page}&kind=${kind}`,
-        // )
-        //     .then((res) => res.json())
-        //     .then((json) => {
-        //         console.log(json);
-        //         setFacilityArray(json.Response);
-        //         setPage((cur) => cur + 1);
-        //         setIsLoading(false);
-        //     });
-
-        const res = apis.mock.getFacilities();
-        setFacilityArray(res.Response);
-        setIsLoading(false);
-    }, []);
-
-    // console.log(facilityArray);
-
-    // Geolocation.getCurrentPosition(info => console.log(info));
-
-    // console.log(apiurl.facilities);
+        console.groupEnd();
+    }, [kind]);
 
     return (
         <>
@@ -190,6 +151,10 @@ function SearchResult({ facilityData }) {
         const json = apis.mock.getFacilityById();
         // console.log(json);
     }, []);
+
+    const userLike = async () => {
+        // const res = await fetch(apis.urls.userLike())
+    };
 
     return (
         <Card

@@ -19,7 +19,6 @@ import apis from '../../apis';
 export default function SearchHeader({ setFacilityArray, kind, setKind }) {
     const navigation = useNavigation();
     const theme = useTheme();
-
     const { width, height } = useWindowDimensions();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -37,8 +36,10 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
         console.log('onSubmit', json);
     };
 
+    console.group("SearchHeader rerendered");
     console.log({kind});
     console.log(kind === "요양병원");
+    console.groupEnd();
 
     return (
         <Appbar.Header
@@ -134,9 +135,9 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
                         onPress={() => {
                             setKind("주간데이케어센터")
                         }}
-                        selected={kind === "주간데이케어센터"}
+                        selected={kind === "주간보호케어센터"}
                     >
-                        주간데이케어센터
+                        주간보호케어센터
                     </Chip>
                 </View>
             </View>
