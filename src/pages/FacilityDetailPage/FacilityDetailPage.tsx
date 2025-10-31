@@ -6,8 +6,8 @@ import {
     Card,
     Icon,
     IconButton,
-    SegmentedButtons,
     Text,
+    TouchableRipple,
     useTheme,
 } from 'react-native-paper';
 
@@ -18,7 +18,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
 import { LoginTokenContext } from '../../Context';
-
 
 const tileData = [
     [
@@ -109,18 +108,19 @@ const FacilityDetailPage = ({ route }) => {
     const navigation = useNavigation();
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
-    const {loginToken} = useContext(LoginTokenContext);
-    
+    const { loginToken } = useContext(LoginTokenContext);
+
     const [facilityData, setFacilityData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [reviews, setReview] = useState([]);
     const [value, setValue] = useState('walk');
-    
+
+    const [tabIndex, setTabIndex] = useState(0);
+
     const scrollRef = useRef<ScrollView>();
-    
-    
+
     const { id } = route.params;
-    console.log("loginToken", loginToken);
+    console.log('loginToken', loginToken);
 
     // 그냥 상태 하나 잡고 아예 랜더링 하는 항목을 바꾸거나 할까...
     useEffect(() => {
@@ -179,7 +179,6 @@ const FacilityDetailPage = ({ route }) => {
             <GoBackHeader title={facilityData.name} />
             <ScrollView
                 contentContainerStyle={{
-                    gap: 10,
                     backgroundColor: '#eeeeee',
                 }}
             >
@@ -301,38 +300,85 @@ const FacilityDetailPage = ({ route }) => {
                             </View>
                         </View>
                         {/* 이동버튼 */}
-                        {/* TODO: 스크롤이랑 동기화 어떻게하지 흠... */}
                         <View
                             style={{
                                 ...showBorder,
                                 flex: 1,
+                                flexDirection: 'row',
+                                justifyContent: 'space-around',
                                 backgroundColor: theme.colors.background,
+                                overflow: 'visible',
                             }}
                         >
-                            <SegmentedButtons
-                                value={value}
-                                onValueChange={setValue}
-                                buttons={[
-                                    {
-                                        value: 'walk',
-                                        label: 'Walking',
-                                        checkedColor: 'red',
-                                        uncheckedColor: 'white',
-                                    },
-                                    {
-                                        value: 'train',
-                                        label: 'Transit',
-                                        checkedColor: 'red',
-                                        uncheckedColor: 'white',
-                                    },
-                                    {
-                                        value: 'drive',
-                                        label: 'Driving',
-                                        checkedColor: 'red',
-                                        uncheckedColor: 'white',
-                                    },
-                                ]}
-                            />
+                            <TouchableRipple
+                                style={{
+                                    flex: 1,
+                                    borderBottomWidth: 10,
+                                    borderBottomColor:
+                                        tabIndex === 0
+                                            ? theme.colors.primary
+                                            : '#dddddd',
+                                    backgroundColor: theme.colors.background,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => {
+                                    setTabIndex(0);
+                                }}
+                            >
+                                <Text
+                                    style={{ marginVertical: 5 }}
+                                    variant="titleLarge"
+                                >
+                                    0
+                                </Text>
+                            </TouchableRipple>
+                            <TouchableRipple
+                                style={{
+                                    flex: 1,
+                                    borderBottomWidth: 10,
+                                    borderBottomColor:
+                                        tabIndex === 1
+                                            ? theme.colors.primary
+                                            : '#dddddd',
+                                    backgroundColor: theme.colors.background,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => {
+                                    setTabIndex(1);
+                                }}
+                            >
+                                <Text
+                                    style={{ marginVertical: 5 }}
+                                    variant="titleLarge"
+                                >
+                                    1
+                                </Text>
+                            </TouchableRipple>
+                            <TouchableRipple
+                                style={{
+                                    flex: 1,
+                                    borderBottomWidth: 10,
+                                    borderBottomColor:
+                                        tabIndex === 2
+                                            ? theme.colors.primary
+                                            : '#dddddd',
+                                    backgroundColor: theme.colors.background,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => {
+                                    setTabIndex(2);
+                                }}
+                            >
+                                <Text
+                                    style={{ marginVertical: 5 }}
+                                    variant="titleLarge"
+                                >
+                                    2
+                                </Text>
+                            </TouchableRipple>
                         </View>
                         {/* 구체적인 정보들 */}
                         <ScrollView
@@ -342,1050 +388,728 @@ const FacilityDetailPage = ({ route }) => {
                             ref={scrollRef}
                         >
                             {/* 병원정보 */}
-                            <View
-                                style={{
-                                    width: viewportWidth,
-                                    gap: 20,
-                                }}
-                            >
-                                {/* 인력정보 */}
+                            {tabIndex === 0 && (
                                 <View
                                     style={{
-                                        backgroundColor:
-                                            theme.colors.background,
-                                        padding: 10,
+                                        width: viewportWidth,
+                                        gap: 20,
                                     }}
                                 >
-                                    <View style={{ marginVertical: 10 }}>
-                                        <Text variant="bodyLarge">
-                                            인력정보
-                                        </Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <View
-                                            style={{
-                                                flex: 1,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
+                                    {/* 인력정보 */}
+                                    <View
+                                        style={{
+                                            backgroundColor:
+                                                theme.colors.background,
+                                            padding: 10,
+                                        }}
+                                    >
+                                        <View style={{ marginVertical: 10 }}>
+                                            <Text variant="bodyLarge">
+                                                인력정보
+                                            </Text>
+                                        </View>
+                                        <View style={{}}>
                                             <View
                                                 style={{
                                                     flex: 1,
                                                     flexDirection: 'row',
-                                                    justifyContent:
-                                                        'space-around',
                                                 }}
                                             >
-                                                <Text>일반의</Text>
-                                                <Text>{`${facilityData.facility_status.doctor_count}명`}</Text>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                        flexDirection: 'row',
+                                                        justifyContent:
+                                                            'space-around',
+                                                    }}
+                                                >
+                                                    <Text>일반의</Text>
+                                                    <Text>{`${facilityData.facility_status.doctor_count}명`}</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                        flexDirection: 'row',
+                                                        justifyContent:
+                                                            'space-around',
+                                                    }}
+                                                >
+                                                    <Text>전공의</Text>
+                                                    <Text>00명</Text>
+                                                </View>
                                             </View>
                                             <View
                                                 style={{
                                                     flex: 1,
                                                     flexDirection: 'row',
-                                                    justifyContent:
-                                                        'space-around',
-                                                }}
-                                            >
-                                                <Text>전공의</Text>
-                                                <Text>00명</Text>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flex: 1,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                    flexDirection: 'row',
-                                                    justifyContent:
-                                                        'space-around',
-                                                }}
-                                            >
-                                                <Text>요양보호사</Text>
-                                                <Text>00명</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            />
-                                        </View>
-                                    </View>
-                                </View>
-                                {/* 진료시간 */}
-                                <View
-                                    style={{
-                                        backgroundColor:
-                                            theme.colors.background,
-                                        padding: 10,
-                                    }}
-                                >
-                                    <View style={{}}>
-                                        <Text>진료시간</Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <Text>오늘의 진료는 종료했어요</Text>
-                                    </View>
-                                    <View
-                                        style={{
-                                            flexDirection: 'row',
-                                        }}
-                                    >
-                                        <View style={{ flex: 1 }}>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>오늘(화요일)</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>0700-2100</Text>
-                                            </View>
-                                        </View>
-                                        <View style={{ flex: 1 }}>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>점심시간</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>0700-2100</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <View style={{ ...showBorder }}>
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
                                                 }}
                                             >
                                                 <View
                                                     style={{
                                                         flex: 1,
+                                                        flexDirection: 'row',
+                                                        justifyContent:
+                                                            'space-around',
                                                     }}
                                                 >
-                                                    <Text>x요일</Text>
+                                                    <Text>요양보호사</Text>
+                                                    <Text>00명</Text>
                                                 </View>
                                                 <View
                                                     style={{
                                                         flex: 1,
                                                     }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>점심시간</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>x요일</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>점심시간</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>x요일</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>점심시간</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>x요일</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>점심시간</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>x요일</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>점심시간</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>x요일</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>점심시간</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>0700-2100</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                                {/* 병원소개 */}
-                                <View
-                                    style={{
-                                        backgroundColor:
-                                            theme.colors.background,
-                                        padding: 10,
-                                    }}
-                                >
-                                    <View style={{}}>
-                                        <Text variant="titleMedium">
-                                            병원소개
-                                        </Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <Text>
-                                            {facilityData.description || '...'}
-                                        </Text>
-                                    </View>
-                                </View>
-                                {/* 주소정보 w.지도 */}
-                                <View
-                                    style={{
-                                        backgroundColor:
-                                            theme.colors.background,
-                                        padding: 10,
-                                    }}
-                                >
-                                    {/* // TODO: 지도임배딩 */}
-                                    <View style={{ ...showBorder }}>
-                                        <Text>일단지도</Text>
-                                    </View>
-                                    <View
-                                        style={{
-                                            flexDirection: 'row',
-                                        }}
-                                    >
-                                        <View style={{ flex: 6 }}>
-                                            <Text>{facilityData.address}</Text>
-                                        </View>
-                                        <View
-                                            style={{ ...showBorder, flex: 1 }}
-                                        >
-                                            <Text>복사</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                                {/* 전화번호 */}
-                                <View
-                                    style={{
-                                        backgroundColor:
-                                            theme.colors.background,
-                                        padding: 10,
-                                    }}
-                                >
-                                    <View style={{ flex: 1 }}>
-                                        <Text>
-                                            밑의 전화걸기를 클릭하면 바로 전화를
-                                            걸 수 있어요
-                                        </Text>
-                                        <Text>{facilityData.telno}</Text>
-                                    </View>
-                                    <View
-                                        style={{
-                                            flexDirection: 'row',
-                                        }}
-                                    >
-                                        <View style={{ flex: 6 }}>
-                                            <Text>도로명</Text>
-                                        </View>
-                                        <View style={{ flex: 1 }}>
-                                            <Text>복사</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            {/* 병원소식 */}
-                            <View
-                                style={{
-                                    ...showBorder,
-                                    width: viewportWidth,
-                                    backgroundColor: theme.colors.background,
-                                }}
-                            >
-                                <View style={{ ...showBorder }}>
-                                    <View style={{ ...showBorder }}>
-                                        <Text>오늘의 메뉴</Text>
-                                    </View>
-                                    <View style={{ ...showBorder }}>
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 3,
-                                                }}
-                                            >
-                                                <Text>CommunityRoute</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 5,
-                                                }}
-                                            >
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>아침: 대표메뉴</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 3,
-                                                }}
-                                            >
-                                                <Text>CommunityRoute</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 5,
-                                                }}
-                                            >
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>아침: 대표메뉴</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 3,
-                                                }}
-                                            >
-                                                <Text>CommunityRoute</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 5,
-                                                }}
-                                            >
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>아침: 대표메뉴</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>나머지</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <View style={{ ...showBorder }}>
-                                        <Text>일주일식단표</Text>
-                                    </View>
-                                    <View
-                                        style={{ ...showBorder, height: 150 }}
-                                    >
-                                        <Image
-                                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
-                                            style={{ flex: 1 }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={{ ...showBorder }}>
-                                    <View style={{ ...showBorder }}>
-                                        <Text>병원소식</Text>
-                                    </View>
-                                    <View style={{ ...showBorder }}>
-                                        <View style={{ ...showBorder }}>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    height: 250,
-                                                }}
-                                            >
-                                                <Image
-                                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
-                                                    style={{ flex: 1 }}
                                                 />
                                             </View>
-                                            <View style={{ ...showBorder }}>
-                                                <Text>제목</Text>
+                                        </View>
+                                    </View>
+                                    {/* 진료시간 */}
+                                    <View
+                                        style={{
+                                            backgroundColor:
+                                                theme.colors.background,
+                                            padding: 10,
+                                        }}
+                                    >
+                                        <View style={{}}>
+                                            <Text>진료시간</Text>
+                                        </View>
+                                        <View style={{}}>
+                                            <Text>
+                                                오늘의 진료는 종료했어요
+                                            </Text>
+                                        </View>
+                                        <View
+                                            style={{
+                                                flexDirection: 'row',
+                                            }}
+                                        >
+                                            <View style={{ flex: 1 }}>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>오늘(화요일)</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>0700-2100</Text>
+                                                </View>
                                             </View>
-                                            <View style={{ ...showBorder }}>
-                                                <Text>줄글</Text>
+                                            <View style={{ flex: 1 }}>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>점심시간</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>0700-2100</Text>
+                                                </View>
                                             </View>
                                         </View>
                                         <View style={{ ...showBorder }}>
                                             <View
                                                 style={{
-                                                    ...showBorder,
-                                                    height: 250,
+                                                    flexDirection: 'row',
                                                 }}
                                             >
-                                                <Image
-                                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
-                                                    style={{ flex: 1 }}
-                                                />
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>x요일</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>점심시간</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
                                             </View>
-                                            <View style={{ ...showBorder }}>
-                                                <Text>제목</Text>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>x요일</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>점심시간</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
                                             </View>
-                                            <View style={{ ...showBorder }}>
-                                                <Text>줄글</Text>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>x요일</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>점심시간</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>x요일</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>점심시간</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>x요일</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>점심시간</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>x요일</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>점심시간</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>0700-2100</Text>
+                                                    </View>
+                                                </View>
                                             </View>
                                         </View>
                                     </View>
-                                    <View style={{ ...showBorder }}>
-                                        <Button
-                                            icon="camera"
-                                            mode="contained"
-                                            onPress={() =>
-                                                console.log('Pressed')
-                                            }
-                                            style={{ flex: 1 }}
-                                        >
-                                            더보기
-                                        </Button>
-                                    </View>
-                                </View>
-                            </View>
-                            {/* 후기 */}
-                            <View
-                                style={{
-                                    ...showBorder,
-                                    width: viewportWidth,
-                                    backgroundColor: theme.colors.background,
-                                }}
-                            >
-                                <View style={{ ...showBorder }}>
-                                    <View style={{ ...showBorder }}>
-                                        <Text>리뷰(120)</Text>
-                                    </View>
+                                    {/* 병원소개 */}
                                     <View
                                         style={{
-                                            ...showBorder,
-                                            flexDirection: 'row',
+                                            backgroundColor:
+                                                theme.colors.background,
+                                            padding: 10,
                                         }}
                                     >
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flex: 1,
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }}
-                                        >
-                                            <View style={{ ...showBorder }}>
-                                                <Text>4.0</Text>
-                                            </View>
-                                            <View style={{ ...showBorder }}>
-                                                <Text>별개수</Text>
-                                            </View>
+                                        <View style={{}}>
+                                            <Text variant="titleMedium">
+                                                병원소개
+                                            </Text>
                                         </View>
-                                        <View
-                                            style={{ ...showBorder, flex: 3 }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>매우만족</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>게이지바</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>00명</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>매우만족</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>게이지바</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>00명</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>매우만족</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>게이지바</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>00명</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>매우만족</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>게이지바</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>00명</Text>
-                                                </View>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>매우만족</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>게이지바</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>00명</Text>
-                                                </View>
-                                            </View>
+                                        <View style={{}}>
+                                            <Text>
+                                                {facilityData.description ||
+                                                    '...'}
+                                            </Text>
                                         </View>
                                     </View>
-                                    <View style={{ ...showBorder }}>
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>진료결과</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>만죽해요</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            />
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>xxx%(00명)</Text>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>진료결과</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>만죽해요</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            />
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>xxx%(00명)</Text>
-                                            </View>
-                                        </View>
-                                        <View
-                                            style={{
-                                                ...showBorder,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>진료결과</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>만죽해요</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            />
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flex: 1,
-                                                }}
-                                            >
-                                                <Text>xxx%(00명)</Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                                <View style={{ ...showBorder }}>
-                                    {/* 후기컴포넌트 */}
-                                    <Card
-                                        onPress={() =>
-                                            console.log('card pressed')
-                                        }
+                                    {/* 주소정보 w.지도 */}
+                                    <View
+                                        style={{
+                                            backgroundColor:
+                                                theme.colors.background,
+                                            padding: 10,
+                                        }}
                                     >
-                                        {/* TODO: 개조해야할지도 */}
-                                        <Card.Cover
-                                            source={{
-                                                uri: 'https://picsum.photos/700',
+                                        {/* // TODO: 지도임배딩 */}
+                                        <View style={{ ...showBorder }}>
+                                            <Text>일단지도</Text>
+                                        </View>
+                                        <View
+                                            style={{
+                                                flexDirection: 'row',
                                             }}
-                                        />
-                                        <Card.Content>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>☆☆☆☆☆</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>4.0</Text>
-                                                </View>
-                                                <View style={{ ...showBorder }}>
-                                                    <Text>만족해요</Text>
-                                                </View>
-                                            </View>
-                                            <View style={{ ...showBorder }}>
-                                                <Text>인증됨</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    ...showBorder,
-                                                    flexDirection: 'row',
-                                                }}
-                                            >
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>깨끗해요</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>친절해요</Text>
-                                                </View>
-                                                <View
-                                                    style={{
-                                                        ...showBorder,
-                                                        flex: 1,
-                                                    }}
-                                                >
-                                                    <Text>최신시설이에요</Text>
-                                                </View>
-                                            </View>
-                                            <View style={{ ...showBorder }}>
+                                        >
+                                            <View style={{ flex: 6 }}>
                                                 <Text>
-                                                    어쩌구저쩌구어쩌구 ...더보기
+                                                    {facilityData.address}
                                                 </Text>
                                             </View>
-                                        </Card.Content>
-                                        <Card.Actions>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flex: 1,
+                                                }}
+                                            >
+                                                <Text>복사</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    {/* 전화번호 */}
+                                    <View
+                                        style={{
+                                            backgroundColor:
+                                                theme.colors.background,
+                                            padding: 10,
+                                        }}
+                                    >
+                                        <View style={{ flex: 1 }}>
+                                            <Text>
+                                                밑의 전화걸기를 클릭하면 바로
+                                                전화를 걸 수 있어요
+                                            </Text>
+                                            <Text>{facilityData.telno}</Text>
+                                        </View>
+                                        <View
+                                            style={{
+                                                flexDirection: 'row',
+                                            }}
+                                        >
+                                            <View style={{ flex: 6 }}>
+                                                <Text>도로명</Text>
+                                            </View>
+                                            <View style={{ flex: 1 }}>
+                                                <Text>복사</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
+                            {/* 병원소식 */}
+                            {tabIndex === 1 && (
+                                <View
+                                    style={{
+                                        ...showBorder,
+                                        width: viewportWidth,
+                                        backgroundColor:
+                                            theme.colors.background,
+                                    }}
+                                >
+                                    <View style={{ ...showBorder }}>
+                                        <View style={{ ...showBorder }}>
+                                            <Text>오늘의 메뉴</Text>
+                                        </View>
+                                        <View style={{ ...showBorder }}>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 3,
+                                                    }}
+                                                >
+                                                    <Text>CommunityRoute</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 5,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>
+                                                            아침: 대표메뉴
+                                                        </Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 3,
+                                                    }}
+                                                >
+                                                    <Text>CommunityRoute</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 5,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>
+                                                            아침: 대표메뉴
+                                                        </Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 3,
+                                                    }}
+                                                >
+                                                    <Text>CommunityRoute</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 5,
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>
+                                                            아침: 대표메뉴
+                                                        </Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>나머지</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <View style={{ ...showBorder }}>
+                                            <Text>일주일식단표</Text>
+                                        </View>
+                                        <View
+                                            style={{
+                                                ...showBorder,
+                                                height: 150,
+                                            }}
+                                        >
+                                            <Image
+                                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
+                                                style={{ flex: 1 }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={{ ...showBorder }}>
+                                        <View style={{ ...showBorder }}>
+                                            <Text>병원소식</Text>
+                                        </View>
+                                        <View style={{ ...showBorder }}>
+                                            <View style={{ ...showBorder }}>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        height: 250,
+                                                    }}
+                                                >
+                                                    <Image
+                                                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
+                                                        style={{ flex: 1 }}
+                                                    />
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>제목</Text>
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>줄글</Text>
+                                                </View>
+                                            </View>
+                                            <View style={{ ...showBorder }}>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        height: 250,
+                                                    }}
+                                                >
+                                                    <Image
+                                                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
+                                                        style={{ flex: 1 }}
+                                                    />
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>제목</Text>
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>줄글</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <View style={{ ...showBorder }}>
                                             <Button
                                                 icon="camera"
                                                 mode="contained"
@@ -1394,24 +1118,437 @@ const FacilityDetailPage = ({ route }) => {
                                                 }
                                                 style={{ flex: 1 }}
                                             >
-                                                신고하기
+                                                더보기
                                             </Button>
-                                        </Card.Actions>
-                                    </Card>
-                                    <View style={{ ...showBorder }}>
-                                        <Button
-                                            icon="camera"
-                                            mode="contained"
-                                            onPress={() =>
-                                                console.log('Pressed')
-                                            }
-                                            style={{ flex: 1 }}
-                                        >
-                                            더보기
-                                        </Button>
+                                        </View>
                                     </View>
                                 </View>
-                            </View>
+                            )}
+                            {/* 후기 */}
+                            {tabIndex === 2 && (
+                                <View
+                                    style={{
+                                        ...showBorder,
+                                        width: viewportWidth,
+                                        backgroundColor:
+                                            theme.colors.background,
+                                    }}
+                                >
+                                    <View style={{ ...showBorder }}>
+                                        <View style={{ ...showBorder }}>
+                                            <Text>리뷰(120)</Text>
+                                        </View>
+                                        <View
+                                            style={{
+                                                ...showBorder,
+                                                flexDirection: 'row',
+                                            }}
+                                        >
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flex: 1,
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>4.0</Text>
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>별개수</Text>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flex: 3,
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>매우만족</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>게이지바</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>00명</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>매우만족</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>게이지바</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>00명</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>매우만족</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>게이지바</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>00명</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>매우만족</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>게이지바</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>00명</Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>매우만족</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>게이지바</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>00명</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <View style={{ ...showBorder }}>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>진료결과</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>만죽해요</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                />
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>xxx%(00명)</Text>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>진료결과</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>만죽해요</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                />
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>xxx%(00명)</Text>
+                                                </View>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    ...showBorder,
+                                                    flexDirection: 'row',
+                                                }}
+                                            >
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>진료결과</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>만죽해요</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                />
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    <Text>xxx%(00명)</Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                    <View style={{ ...showBorder }}>
+                                        {/* 후기컴포넌트 */}
+                                        <Card
+                                            onPress={() =>
+                                                console.log('card pressed')
+                                            }
+                                        >
+                                            {/* TODO: 개조해야할지도 */}
+                                            <Card.Cover
+                                                source={{
+                                                    uri: 'https://picsum.photos/700',
+                                                }}
+                                            />
+                                            <Card.Content>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>☆☆☆☆☆</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>4.0</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                        }}
+                                                    >
+                                                        <Text>만족해요</Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>인증됨</Text>
+                                                </View>
+                                                <View
+                                                    style={{
+                                                        ...showBorder,
+                                                        flexDirection: 'row',
+                                                    }}
+                                                >
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>깨끗해요</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>친절해요</Text>
+                                                    </View>
+                                                    <View
+                                                        style={{
+                                                            ...showBorder,
+                                                            flex: 1,
+                                                        }}
+                                                    >
+                                                        <Text>
+                                                            최신시설이에요
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <View style={{ ...showBorder }}>
+                                                    <Text>
+                                                        어쩌구저쩌구어쩌구
+                                                        ...더보기
+                                                    </Text>
+                                                </View>
+                                            </Card.Content>
+                                            <Card.Actions>
+                                                <Button
+                                                    icon="camera"
+                                                    mode="contained"
+                                                    onPress={() =>
+                                                        console.log('Pressed')
+                                                    }
+                                                    style={{ flex: 1 }}
+                                                >
+                                                    신고하기
+                                                </Button>
+                                            </Card.Actions>
+                                        </Card>
+                                        <View style={{ ...showBorder }}>
+                                            <Button
+                                                icon="camera"
+                                                mode="contained"
+                                                onPress={() =>
+                                                    console.log('Pressed')
+                                                }
+                                                style={{ flex: 1 }}
+                                            >
+                                                더보기
+                                            </Button>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
                         </ScrollView>
                         {/* 버그신고등등등 */}
                         <View style={{ ...showBorder }}>
