@@ -18,6 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
 import { LoginTokenContext } from '../../Context';
+import z from 'zod';
 
 // dent_doctor_count
 // dent_gn_count
@@ -130,6 +131,13 @@ const tileData = [
     ],
 ];
 
+// TODO
+const facilityDataStructure = z.object({
+
+})
+
+type facilityData_t = z.infer<typeof facilityDataStructure>
+
 const FacilityDetailPage = ({ route }) => {
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
@@ -167,9 +175,6 @@ const FacilityDetailPage = ({ route }) => {
             console.error(error);
         } finally {
             setIsLoading(false);
-        }
-
-        {
         }
 
         // {
@@ -579,7 +584,7 @@ const FacilityDetailPage = ({ route }) => {
                                         </View>
                                         <View
                                             style={{
-                                                paddingVertical: 5,
+                                                paddingVertical: 10,
                                                 paddingHorizontal: 10,
                                                 backgroundColor: '#eeeeee',
                                                 gap: 10,
@@ -1011,15 +1016,22 @@ const FacilityDetailPage = ({ route }) => {
                             {tabIndex === 1 && (
                                 <View
                                     style={{
-                                        ...showBorder,
                                         width: viewportWidth,
-                                        backgroundColor:
-                                            theme.colors.background,
+                                        gap: 10,
                                     }}
                                 >
-                                    <View style={{ ...showBorder }}>
-                                        <View style={{ ...showBorder }}>
-                                            <Text>오늘의 메뉴</Text>
+                                    <View
+                                        style={{
+                                            paddingVertical: 10,
+                                            paddingHorizontal: 10,
+                                            backgroundColor:
+                                                theme.colors.background,
+                                        }}
+                                    >
+                                        <View style={{ marginVertical: 10, }}>
+                                            <Text variant="titleMedium">
+                                                오늘의 메뉴
+                                            </Text>
                                         </View>
                                         <View style={{ ...showBorder }}>
                                             <View
@@ -1188,13 +1200,18 @@ const FacilityDetailPage = ({ route }) => {
                                                 height: 150,
                                             }}
                                         >
-                                            <Image
+                                            <Imag e
                                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
                                                 style={{ flex: 1 }}
                                             />
                                         </View>
                                     </View>
-                                    <View style={{ ...showBorder }}>
+                                    <View
+                                        style={{
+                                            backgroundColor:
+                                                theme.colors.background,
+                                        }}
+                                    >
                                         <View style={{ ...showBorder }}>
                                             <Text>병원소식</Text>
                                         </View>
@@ -1680,7 +1697,7 @@ const FacilityDetailPage = ({ route }) => {
                             )}
                         </ScrollView>
                         {/* 버그신고등등등 */}
-                        <View2
+                        <View
                             style={{ paddingBottom: 50, paddingHorizontal: 10 }}
                         >
                             <TouchableRipple
