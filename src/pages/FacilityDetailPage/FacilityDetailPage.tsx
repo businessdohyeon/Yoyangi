@@ -1680,7 +1680,7 @@ const FacilityDetailPage = ({ route }) => {
                             )}
                         </ScrollView>
                         {/* 버그신고등등등 */}
-                        <View2
+                        <View
                             style={{ paddingBottom: 50, paddingHorizontal: 10 }}
                         >
                             <TouchableRipple

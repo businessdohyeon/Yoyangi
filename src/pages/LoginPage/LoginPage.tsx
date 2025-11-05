@@ -1,10 +1,12 @@
-import { Linking, useWindowDimensions, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Image, Linking, useWindowDimensions, View } from 'react-native';
+import { Button, Text, TouchableRipple, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 import apis from '../../apis';
 import { LoginTokenContext } from '../../Context';
+import { showBorder } from '../../common';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const _goBack = () => console.log('Went back');
 const _handleSearch = () => console.log('Searching');
@@ -19,30 +21,28 @@ const LoginPage = () => {
     const navigation = useNavigation();
     const theme = useTheme();
     const { width, height } = useWindowDimensions();
-    const {loginToken, setLoginToken} = useContext(LoginTokenContext);
+    const { loginToken, storeLoginInfo } = useContext(LoginTokenContext);
 
-    const [code, setCode] = useState<String | null>(null);
-
-    console.log("loginToken", loginToken)
+    console.log('loginToken', loginToken);
 
     const handleUrl = useCallback((event) => {
         const url = event.url || event;
 
         console.log('url', url);
 
-        const receivedCode = parseTokenFromUrl(url);
+        const urlobj = new URL(url);
+        const params = urlobj.searchParams;
+        const token = params.get("token");
+        const refreshToken = params.get("refreshToken");
+        const userId = params.get("userId");
 
-        if (receivedCode) {
-            setCode(receivedCode);
-            setLoginToken(receivedCode);
+        console.log({tmp: urlobj, params, token});
 
-            // fetch(
-            //     `${apis.urls.server}/user/sns/login/naver/callback?code=${receivedCode}`,
-            // )
-            //     .then((res) => res.json())
-            //     .then((json) => {
-            //         console.log(json);
-            //     });
+        if (token !== null && refreshToken !== null && userId !== null) {
+            storeLoginInfo({token, refreshToken, userId});
+            navigation.goBack();
+        }else{
+
         }
     }, []);
 
@@ -81,11 +81,22 @@ const LoginPage = () => {
                 }}
             >
                 <View style={{ padding: 16 }}>
+                    <TouchableRipple
+                    style={{...showBorder, }}
+                        onPress={() => {
+                            console.log('bla');
+                        }}
+                    >
+                        <Image
+                            resizeMode="center"
+                            source={require('./btnG_완성형.png')}
+                        />
+                    </TouchableRipple>
                     <Button mode="outlined" onPress={openAuth}>
                         naver login
                     </Button>
                     <Text style={{ marginTop: 12 }}>
-                        authorization_code: {code ?? 'none'}
+                        authorization_code: {"code" ?? 'none'}
                     </Text>
                 </View>
                 <Button mode="outlined" onPress={_handleMore}>
@@ -96,6 +107,9 @@ const LoginPage = () => {
                 </Button>
                 <Button mode="outlined" onPress={_handleMore}>
                     전화번호 login
+                </Button>
+                <Button mode="outlined" onPress={() => {AsyncStorage.clear();}}>
+                    async clear
                 </Button>
             </View>
         </>
