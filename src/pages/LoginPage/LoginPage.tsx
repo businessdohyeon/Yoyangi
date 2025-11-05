@@ -36,7 +36,7 @@ const LoginPage = () => {
         const refreshToken = params.get("refreshToken");
         const userId = params.get("userId");
 
-        console.log({tmp: urlobj, params, token});
+        console.log({urlobj, params, token, userId});
 
         if (token !== null && refreshToken !== null && userId !== null) {
             storeLoginInfo({token, refreshToken, userId});
@@ -59,10 +59,10 @@ const LoginPage = () => {
         };
     }, [handleUrl]);
 
-    const openAuth = async () => {
+    const openAuth = async (provider) => {
         try {
             // await Linking.openURL(authUrl);
-            await Linking.openURL(apis.urls.loginNaver);
+            await Linking.openURL(`${apis.urls.server}/user/sns/login/${provider}`);
         } catch (e) {
             console.warn('openURL failed', e);
         }
@@ -92,17 +92,17 @@ const LoginPage = () => {
                             source={require('./btnG_완성형.png')}
                         />
                     </TouchableRipple>
-                    <Button mode="outlined" onPress={openAuth}>
+                    <Button mode="outlined" onPress={()=>{openAuth("naver")}}>
                         naver login
                     </Button>
                     <Text style={{ marginTop: 12 }}>
                         authorization_code: {"code" ?? 'none'}
                     </Text>
                 </View>
-                <Button mode="outlined" onPress={_handleMore}>
+                <Button mode="outlined" onPress={() => {openAuth("kakao")}}>
                     kakao login
                 </Button>
-                <Button mode="outlined" onPress={_handleMore}>
+                <Button mode="outlined" onPress={() => {openAuth("google")}}>
                     google login
                 </Button>
                 <Button mode="outlined" onPress={_handleMore}>

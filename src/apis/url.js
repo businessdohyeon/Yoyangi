@@ -1,5 +1,6 @@
 const port = 8080;
-const server = `http://10.0.2.2:${port}`;
+// const server = `http://10.0.2.2:${port}`;
+const server = `http://localhost:${port}`;
 
 // TODO: 별로 맘에 안드는데....
 const urls = {
@@ -15,3 +16,6 @@ const urls = {
 };
 
 export default urls;
+
+
+// adb reverse tcp:8080 tcp:8080
