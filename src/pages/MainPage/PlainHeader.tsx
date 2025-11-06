@@ -1,9 +1,13 @@
 import { Appbar, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { useContext } from 'react';
+import { LocationInfoContext, LoginTokenContext } from '../../Context';
 
 export default function PlainHeader() {
     const navigation = useNavigation();
     const theme = useTheme();
+    const { locationInfo } = useContext(LocationInfoContext);
+    const { loginToken } = useContext(LoginTokenContext);
 
     return (
         <Appbar.Header
@@ -18,7 +22,7 @@ export default function PlainHeader() {
                 }}
             />
             {/* TODO: 현재위치 가져오는거 */}
-            <Appbar.Content title="현재위치" />
+            <Appbar.Content title={locationInfo?.roadAddress} />
             <Appbar.Action
                 icon="magnify"
                 onPress={() => {

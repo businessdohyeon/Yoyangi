@@ -1,8 +1,9 @@
 import { ScrollView, View } from 'react-native';
 import { Appbar, Button, Searchbar, Text, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import apis from '../../apis';
+import { LocationInfoContext } from '../../Context';
 // import { showBorder } from "./common.js"
 
 const _goBack = () => console.log('Went back');
@@ -12,6 +13,7 @@ const _handleMore = () => console.log('Shown more');
 const EditLocationPage = () => {
     const navigation = useNavigation();
     const theme = useTheme();
+    const { locationInfo, storeLocationInfo } = useContext(LocationInfoContext);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState(null);
@@ -28,9 +30,15 @@ const EditLocationPage = () => {
             const { addresses } = Response;
             const tmp = addresses[0];
 
+            const newSearchResult = {
+                roadAddress: tmp.roadAddress,
+                latitude: tmp.x,
+                longitude: tmp.y,
+            };
+
             console.log(json);
 
-            setSearchResult(tmp);
+            setSearchResult(newSearchResult);
             setSearchQuery('');
         } catch (error) {
             console.log(error);
@@ -39,12 +47,18 @@ const EditLocationPage = () => {
         }
     };
 
+    const register = () => {
+        console.log(searchResult);
+        storeLocationInfo(searchResult);
+    };
+
+
     return (
         <>
             <Appbar.Header>
                 <Appbar.Action icon="map-marker" onPress={_handleSearch} />
                 {/* TODO: 현재위치 가져오는거 */}
-                <Appbar.Content title="현재위치" />
+                <Appbar.Content title={locationInfo?.roadAddress} />
                 <Appbar.Action
                     icon="magnify"
                     onPress={() => {
@@ -76,7 +90,7 @@ const EditLocationPage = () => {
                         borderRadius: 10,
                     }}
                 >
-                    <Text variant="titleLarge">검색결과</Text>
+                    <Text variant="titleMedium">검색결과</Text>
                     <View
                         style={{
                             justifyContent: 'center',
@@ -85,7 +99,7 @@ const EditLocationPage = () => {
                         <Text variant="titleMedium">
                             {searchResult === null
                                 ? '검색결과가 없습니다'
-                                : searchResult.jibunAddress}
+                                : searchResult.roadAddress}
                         </Text>
                     </View>
                     {searchResult !== null && (
@@ -95,12 +109,7 @@ const EditLocationPage = () => {
                                 alignItems: 'flex-end',
                             }}
                         >
-                            <Button
-                                mode="outlined"
-                                onPress={() => {
-                                    console.log('!');
-                                }}
-                            >
+                            <Button mode="outlined" onPress={register}>
                                 등록
                             </Button>
                         </View>

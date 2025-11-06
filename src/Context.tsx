@@ -1,37 +1,65 @@
 import { createContext, useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const LocationContext = createContext(null);
+export const LocationInfoContext = createContext(null);
 export const LoginTokenContext = createContext(null);
 
 export function TotalContextPovider({ children }) {
-    const [location, setLocation] = useState<[number, number]>([0, 0]);
+    const [locationInfo, setLocationInfo] = useState(null);
     const [loginInfo, setLoginInfo] = useState(null);
 
-    const getLonginInfo = async() =>{
-        const loginInfo = await AsyncStorage.getItem("loginInfo");
-        
-        setLoginInfo(loginInfo === null ? null : JSON.parse(loginInfo));
-        
-        console.group("getLonginInfo");
-        console.log({loginInfo});
-        console.groupEnd();
-    }
+    const loadLonginInfo = async () => {
+        const loginInfo = await AsyncStorage.getItem('loginInfo');
 
-    useEffect(()=>{
-        getLonginInfo();
+        setLoginInfo(loginInfo === null ? null : JSON.parse(loginInfo));
+
+        console.group('getLonginInfo');
+        console.log({ loginInfo });
+        console.groupEnd();
+    };
+
+    const storeLoginInfo = useCallback((value) => {
+        setLoginInfo(value);
+        AsyncStorage.setItem('loginInfo', JSON.stringify(value));
     }, []);
 
-    const storeLoginInfo = useCallback((value)=>{
-        setLoginInfo(value);
-        AsyncStorage.setItem("loginInfo", JSON.stringify(value));
-    },[])
+    const loadLocationInfo = async () => {
+        const locationInfo = await AsyncStorage.getItem('locationInfo');
+
+        setLocationInfo(
+            locationInfo === null ? null : JSON.parse(locationInfo),
+        );
+
+        console.group('getLocationInfo');
+        console.log({ locationInfo });
+        console.groupEnd();
+    };
+
+    const storeLocationInfo = async (value) => {
+        setLocationInfo(value);
+        await AsyncStorage.setItem('locationInfo', JSON.stringify(value));
+    };
+
+    useEffect(() => {
+        loadLonginInfo();
+        loadLocationInfo();
+    }, []);
 
     return (
-        <LocationContext.Provider value={{ location, setLocation }}>
-            <LoginTokenContext.Provider value={{ loginToken: loginInfo, storeLoginInfo: storeLoginInfo }}>
+        <LocationInfoContext.Provider
+            value={{
+                locationInfo: locationInfo,
+                storeLocationInfo: storeLocationInfo,
+            }}
+        >
+            <LoginTokenContext.Provider
+                value={{
+                    loginToken: loginInfo,
+                    storeLoginInfo: storeLoginInfo,
+                }}
+            >
                 {children}
             </LoginTokenContext.Provider>
-        </LocationContext.Provider>
+        </LocationInfoContext.Provider>
     );
 }
