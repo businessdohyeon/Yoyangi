@@ -1012,11 +1012,13 @@ const getFacilityById = () => {
         dong_name: '상면',
         postno: '12440',
         established_date: 20170901,
-        longitude: '127.3042465',
-        latitude: '37.8409105',
+        longitude: 127.3042465,
+        latitude: 37.8409105,
         care_code:
             'JDQ4MTYyMiM1MSMkMSMkMCMkOTkkNTgxMzUxIzQxIyQxIyQ3IyQ5MiQyNjEyMjIjNzEjJDEjJDgjJDgz',
         facility_number: null,
+        average_rating: 0,
+        review_count: 0,
         created_at: '2025-09-16T04:13:46.911Z',
         updated_at: '2025-09-16T04:13:46.911Z',
         facility_status: {
@@ -1045,7 +1047,7 @@ const getFacilityById = () => {
             created_at: null,
             updated_at: null,
         },
-        advertisement: null,
+        advertisements: [],
     };
 };
 
