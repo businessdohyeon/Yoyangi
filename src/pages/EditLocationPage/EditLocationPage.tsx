@@ -1,6 +1,8 @@
-import { ScrollView } from 'react-native';
-import { Appbar, Text } from 'react-native-paper';
+import { ScrollView, View } from 'react-native';
+import { Appbar, Button, Searchbar, Text, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import apis from '../../apis';
 // import { showBorder } from "./common.js"
 
 const _goBack = () => console.log('Went back');
@@ -9,6 +11,33 @@ const _handleMore = () => console.log('Shown more');
 
 const EditLocationPage = () => {
     const navigation = useNavigation();
+    const theme = useTheme();
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResult, setSearchResult] = useState(null);
+
+    const onSubmitEditing = async () => {
+        if (searchQuery === '') return;
+
+        try {
+            const res = await fetch(
+                `${apis.urls.getGeoLocaton}?location=${searchQuery}`,
+            );
+            const json = await res.json();
+            const { Response } = json;
+            const { addresses } = Response;
+            const tmp = addresses[0];
+
+            console.log(json);
+
+            setSearchResult(tmp);
+            setSearchQuery('');
+        } catch (error) {
+            console.log(error);
+        } finally {
+            console.log('finally');
+        }
+    };
 
     return (
         <>
@@ -25,9 +54,58 @@ const EditLocationPage = () => {
                 <Appbar.Action icon="bell" onPress={_handleMore} />
             </Appbar.Header>
             <ScrollView
-                contentContainerStyle={{ gap: 10, backgroundColor: '#eeeeee' }}
+                contentContainerStyle={{
+                    gap: 30,
+                    backgroundColor: '#eeeeee',
+                    paddingHorizontal: 10,
+                    paddingVertical: 20,
+                }}
             >
-                <Text>EditLocationPage</Text>
+                <Searchbar
+                    placeholder="도로명 주소를 입력해주세요"
+                    onChangeText={setSearchQuery}
+                    value={searchQuery}
+                    onSubmitEditing={onSubmitEditing}
+                />
+                <View
+                    style={{
+                        backgroundColor: theme.colors.background,
+                        paddingVertical: 15,
+                        paddingHorizontal: 15,
+                        gap: 15,
+                        borderRadius: 10,
+                    }}
+                >
+                    <Text variant="titleLarge">검색결과</Text>
+                    <View
+                        style={{
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Text variant="titleMedium">
+                            {searchResult === null
+                                ? '검색결과가 없습니다'
+                                : searchResult.jibunAddress}
+                        </Text>
+                    </View>
+                    {searchResult !== null && (
+                        <View
+                            style={{
+                                justifyContent: 'center',
+                                alignItems: 'flex-end',
+                            }}
+                        >
+                            <Button
+                                mode="outlined"
+                                onPress={() => {
+                                    console.log('!');
+                                }}
+                            >
+                                등록
+                            </Button>
+                        </View>
+                    )}
+                </View>
             </ScrollView>
         </>
     );

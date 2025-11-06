@@ -12,7 +12,8 @@ const urls = {
     logiKakao: `${server}/user/sns/login/kakao`,
     loginGoogle: `${server}/user/sns/login/google`,
     communites: `${server}/community`,
-    userLike: (userId, facilityId) => `${server}/user/${userId}/favorites/${facilityId}`
+    userLike: (userId, facilityId) => `${server}/user/${userId}/favorites/${facilityId}`,
+    getGeoLocaton: `${server}/user/geolocation`,
 };
 
 export default urls;
