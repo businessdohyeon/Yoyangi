@@ -57,7 +57,6 @@ const EditLocationPage = () => {
         <>
             <Appbar.Header>
                 <Appbar.Action icon="map-marker" onPress={_handleSearch} />
-                {/* TODO: 현재위치 가져오는거 */}
                 <Appbar.Content title={locationInfo?.roadAddress} />
                 <Appbar.Action
                     icon="magnify"

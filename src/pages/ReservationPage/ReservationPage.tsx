@@ -78,6 +78,7 @@ export default function ReservationPage({ route }) {
     return (
         <>
             <GoBackHeader title={`${facilityName} 예약`} />
+            <GoBackHeader title={`${facilityName} 예약`} />
             <ScrollView contentContainerStyle={{ padding: 16 }}>
                 <Text variant="titleLarge">예약 정보 입력</Text>
 

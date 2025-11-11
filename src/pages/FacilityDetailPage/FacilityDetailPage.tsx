@@ -314,9 +314,9 @@ const FacilityDetailPage = ({ route }) => {
                             >
                                 <Text
                                     style={{ marginVertical: 5 }}
-                                    variant="titleLarge"
+                                    variant="titleMedium"
                                 >
-                                    0
+                                    병원정보
                                 </Text>
                             </TouchableRipple>
                             <TouchableRipple
@@ -337,9 +337,9 @@ const FacilityDetailPage = ({ route }) => {
                             >
                                 <Text
                                     style={{ marginVertical: 5 }}
-                                    variant="titleLarge"
+                                    variant="titleMedium"
                                 >
-                                    1
+                                    병원소식
                                 </Text>
                             </TouchableRipple>
                             <TouchableRipple
@@ -360,9 +360,9 @@ const FacilityDetailPage = ({ route }) => {
                             >
                                 <Text
                                     style={{ marginVertical: 5 }}
-                                    variant="titleLarge"
+                                    variant="titleMedium"
                                 >
-                                    2
+                                    후기
                                 </Text>
                             </TouchableRipple>
                         </View>
@@ -481,7 +481,15 @@ function Footer({ facilityData }) {
                     alignItems: 'center',
                 }}
             >
-                <Button icon={'phone'} onPress={() => {}}>
+                <Button
+                    icon={'phone'}
+                    onPress={() => {
+                        navigation.navigate('ReviewForm', {
+                            facilityId: facilityData.id,
+                            facilityName: facilityData.name,
+                        });
+                    }}
+                >
                     후기작성
                 </Button>
             </View>

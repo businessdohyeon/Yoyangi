@@ -1,0 +1,186 @@
+import React, { useContext } from 'react';
+import { Alert } from 'react-native';
+import { TextInput, Button, Card } from 'react-native-paper';
+import { useForm } from '@tanstack/react-form';
+import { LoginInfoContext } from '../../Context';
+import { ScrollView } from 'react-native-gesture-handler';
+import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
+import apis from '../../apis';
+
+// form 초기화
+
+export default function ReviewForm({ route, navigation }) {
+    const { facilityId } = route.params;
+    const { facilityName } = route.params;
+    const { loginInfo } = useContext(LoginInfoContext);
+
+    const form = useForm({
+        defaultValues: {
+            content: '',
+            rating: '',
+            reservationId: '',
+            images: [],
+        },
+        onSubmit: async (values) => {
+            try {
+                const formData = new FormData();
+                formData.append('content', values.value.content);
+                formData.append('rating', Number(values.value.rating));
+
+                if (values.value.reservationId)
+                    formData.append('reservationId', values.value.reservationId);
+
+                // 이미지가 있을 때만 formData에 추가
+                if (Array.isArray(values.value.images) && values.value.images.length > 0) {
+                    values.value.images.forEach((img, idx) => {
+                        if (img?.uri) {
+                            formData.append('files', {
+                                uri: img.uri,
+                                name: `review_${idx}.jpg`,
+                                type: 'image/jpeg',
+                            });
+                        }
+                    });
+                }
+
+                const res = await fetch(
+                    `${apis.urls.server}/reviews/${facilityId}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${loginInfo.token}`,
+                        },
+                        body: formData,
+                    },
+                );
+
+                const json = await res.json();
+
+                console.log(json);
+
+                if (!res.ok) {
+                    console.log(res);
+                    return;
+                }
+
+                navigation.goBack();
+            } catch (err) {
+                // Alert.alert('오류', err.response?.data?.Message || '서버 오류');
+                console.error(err);
+            }
+        },
+    });
+
+    return (
+        <>
+            <GoBackHeader title={`${facilityName} 후기 쓰기`} />
+            <ScrollView style={{ flex: 1, padding: 16 }}>
+                <Card style={{ padding: 16 }}>
+                    <form.Field
+                        name="content"
+                        validators={{
+                            onChange: ({ value }) =>
+                                !value
+                                    ? '리뷰 내용을 입력하세요'
+                                    : value.length < 5
+                                    ? '5자 이상 입력 필요'
+                                    : undefined,
+                        }}
+                        children={(field) => (
+                            <>
+                                <TextInput
+                                    label="리뷰 내용"
+                                    value={field.state.value}
+                                    onChangeText={field.handleChange}
+                                    onBlur={field.handleBlur}
+                                    multiline
+                                />
+                                {field.state.meta.error ? (
+                                    <Text style={{ color: 'red' }}>
+                                        {field.state.meta.error}
+                                    </Text>
+                                ) : null}
+                            </>
+                        )}
+                    />
+
+                    <form.Field
+                        name="rating"
+                        validators={{
+                            onChange: ({ value }) =>
+                                !value || isNaN(value) || value < 1 || value > 5
+                                    ? '평점은 1~5 사이여야 함'
+                                    : undefined,
+                        }}
+                        children={(field) => (
+                            <>
+                                <TextInput
+                                    label="평점 (1~5)"
+                                    keyboardType="numeric"
+                                    value={field.state.value}
+                                    onChangeText={field.handleChange}
+                                    onBlur={field.handleBlur}
+                                />
+                                {field.state.meta.error ? (
+                                    <Text style={{ color: 'red' }}>
+                                        {field.state.meta.error}
+                                    </Text>
+                                ) : null}
+                            </>
+                        )}
+                    />
+
+                    <form.Field
+                        name="reservationId"
+                        validators={{
+                            onChange: ({ value }) =>
+                                value && isNaN(value)
+                                    ? '숫자만 입력 가능'
+                                    : undefined,
+                        }}
+                        children={(field) => (
+                            <>
+                                <TextInput
+                                    label="예약 ID (선택)"
+                                    keyboardType="numeric"
+                                    value={field.state.value}
+                                    onChangeText={field.handleChange}
+                                    onBlur={field.handleBlur}
+                                />
+                            </>
+                        )}
+                    />
+
+                    {/* 이미지 업로드 예시 - 간단히 로컬 배열에 저장 */}
+                    {/* 실제로는 react-native-image-picker 등을 통해 처리 */}
+                    <Button
+                        mode="outlined"
+                        onPress={() =>
+                            Alert.alert('TODO', '이미지 선택 기능 구현 필요')
+                        }
+                        style={{ marginVertical: 10 }}
+                    >
+                        이미지 추가
+                    </Button>
+
+                    <form.Subscribe
+                        selector={(state) => ({
+                            canSubmit: state.canSubmit,
+                            isSubmitting: state.isSubmitting,
+                        })}
+                        children={({ canSubmit, isSubmitting }) => (
+                            <Button
+                                mode="contained"
+                                loading={isSubmitting}
+                                disabled={!canSubmit}
+                                onPress={form.handleSubmit}
+                            >
+                                리뷰 등록
+                            </Button>
+                        )}
+                    />
+                </Card>
+            </ScrollView>
+        </>
+    );
+}
