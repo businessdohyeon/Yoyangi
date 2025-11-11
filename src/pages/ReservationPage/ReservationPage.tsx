@@ -1,124 +1,112 @@
-import { Button, Text, TextInput } from 'react-native-paper';
-import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
-import z from 'zod';
-import { View } from 'react-native';
+import React, { useContext } from 'react';
+import { View, ScrollView } from 'react-native';
+import { TextInput, Button, HelperText, Text } from 'react-native-paper';
+import { useForm } from '@tanstack/react-form';
 import apis from '../../apis';
+import { LoginTokenContext } from '../../Context';
+import PlainHeader from '../MainPage/PlainHeader';
+import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 
-const { fieldContext, formContext } = createFormHookContexts();
+export default function ReservationPage({ route }) {
+    const { facilityId } = route.params;
+    const { loginToken } = useContext(LoginTokenContext);
 
-// Allow us to bind components to the form to keep type safety but reduce production boilerplate
-// Define this once to have a generator of consistent form instances throughout your app
-const { useAppForm } = createFormHook({
-    fieldComponents: {
-        TextInput,
-    },
-    formComponents: {
-        Button,
-    },
-    fieldContext,
-    formContext,
-});
+    console.group('ReservationPage rerandereed');
+    console.log({ route, facilityId, loginToken });
+    console.groupEnd();
 
-const tmpBody = {
-    Message: 'OO기관에 홍길동님의 예약이 완료되었습니다.',
-    ResultCode: 'SUCCESS',
-    data: {
-        reservation: {
-            id: 123,
-            facility_id: 1,
-            reserved_date: '2025-10-05',
-            reserved_time: '10:00',
-            status: 'PENDING',
-        },
-        patient: {
-            // 진료 대상자
-            name: '김철수',
-            birth: '1950-05-12',
-            gender: 'M',
-            phone: '010-1234-5678',
-            disease_type: '치매',
-            notes: '기저질환 있음',
-        },
-        reservation_user: {
-            id: 7,
-            name: '홍길동',
-            phone: '010-9876-5432',
-        },
-        facility: {
-            id: 1,
-            name: 'OO 요양원',
-        },
-    },
-};
-
-// TODO: auth gard for this route?
-const ReservationPage = ({ route }) => {
-    const { params } = route;
-    const {id} = params;
-    console.log('params', params);
-
-    const form = useAppForm({
+    const form = useForm({
         defaultValues: {
-            username: '',
-            age: 0,
+            reserved_date: '',
+            reserved_time: '',
+            patient_name: '',
+            patient_birth: '',
+            patient_gender: '',
+            patient_phone: '',
+            disease_type: '',
+            notes: '',
         },
-        validators: {
-            // Pass a schema or function to validate
-            onChange: z.object({
-                username: z.string(),
-                age: z.number().min(13),
-            }),
-        },
-        onSubmit: ({ value }) => {
-            // Do something with form data
-            console.log(JSON.stringify(value, null, 2));
+        onSubmit: async ({ value }) => {
+            try {
+                const res = await fetch(
+                    `${apis.urls.server}/facilities/${facilityId}/reservation`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            Authorization: `Bearer ${loginToken.token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(value),
+                    },
+                );
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    console.error('예약 실패:', data);
+                    return;
+                }
+
+                console.log('예약 성공:', data);
+            } catch (err) {
+                console.error('예약 실패:', err.response?.data || err.message);
+            }
         },
     });
 
-    const submitFunc = async()=>{
-        const res = await fetch(`${apis.urls.server}/facilities/${id}/reservation`, {
-            method: "POST",
-            headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer {JWT_TOKEN}`,
-            },
-            body: JSON.stringify(tmpBody),
-        });
-
-        const json = await res.json();
-
-        console.log("json", json);
-    }
-
     return (
-        <View>
-            <Text>adfadfdas</Text>
-            <form.Field
-                name="age"
-                validators={{
-                    onChange: (val) =>
-                        val < 13
-                            ? 'You must be 13 to make an account'
-                            : undefined,
-                }}
-            >
-                {(field) => (
-                    <>
-                        <Text>Age:</Text>
-                        <TextInput
-                            value={field.state.value}
-                            onChangeText={field.handleChange}
-                        />
-                        {!field.state.meta.isValid && (
-                            <Text>{field.state.meta.errors.join(', ')}</Text>
-                        )}
-                    </>
-                )}
-            </form.Field>
-            <Text>adfadfdas</Text>
-            <Button onPress={submitFunc} >submit</Button>
-        </View>
-    );
-};
+        <>
+            <GoBackHeader />
+            <ScrollView contentContainerStyle={{ padding: 16 }}>
+                <Text variant="titleLarge">예약 정보 입력</Text>
 
-export default ReservationPage;
+                {Object.entries({
+                    reserved_date: '예약 날짜 (YYYY-MM-DD)',
+                    reserved_time: '예약 시간 (HH:mm)',
+                    patient_name: '환자 이름',
+                    patient_birth: '생년월일 (YYYYMMDD)',
+                    patient_gender: '성별 (남/여)',
+                    patient_phone: '연락처',
+                    disease_type: '질병 유형 (치매/재활/파킨슨 등)',
+                    notes: '비고',
+                }).map(([key, label]) => (
+                    <form.Field
+                        key={key}
+                        name={key}
+                        validators={{
+                            onChange: (v) =>
+                                !v
+                                    ? `${label}은(는) 필수 항목입니다.`
+                                    : undefined,
+                        }}
+                    >
+                        {(field) => (
+                            <View style={{ marginBottom: 12 }}>
+                                <TextInput
+                                    label={label}
+                                    value={field.state.value}
+                                    onChangeText={field.handleChange}
+                                    mode="outlined"
+                                />
+                                <HelperText
+                                    type="error"
+                                    visible={!!field.state.meta.error}
+                                >
+                                    {field.state.meta.error}
+                                </HelperText>
+                            </View>
+                        )}
+                    </form.Field>
+                ))}
+
+                <Button
+                    mode="contained"
+                    onPress={() => form.handleSubmit()}
+                    style={{ marginTop: 20 }}
+                >
+                    예약하기
+                </Button>
+            </ScrollView>
+        </>
+    );
+}

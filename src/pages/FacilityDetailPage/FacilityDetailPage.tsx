@@ -412,7 +412,7 @@ const FacilityDetailPage = ({ route }) => {
                 )}
             </ScrollView>
             {/* footer */}
-            <Footer facilityData />
+            <Footer facilityData={facilityData} />
         </>
     );
 };
@@ -454,7 +454,7 @@ function Footer({ facilityData }) {
                     icon={'heart'}
                     onPress={() => {
                         navigation.navigate('ReservationPage', {
-                            id: facilityData.id,
+                            facilityId: facilityData.id,
                         });
                     }}
                     style={{}}
@@ -471,6 +471,17 @@ function Footer({ facilityData }) {
             >
                 <Button icon={'phone'} onPress={() => {}}>
                     상담전화걸기
+                </Button>
+            </View>
+            <View
+                style={{
+                    flex: 3,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Button icon={'phone'} onPress={() => {}}>
+                    후기작성
                 </Button>
             </View>
         </View>
