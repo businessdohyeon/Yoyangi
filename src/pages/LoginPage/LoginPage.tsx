@@ -32,14 +32,15 @@ const LoginPage = () => {
 
         const urlobj = new URL(url);
         const params = urlobj.searchParams;
+        const provider = params.get("provider");
         const token = params.get("token");
         const refreshToken = params.get("refreshToken");
         const userId = params.get("userId");
 
         console.log({urlobj, params, token, userId});
 
-        if (token !== null && refreshToken !== null && userId !== null) {
-            storeLoginInfo({token, refreshToken, userId});
+        if (provider != null && token !== null && refreshToken !== null && userId !== null) {
+            storeLoginInfo({provider, token, refreshToken, userId});
             navigation.goBack();
         }else{
 
