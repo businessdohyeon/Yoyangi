@@ -31,7 +31,7 @@ export function TotalContextPovider({ children }) {
         );
 
         console.group('getLocationInfo');
-        console.log({ locationInfo });
+        console.log({ locationInfo: JSON.parse(locationInfo) });
         console.groupEnd();
     };
 

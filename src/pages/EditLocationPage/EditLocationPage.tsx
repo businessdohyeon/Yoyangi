@@ -32,8 +32,8 @@ const EditLocationPage = () => {
 
             const newSearchResult = {
                 roadAddress: tmp.roadAddress,
-                latitude: tmp.x,
-                longitude: tmp.y,
+                latitude: tmp.y,
+                longitude: tmp.x,
             };
 
             console.log(json);
