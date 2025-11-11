@@ -4,8 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useCallback, useContext, useEffect } from 'react';
 
 import apis from '../../apis';
-import { LoginTokenContext } from '../../Context';
-import { showBorder } from '../../common';
+import { LoginInfoContext } from '../../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import naverLoginBtnImg from './btnG_완성형.png';
 import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
@@ -24,9 +23,9 @@ const LoginPage = () => {
     const navigation = useNavigation();
     const theme = useTheme();
     const { width, height } = useWindowDimensions();
-    const { loginToken, storeLoginInfo } = useContext(LoginTokenContext);
+    const { loginInfo, storeLoginInfo } = useContext(LoginInfoContext);
 
-    console.log('loginToken', loginToken);
+    console.log('loginInfo', loginInfo);
 
     const handleUrl = useCallback((event) => {
         const url = event.url || event;
@@ -53,6 +52,38 @@ const LoginPage = () => {
         } else {
         }
     }, []);
+
+    const refreashToken = async () => {
+        try {
+            const res = await fetch(
+                `${apis.urls.server}/user/sns/login/refresh-token`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+
+                    body: JSON.stringify({
+                        refreshToken: loginInfo.refreshToken,
+                    }),
+                },
+            );
+
+            if (!res.ok) {
+                console.log(res);
+                return;
+            }
+
+            const json = await res.json();
+
+            console.log(json);
+
+            storeLoginInfo({
+                ...loginInfo,
+                token: json.token,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     useEffect(() => {
         // 콜드 스타트 처리
@@ -110,7 +141,7 @@ const LoginPage = () => {
                         onPress={() => openAuth(id)}
                     >
                         <Image
-                            style={{ ...buttonSize,  }}
+                            style={{ ...buttonSize }}
                             resizeMode="contain"
                             source={src}
                         />
@@ -119,10 +150,13 @@ const LoginPage = () => {
                 {/* TODO
                 <Button mode="outlined" onPress={_handleMore}>
                     전화번호 login
+                </Button> */}
+                <Button mode="outlined" onPress={refreashToken}>
+                    refresh token
                 </Button>
                 <Button mode="outlined" onPress={() => AsyncStorage.clear()}>
                     async clear
-                </Button> */}
+                </Button>
             </View>
         </>
     );

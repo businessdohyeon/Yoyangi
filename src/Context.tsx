@@ -2,7 +2,7 @@ import { createContext, useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const LocationInfoContext = createContext(null);
-export const LoginTokenContext = createContext(null);
+export const LoginInfoContext = createContext(null);
 
 export function TotalContextPovider({ children }) {
     const [locationInfo, setLocationInfo] = useState(null);
@@ -52,14 +52,14 @@ export function TotalContextPovider({ children }) {
                 storeLocationInfo: storeLocationInfo,
             }}
         >
-            <LoginTokenContext.Provider
+            <LoginInfoContext.Provider
                 value={{
-                    loginToken: loginInfo,
+                    loginInfo: loginInfo,
                     storeLoginInfo: storeLoginInfo,
                 }}
             >
                 {children}
-            </LoginTokenContext.Provider>
+            </LoginInfoContext.Provider>
         </LocationInfoContext.Provider>
     );
 }

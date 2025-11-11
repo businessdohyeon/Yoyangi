@@ -1,13 +1,13 @@
 import { Appbar, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useContext } from 'react';
-import { LocationInfoContext, LoginTokenContext } from '../../Context';
+import { LocationInfoContext, LoginInfoContext } from '../../Context';
 
 export default function PlainHeader() {
     const navigation = useNavigation();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
-    const { loginToken } = useContext(LoginTokenContext);
+    const { loginInfo } = useContext(LoginInfoContext);
 
     return (
         <Appbar.Header

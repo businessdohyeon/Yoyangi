@@ -11,17 +11,16 @@ import {
 import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
-import { LoginTokenContext } from '../../Context';
+import { LoginInfoContext } from '../../Context';
 
 const _goBack = () => console.log('Went back');
 const _handleSearch = () => console.log('Searching');
 const _handleMore = () => console.log('Shown more');
 
-const CommunityDetailPage  = ({ route }) => {
-    
+const CommunityDetailPage = ({ route }) => {
     const navigation = useNavigation();
-    
-    console.log("route", route);
+
+    console.log('route', route);
 
     return (
         <>
@@ -38,12 +37,16 @@ const CommunityDetailPage  = ({ route }) => {
                 <Appbar.Action icon="bell" onPress={_handleMore} />
             </Appbar.Header>
             <ScrollView
-                contentContainerStyle={{ gap: 10, backgroundColor: '#eeeeee', padding: 10 }}
+                contentContainerStyle={{
+                    gap: 10,
+                    backgroundColor: '#eeeeee',
+                    padding: 10,
+                }}
             >
-               <Text>CommunityDetailPage </Text>
+                <Text>CommunityDetailPage </Text>
             </ScrollView>
         </>
     );
 };
 
-export default CommunityDetailPage ;
+export default CommunityDetailPage;

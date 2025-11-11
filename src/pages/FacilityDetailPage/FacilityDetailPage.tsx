@@ -17,7 +17,7 @@ import apis from '../../apis';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
-import { LoginTokenContext } from '../../Context';
+import { LoginInfoContext } from '../../Context';
 import z from 'zod';
 
 const tileData = [
@@ -114,7 +114,7 @@ const FacilityDetailPage = ({ route }) => {
     const navigation = useNavigation();
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
-    const { loginToken } = useContext(LoginTokenContext);
+    const { loginInfo } = useContext(LoginInfoContext);
 
     const [facilityData, setFacilityData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
@@ -126,7 +126,7 @@ const FacilityDetailPage = ({ route }) => {
     const { id } = route.params;
 
     console.group('[rerender]: FacilityDetailPage');
-    console.log({ loginToken });
+    console.log({ loginInfo });
     console.log({ route });
     console.log({ reviews });
     console.groupEnd();

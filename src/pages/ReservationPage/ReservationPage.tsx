@@ -11,7 +11,7 @@ import {
 import { useForm } from '@tanstack/react-form';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import apis from '../../apis';
-import { LoginTokenContext } from '../../Context';
+import { LoginInfoContext } from '../../Context';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
 
@@ -19,7 +19,7 @@ export default function ReservationPage({ route }) {
     const navigation = useNavigation();
 
     const { facilityId, facilityName } = route.params;
-    const { loginToken } = useContext(LoginTokenContext);
+    const { loginInfo } = useContext(LoginInfoContext);
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
@@ -53,7 +53,7 @@ export default function ReservationPage({ route }) {
                     {
                         method: 'POST',
                         headers: {
-                            Authorization: `Bearer ${loginToken.token}`,
+                            Authorization: `Bearer ${loginInfo.token}`,
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify(values.value),
@@ -77,7 +77,7 @@ export default function ReservationPage({ route }) {
 
     return (
         <>
-            <GoBackHeader title={`${facilityName} 예약`}/>
+            <GoBackHeader title={`${facilityName} 예약`} />
             <ScrollView contentContainerStyle={{ padding: 16 }}>
                 <Text variant="titleLarge">예약 정보 입력</Text>
 
