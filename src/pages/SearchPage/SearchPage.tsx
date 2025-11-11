@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
     ActivityIndicator,
@@ -14,6 +14,8 @@ import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
 import SearchHeader from './SearchHeader';
+
+import { LocationInfoContext } from '../../Context';
 import {
     NaverMapMarkerOverlay,
     NaverMapView,
@@ -76,16 +78,16 @@ const LIMIT = 10;
 export default function SearchPage() {
     const navigation = useNavigation();
     const theme = useTheme();
+    const { locationInfo } = useContext(LocationInfoContext);
 
     const [isLoading, setIsLoading] = useState(true);
     const [facilityArray, setFacilityArray] = useState([]);
     const [isMapShown, setIsMapShown] = useState(false);
+
     // query params
     const [page, setPage] = useState(1);
     const [kind, setKind] = useState('요양병원');
     const [searchQuery, setSearchQuery] = useState('');
-    const [latitude, setLatitude] = useState(null);
-    const [longitude, setLongitude] = useState(null);
 
     console.group('SearchPage rerendered');
     console.log({ facilityArray });
@@ -95,21 +97,35 @@ export default function SearchPage() {
         setIsLoading(true);
 
         try {
-            // const res = await fetch(`${apis.urls.facilities}?limit=${LIMIT}&page=${targetPage}&kind=${kind}`);
-            // const json = await res.json();
+            const url =
+                `${apis.urls.facilities}` +
+                `?limit=${LIMIT}` +
+                `&page=${targetPage}` +
+                `&latitude=${locationInfo.latitude}` +
+                `&longitude=${locationInfo.longitude}` +
+                `&kind=${kind}`;
 
-            const json = apis.mock.getFacilities();
+            const res = await fetch(url);
+            const json = await res.json();
+
+            // const json = apis.mock.getFacilities();
+
+            console.log(url);
+            console.log(json);
 
             const { Response } = json;
 
-            setFacilityArray((cur) =>
-                resetFlag ? Response : [...cur, ...Response],
-            );
-            setPage(targetPage + 1);
+            if (Response !== null && Response !== undefined) {
+                setFacilityArray((cur) =>
+                    resetFlag ? Response : [...cur, ...Response],
+                );
+                setPage(targetPage + 1);
+
+                setIsLoading(false);
+            }
         } catch (error) {
             console.error(error);
         } finally {
-            setIsLoading(false);
         }
     };
 
@@ -123,7 +139,7 @@ export default function SearchPage() {
         fetchFacilites(1, true);
 
         console.groupEnd();
-    }, [kind]);
+    }, [kind, locationInfo]);
 
     return (
         <>
@@ -142,10 +158,10 @@ export default function SearchPage() {
                 <NaverMapView
                     style={{ flex: 1 }}
                     initialRegion={{
-                        latitude: 37.5665,
-                        longitude: 126.978,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
+                        latitude: Number.parseFloat(locationInfo.latitude),
+                        longitude: Number.parseFloat(locationInfo.longitude),
+                        latitudeDelta: 0.00,
+                        longitudeDelta: 0.00,
                     }}
                 >
                     {facilityArray.map((facilityData) => {
@@ -161,9 +177,9 @@ export default function SearchPage() {
                                 anchor={{ x: 0.5, y: 1 }}
                                 caption={{ text: facilityData.name }}
                                 onTap={() => {
-                                    navigation.navigate("FacilityDetailPage", {
-                                        id: facilityData.id
-                                    })
+                                    navigation.navigate('FacilityDetailPage', {
+                                        id: facilityData.id,
+                                    });
                                 }}
                             />
                         );
