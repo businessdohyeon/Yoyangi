@@ -155,7 +155,7 @@ export default function SearchPage() {
                     // padding: 20,
                 }}
             >
-                <NaverMapView
+                {/* <NaverMapView
                     style={{ flex: 1 }}
                     initialRegion={{
                         latitude: Number.parseFloat(locationInfo.latitude),
@@ -184,7 +184,7 @@ export default function SearchPage() {
                             />
                         );
                     })}
-                </NaverMapView>
+                </NaverMapView> */}
             </View>
             <ScrollView
                 style={{ display: isMapShown ? 'none' : 'flex' }}
