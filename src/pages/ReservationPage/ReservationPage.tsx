@@ -1,19 +1,39 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { TextInput, Button, HelperText, Text } from 'react-native-paper';
+import {
+    TextInput,
+    Button,
+    HelperText,
+    Text,
+    RadioButton,
+    Menu,
+} from 'react-native-paper';
 import { useForm } from '@tanstack/react-form';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import apis from '../../apis';
 import { LoginTokenContext } from '../../Context';
-import PlainHeader from '../MainPage/PlainHeader';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ReservationPage({ route }) {
-    const { facilityId } = route.params;
+    const navigation = useNavigation();
+
+    const { facilityId, facilityName } = route.params;
     const { loginToken } = useContext(LoginTokenContext);
 
-    console.group('ReservationPage rerandereed');
-    console.log({ route, facilityId, loginToken });
-    console.groupEnd();
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    const [diseaseMenuVisible, setDiseaseMenuVisible] = useState(false);
+
+    const diseaseOptions = [
+        '치매',
+        '재활',
+        '파킨슨',
+        '뇌혈관성질환',
+        '중풍',
+        '암',
+        '기타',
+    ];
 
     const form = useForm({
         defaultValues: {
@@ -21,12 +41,12 @@ export default function ReservationPage({ route }) {
             reserved_time: '',
             patient_name: '',
             patient_birth: '',
-            patient_gender: '',
+            patient_gender: 'M',
             patient_phone: '',
             disease_type: '',
             notes: '',
         },
-        onSubmit: async ({ value }) => {
+        onSubmit: async (values) => {
             try {
                 const res = await fetch(
                     `${apis.urls.server}/facilities/${facilityId}/reservation`,
@@ -36,68 +56,273 @@ export default function ReservationPage({ route }) {
                             Authorization: `Bearer ${loginToken.token}`,
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(value),
+                        body: JSON.stringify(values.value),
                     },
                 );
-
                 const data = await res.json();
-
                 if (!res.ok) {
                     console.error('예약 실패:', data);
                     return;
                 }
-
                 console.log('예약 성공:', data);
+                navigation.goBack();
             } catch (err) {
-                console.error('예약 실패:', err.response?.data || err.message);
+                console.error('예약 실패:', err.message);
             }
         },
     });
 
+    const formatPhone = (text) =>
+        text.replace(/\D/g, '').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+
     return (
         <>
-            <GoBackHeader />
+            <GoBackHeader title={`${facilityName} 예약`}/>
             <ScrollView contentContainerStyle={{ padding: 16 }}>
                 <Text variant="titleLarge">예약 정보 입력</Text>
 
-                {Object.entries({
-                    reserved_date: '예약 날짜 (YYYY-MM-DD)',
-                    reserved_time: '예약 시간 (HH:mm)',
-                    patient_name: '환자 이름',
-                    patient_birth: '생년월일 (YYYYMMDD)',
-                    patient_gender: '성별 (남/여)',
-                    patient_phone: '연락처',
-                    disease_type: '질병 유형 (치매/재활/파킨슨 등)',
-                    notes: '비고',
-                }).map(([key, label]) => (
-                    <form.Field
-                        key={key}
-                        name={key}
-                        validators={{
-                            onChange: (v) =>
-                                !v
-                                    ? `${label}은(는) 필수 항목입니다.`
-                                    : undefined,
-                        }}
-                    >
-                        {(field) => (
-                            <View style={{ marginBottom: 12 }}>
-                                <TextInput
-                                    label={label}
-                                    value={field.state.value}
-                                    onChangeText={field.handleChange}
-                                    mode="outlined"
-                                />
-                                <HelperText
-                                    type="error"
-                                    visible={!!field.state.meta.error}
-                                >
-                                    {field.state.meta.error}
-                                </HelperText>
+                {/* 날짜 선택 */}
+                <form.Field
+                    name="reserved_date"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? '필수 입력' : undefined,
+                    }}
+                >
+                    {(field) => (
+                        <>
+                            <Button
+                                mode="outlined"
+                                onPress={() => setShowDatePicker(true)}
+                                style={{ marginTop: 8 }}
+                            >
+                                {field.state.value || '예약 날짜 선택'}
+                            </Button>
+                            <DateTimePickerModal
+                                isVisible={showDatePicker}
+                                mode="date"
+                                onConfirm={(date) => {
+                                    field.handleChange(
+                                        date.toISOString().split('T')[0],
+                                    );
+                                    setShowDatePicker(false);
+                                }}
+                                onCancel={() => setShowDatePicker(false)}
+                            />
+                            <HelperText
+                                type="error"
+                                visible={!!field.state.error}
+                            >
+                                {field.state.error}
+                            </HelperText>
+                        </>
+                    )}
+                </form.Field>
+
+                {/* 시간 선택 */}
+                <form.Field
+                    name="reserved_time"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? '필수 입력' : undefined,
+                    }}
+                >
+                    {(field) => (
+                        <>
+                            <Button
+                                mode="outlined"
+                                onPress={() => setShowTimePicker(true)}
+                                style={{ marginTop: 8 }}
+                            >
+                                {field.state.value || '예약 시간 선택'}
+                            </Button>
+                            <DateTimePickerModal
+                                isVisible={showTimePicker}
+                                mode="time"
+                                onConfirm={(time) => {
+                                    field.handleChange(
+                                        time.toTimeString().slice(0, 5),
+                                    );
+                                    setShowTimePicker(false);
+                                }}
+                                onCancel={() => setShowTimePicker(false)}
+                            />
+                            <HelperText
+                                type="error"
+                                visible={!!field.state.error}
+                            >
+                                {field.state.error}
+                            </HelperText>
+                        </>
+                    )}
+                </form.Field>
+
+                {/* 환자 이름 */}
+                <form.Field
+                    name="patient_name"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? '필수 입력' : undefined,
+                    }}
+                >
+                    {(field) => (
+                        <>
+                            <TextInput
+                                label="환자 이름"
+                                value={field.state.value}
+                                onChangeText={field.handleChange}
+                                onBlur={field.handleBlur}
+                                mode="outlined"
+                                style={{ marginTop: 8 }}
+                            />
+                            <HelperText
+                                type="error"
+                                visible={!!field.state.error}
+                            >
+                                {field.state.error}
+                            </HelperText>
+                        </>
+                    )}
+                </form.Field>
+
+                {/* 생년월일 */}
+                <form.Field
+                    name="patient_birth"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? '필수 입력' : undefined,
+                    }}
+                >
+                    {(field) => (
+                        <>
+                            <TextInput
+                                label="생년월일 (YYYYMMDD)"
+                                value={field.state.value}
+                                onChangeText={(text) =>
+                                    field.handleChange(text.replace(/\D/g, ''))
+                                }
+                                onBlur={field.handleBlur}
+                                mode="outlined"
+                                style={{ marginTop: 8 }}
+                            />
+                            <HelperText
+                                type="error"
+                                visible={!!field.state.error}
+                            >
+                                {field.state.error}
+                            </HelperText>
+                        </>
+                    )}
+                </form.Field>
+
+                {/* 성별 */}
+                <form.Field name="patient_gender">
+                    {(field) => (
+                        <RadioButton.Group
+                            onValueChange={field.handleChange}
+                            value={field.state.value}
+                        >
+                            <View
+                                style={{ flexDirection: 'row', marginTop: 8 }}
+                            >
+                                <RadioButton.Item label="남" value="M" />
+                                <RadioButton.Item label="여" value="F" />
                             </View>
-                        )}
-                    </form.Field>
-                ))}
+                        </RadioButton.Group>
+                    )}
+                </form.Field>
+
+                {/* 전화번호 */}
+                <form.Field
+                    name="patient_phone"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? '필수 입력' : undefined,
+                    }}
+                >
+                    {(field) => (
+                        <>
+                            <TextInput
+                                label="연락처"
+                                value={field.state.value}
+                                onChangeText={(text) =>
+                                    field.handleChange(formatPhone(text))
+                                }
+                                onBlur={field.handleBlur}
+                                keyboardType="phone-pad"
+                                mode="outlined"
+                                style={{ marginTop: 8 }}
+                            />
+                            <HelperText
+                                type="error"
+                                visible={!!field.state.error}
+                            >
+                                {field.state.error}
+                            </HelperText>
+                        </>
+                    )}
+                </form.Field>
+
+                {/* 질병 유형 */}
+                <form.Field
+                    name="disease_type"
+                    validators={{
+                        onChange: ({ value }) =>
+                            !value ? '필수 입력' : undefined,
+                    }}
+                >
+                    {(field) => (
+                        <>
+                            <Menu
+                                visible={diseaseMenuVisible}
+                                onDismiss={() => setDiseaseMenuVisible(false)}
+                                anchor={
+                                    <Button
+                                        mode="outlined"
+                                        onPress={() =>
+                                            setDiseaseMenuVisible(true)
+                                        }
+                                        style={{ marginTop: 8 }}
+                                    >
+                                        {field.state.value || '질병 유형 선택'}
+                                    </Button>
+                                }
+                            >
+                                {diseaseOptions.map((d) => (
+                                    <Menu.Item
+                                        key={d}
+                                        title={d}
+                                        onPress={() => {
+                                            field.handleChange(d);
+                                            setDiseaseMenuVisible(false);
+                                        }}
+                                    />
+                                ))}
+                            </Menu>
+                            <HelperText
+                                type="error"
+                                visible={!!field.state.error}
+                            >
+                                {field.state.error}
+                            </HelperText>
+                        </>
+                    )}
+                </form.Field>
+
+                {/* 비고 */}
+                <form.Field name="notes">
+                    {(field) => (
+                        <>
+                            <TextInput
+                                label="비고"
+                                value={field.state.value}
+                                onChangeText={field.handleChange}
+                                mode="outlined"
+                                style={{ marginTop: 8 }}
+                            />
+                        </>
+                    )}
+                </form.Field>
 
                 <Button
                     mode="contained"

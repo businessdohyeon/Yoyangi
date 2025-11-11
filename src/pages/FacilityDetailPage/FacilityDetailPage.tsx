@@ -455,6 +455,7 @@ function Footer({ facilityData }) {
                     onPress={() => {
                         navigation.navigate('ReservationPage', {
                             facilityId: facilityData.id,
+                            facilityName: facilityData.name,
                         });
                     }}
                     style={{}}
@@ -1231,7 +1232,7 @@ function FacilityReview({ facilityData }) {
                 }}
             >
                 <View style={{ marginVertical: 10 }}>
-                    <Text variant="titleMedium" >리뷰(120)</Text>
+                    <Text variant="titleMedium">리뷰(120)</Text>
                 </View>
                 <View
                     style={{
