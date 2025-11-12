@@ -27,7 +27,7 @@ export const FacilityStatusSchema = z.object({
     updated_at: z.string().nullable(),
 });
 
-export const FacilitySchema = z.object({
+export const FacilityDataSchema = z.object({
     id: z.number(),
     kind: z.string(),
     name: z.string(),
@@ -49,9 +49,8 @@ export const FacilitySchema = z.object({
     review_count: z.number(),
     created_at: z.string().nullable(),
     updated_at: z.string().nullable(),
-    distance: z.number(),
     facility_status: FacilityStatusSchema,
     advertisements: z.array(z.unknown()),
 });
 
-export type FacilityData = z.infer<typeof FacilitySchema>;
+export type FacilityData_t = z.infer<typeof FacilityDataSchema>;

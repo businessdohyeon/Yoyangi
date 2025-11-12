@@ -20,7 +20,7 @@ import {
     NaverMapMarkerOverlay,
     NaverMapView,
 } from '@mj-studio/react-native-naver-map';
-import { FacilityData } from './scheme';
+import { FacilityData_t } from './scheme';
 
 const LIMIT = 10;
 
@@ -32,7 +32,7 @@ export default function SearchPage() {
     const { locationInfo } = useContext(LocationInfoContext);
 
     const [isLoading, setIsLoading] = useState(true);
-    const [facilityArray, setFacilityArray] = useState<FacilityData[]>([]);
+    const [facilityArray, setFacilityArray] = useState<FacilityData_t[]>([]);
     const [isMapShown, setIsMapShown] = useState(false);
 
     // query params
@@ -182,7 +182,7 @@ export default function SearchPage() {
     );
 }
 
-function SearchResult({ facilityData }: { facilityData: FacilityData }) {
+function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const navigation = useNavigation();
     const theme = useTheme();
 
@@ -327,7 +327,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData }) {
     );
 }
 
-function MoreButton({ onPress } : any) {
+function MoreButton({ onPress }: any) {
     return (
         <View
             style={{

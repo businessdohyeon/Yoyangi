@@ -1,9 +1,6 @@
 module.exports = {
     root: true,
-    extends: [
-        '@react-native', 
-        'plugin:react-hooks/recommended',
-    ],
+    extends: ['@react-native', 'plugin:react-hooks/recommended'],
     plugins: ['unused-imports'],
     rules: {
         'unused-imports/no-unused-imports': 'error',
@@ -11,5 +8,6 @@ module.exports = {
             'warn',
             { vars: 'all', varsIgnorePattern: '^_', argsIgnorePattern: '^_' },
         ],
+        'react-native/no-inline-styles': 'off',
     },
 };
