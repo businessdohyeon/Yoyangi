@@ -10,15 +10,6 @@ import naverLoginBtnImg from './btnG_완성형.png';
 import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
 import googleLoginBtnImg from './web_light_sq_SI.png';
 
-const _goBack = () => console.log('Went back');
-const _handleSearch = () => console.log('Searching');
-const _handleMore = () => console.log('Shown more');
-
-const parseTokenFromUrl = (url) => {
-    const m = url.match(/[?&]token=([^&]+)/);
-    return m ? decodeURIComponent(m[1]) : null;
-};
-
 const LoginPage = () => {
     const navigation = useNavigation();
     const theme = useTheme();

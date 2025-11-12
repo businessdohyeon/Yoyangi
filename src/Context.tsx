@@ -1,63 +1,122 @@
 import { createContext, useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { z } from 'zod';
 
-export const LocationInfoContext = createContext(null);
-export const LoginInfoContext = createContext(null);
+const LocationInfoSchema = z.object({
+    latitude: z.preprocess((val) => Number(val), z.number()).default(0.0),
+    longitude: z.preprocess((val) => Number(val), z.number()).default(0.0),
+    roadAddress: z.string().default(''),
+});
 
-export function TotalContextPovider({ children }) {
-    const [locationInfo, setLocationInfo] = useState(null);
-    const [loginInfo, setLoginInfo] = useState(null);
+const LoginInfoSchema = z.object({
+    userId: z.preprocess((val) => Number(val), z.number()).default(0),
+    token: z.string().default(''),
+    refreshToken: z.string().default(''),
+    provider: z.enum(['naver', 'kakao', 'google']).default('naver'),
+});
 
-    const loadLonginInfo = async () => {
-        const loginInfo = await AsyncStorage.getItem('loginInfo');
+export type LocationInfo = z.infer<typeof LocationInfoSchema>;
+export type LoginInfo = z.infer<typeof LoginInfoSchema>;
 
-        setLoginInfo(loginInfo === null ? null : JSON.parse(loginInfo));
+export const LocationInfoContext = createContext<{
+    locationInfo: LocationInfo;
+    storeLocationInfo: (value: LocationInfo) => Promise<void>;
+}>({
+    locationInfo: LocationInfoSchema.parse({}),
+    storeLocationInfo: async (value) => {
+        console.log(value);
+    },
+});
 
-        console.group('getLonginInfo');
-        console.log({ loginInfo });
-        console.groupEnd();
+export const LoginInfoContext = createContext<{
+    loginInfo: LoginInfo;
+    storeLoginInfo: (value: LoginInfo) => void;
+}>({
+    loginInfo: LoginInfoSchema.parse({}),
+    storeLoginInfo: async (value) => {
+        console.log(value);
+    },
+});
+
+export function TotalContextProvider({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const [locationInfo, setLocationInfo] = useState<LocationInfo>(
+        LocationInfoSchema.parse({}),
+    );
+    const [loginInfo, setLoginInfo] = useState<LoginInfo>(
+        LoginInfoSchema.parse({}),
+    );
+
+    const loadLoginInfo = async () => {
+        const data = await AsyncStorage.getItem('loginInfo');
+        if (data) {
+            try {
+                const parsed = LoginInfoSchema.parse(JSON.parse(data));
+                setLoginInfo(parsed);
+
+                console.group('getLoginInfo');
+                console.log(parsed);
+                console.groupEnd();
+            } catch (e) {
+                console.error('Invalid loginInfo schema', e);
+                setLoginInfo(LoginInfoSchema.parse({}));
+            }
+        }
     };
 
-    const storeLoginInfo = useCallback((value) => {
+    const storeLoginInfo = useCallback((value: LoginInfo) => {
         setLoginInfo(value);
         AsyncStorage.setItem('loginInfo', JSON.stringify(value));
     }, []);
 
     const loadLocationInfo = async () => {
-        const locationInfo = await AsyncStorage.getItem('locationInfo');
-
-        setLocationInfo(
-            locationInfo === null ? null : JSON.parse(locationInfo),
-        );
-
-        console.group('getLocationInfo');
-        console.log({ locationInfo });
-        console.groupEnd();
+        const data = await AsyncStorage.getItem('locationInfo');
+        if (data) {
+            try {
+                const parsed = LocationInfoSchema.parse(JSON.parse(data));
+                setLocationInfo(parsed);
+                console.group('getLocationInfo');
+                console.log(parsed);
+                console.groupEnd();
+            } catch (e) {
+                console.error('Invalid locationInfo schema', e);
+                setLocationInfo(LocationInfoSchema.parse({}));
+            }
+        }
     };
 
-    const storeLocationInfo = async (value) => {
-        setLocationInfo(value);
-        await AsyncStorage.setItem('locationInfo', JSON.stringify(value));
+    const storeLocationInfo = async (value: LocationInfo) => {
+        try {
+            const parsed = LocationInfoSchema.parse(value);
+            setLocationInfo(parsed);
+
+            console.group('storeLocationInfo');
+            console.log(parsed);
+            console.groupEnd();
+
+            setLocationInfo(value);
+            await AsyncStorage.setItem('locationInfo', JSON.stringify(value));
+        } catch (e) {
+            console.error('Invalid locationInfo schema', e);
+            setLocationInfo(LocationInfoSchema.parse({}));
+        }
     };
 
     useEffect(() => {
-        loadLonginInfo();
-        loadLocationInfo();
+        (async () => {
+            await loadLoginInfo();
+            await loadLocationInfo();
+        })();
     }, []);
 
     return (
         <LocationInfoContext.Provider
-            value={{
-                locationInfo: locationInfo,
-                storeLocationInfo: storeLocationInfo,
-            }}
+            value={{ locationInfo, storeLocationInfo }}
         >
-            <LoginInfoContext.Provider
-                value={{
-                    loginInfo: loginInfo,
-                    storeLoginInfo: storeLoginInfo,
-                }}
-            >
+            <LoginInfoContext.Provider value={{ loginInfo, storeLoginInfo }}>
                 {children}
             </LoginInfoContext.Provider>
         </LocationInfoContext.Provider>

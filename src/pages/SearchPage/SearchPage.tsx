@@ -20,56 +20,7 @@ import {
     NaverMapMarkerOverlay,
     NaverMapView,
 } from '@mj-studio/react-native-naver-map';
-
-// TODO: make schema using zod
-// const facilityDataStructure = z.object({
-//     "id": z.number(),
-//     "kind": z.string(),
-//     "name": z.string(),
-//     "address": z.string(),
-//     "url": z.url(),
-//     "telno": "055-320-2080",
-//     "description": z.string(),
-//     "approval_status": null,
-//     "sido_name": "경남",
-//     "sggu_name": "김해시",
-//     "dong_name": "삼정동",
-//     "postno": "50934",
-//     "established_date": 20100727,
-//     "longitude": "128.8980324",
-//     "latitude": "35.2281381",
-//     "care_code": "JDQ4MTYyMiM4MSMkMSMkNCMkOTkkNTgxMzUxIzIxIyQxIyQ1IyQ4OSQzNjE4MzIjNjEjJDEjJDAjJDgz",
-//     "facility_number": null,
-//     "created_at": "2025-09-16T04:13:40.581Z",
-//     "updated_at": "2025-09-16T04:13:40.581Z",
-//     "facility_status": {
-//         "id": 1337,
-//         "total_patients_count": 0,
-//         "man_patients_count": 0,
-//         "woman_patients_count": 0,
-//         "user_capacity": 0,
-//         "doctor_count": 5,
-//         "manager_count": 0,
-//         "hb_doctor_count": 0,
-//         "dent_doctor_count": 0,
-//         "medc_doctor_count": 0,
-//         "hb_resdnt_count": 0,
-//         "hb_sp_count": 0,
-//         "hb_gn_count": 2,
-//         "hb_intn_count": 0,
-//         "dent_gn_count": 0,
-//         "dent_resdnt_count": 0,
-//         "dent_sp_count": 0,
-//         "medc_resdnt_count": 0,
-//         "medc_gn_count": 0,
-//         "medc_intn_count": 0,
-//         "medc_sp_count": 3,
-//         "facility_id": 3902,
-//         "created_at": null,
-//         "updated_at": null
-//     },
-//     "advertisement": null
-// })
+import { FacilityData } from './scheme';
 
 const LIMIT = 10;
 
@@ -81,13 +32,13 @@ export default function SearchPage() {
     const { locationInfo } = useContext(LocationInfoContext);
 
     const [isLoading, setIsLoading] = useState(true);
-    const [facilityArray, setFacilityArray] = useState([]);
+    const [facilityArray, setFacilityArray] = useState<FacilityData[]>([]);
     const [isMapShown, setIsMapShown] = useState(false);
 
     // query params
     const [page, setPage] = useState(1);
     const [kind, setKind] = useState('요양병원');
-    const [searchQuery, setSearchQuery] = useState('');
+    // const [searchQuery, setSearchQuery] = useState('');
 
     console.group('SearchPage rerendered');
     console.log({ facilityArray });
@@ -101,8 +52,8 @@ export default function SearchPage() {
                 `${apis.urls.facilities}` +
                 `?limit=${LIMIT}` +
                 `&page=${targetPage}` +
-                `&latitude=${locationInfo.latitude}` +
-                `&longitude=${locationInfo.longitude}` +
+                `&latitude=${locationInfo?.latitude}` +
+                `&longitude=${locationInfo?.longitude}` +
                 `&kind=${kind}`;
 
             const res = await fetch(url);
@@ -155,25 +106,24 @@ export default function SearchPage() {
                     // padding: 20,
                 }}
             >
-                {/* <NaverMapView
+                <NaverMapView
                     style={{ flex: 1 }}
-                    initialRegion={{
-                        latitude: Number.parseFloat(locationInfo.latitude),
-                        longitude: Number.parseFloat(locationInfo.longitude),
-                        latitudeDelta: 0.00,
-                        longitudeDelta: 0.00,
+                    // initialRegion={{
+                    //     latitudeDelta: 0.00,
+                    //     longitudeDelta: 0.00,
+                    // }}
+                    initialCamera={{
+                        latitude: locationInfo.latitude,
+                        longitude: locationInfo.longitude,
+                        zoom: 14,
                     }}
                 >
                     {facilityArray.map((facilityData) => {
                         return (
                             <NaverMapMarkerOverlay
                                 key={facilityData.id}
-                                latitude={Number.parseFloat(
-                                    facilityData.latitude,
-                                )}
-                                longitude={Number.parseFloat(
-                                    facilityData.longitude,
-                                )}
+                                latitude={facilityData.latitude}
+                                longitude={facilityData.longitude}
                                 anchor={{ x: 0.5, y: 1 }}
                                 caption={{ text: facilityData.name }}
                                 onTap={() => {
@@ -184,7 +134,7 @@ export default function SearchPage() {
                             />
                         );
                     })}
-                </NaverMapView> */}
+                </NaverMapView>
             </View>
             <ScrollView
                 style={{ display: isMapShown ? 'none' : 'flex' }}
@@ -232,7 +182,7 @@ export default function SearchPage() {
     );
 }
 
-function SearchResult({ facilityData }) {
+function SearchResult({ facilityData }: { facilityData: FacilityData }) {
     const navigation = useNavigation();
     const theme = useTheme();
 
@@ -377,7 +327,7 @@ function SearchResult({ facilityData }) {
     );
 }
 
-function MoreButton({ onPress }) {
+function MoreButton({ onPress } : any) {
     return (
         <View
             style={{
