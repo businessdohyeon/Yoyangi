@@ -20,7 +20,7 @@ import {
     NaverMapMarkerOverlay,
     NaverMapView,
 } from '@mj-studio/react-native-naver-map';
-import { FacilityData_t } from './scheme';
+import { FacilityData_t } from '../../types/FacilityDataScheme';
 
 const LIMIT = 10;
 

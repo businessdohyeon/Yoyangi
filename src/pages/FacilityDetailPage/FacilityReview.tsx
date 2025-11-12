@@ -4,11 +4,13 @@ import { Button, Text, useTheme } from 'react-native-paper';
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
 import ReviewCard from './ReviewCard';
-import { FacilityData_t } from '../SearchPage/scheme';
+import { FacilityData_t } from '../../types/FacilityDataScheme';
 import apis from '../../apis';
 import { useEffect, useState } from 'react';
-import { ReviewData_t, ReviewDataArraySchema } from './scheme';
-import { da } from 'zod/v4/locales';
+import {
+    ReviewData_t,
+    ReviewDataArraySchema,
+} from '../../types/ReviewDataScheme';
 
 export function FacilityReview({
     facilityData,
@@ -30,7 +32,7 @@ export function FacilityReview({
             const json = await res.json();
             const { data } = json;
 
-            console.log(json)
+            console.log(json);
 
             const tmp = ReviewDataArraySchema.parse(data);
             console.log(...tmp);
@@ -369,7 +371,7 @@ export function FacilityReview({
                     backgroundColor: theme.colors.background,
                     paddingHorizontal: 10,
                     paddingVertical: 20,
-                    gap: 10, 
+                    gap: 10,
                 }}
             >
                 {reviewDataArray.map((reviewData) => {

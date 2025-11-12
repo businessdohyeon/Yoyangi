@@ -16,7 +16,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
 import { LoginInfoContext } from '../../Context';
-import { FacilityData_t, FacilityDataSchema } from '../SearchPage/scheme';
+import {
+    FacilityData_t,
+    FacilityDataSchema,
+} from '../../types/FacilityDataScheme';
 import { FacilityNotice } from './FacilityNotice';
 import { FacilityReview } from './FacilityReview';
 import { tileData } from './data';
@@ -45,7 +48,6 @@ export default function FacilityDetailPage({ route }) {
             const { Response } = json;
             const tmp = FacilityDataSchema.parse(Response);
 
-            
             console.group('fetchFacilityData');
             console.log(tmp);
             console.groupEnd();
@@ -56,7 +58,6 @@ export default function FacilityDetailPage({ route }) {
             console.error(error);
         } finally {
         }
-
     };
 
     useEffect(() => {

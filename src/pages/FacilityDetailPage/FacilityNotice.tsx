@@ -3,7 +3,7 @@ import { Button, Text, useTheme } from 'react-native-paper';
 
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
-import { FacilityData_t } from '../SearchPage/scheme';
+import { FacilityData_t } from '../../types/FacilityDataScheme';
 
 export function FacilityNotice({
     facilityData,
