@@ -36,9 +36,17 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
         console.log('onSubmit', json);
     };
 
-    console.group("SearchHeader rerendered");
-    console.log({kind});
-    console.log(kind === "요양병원");
+    const toggleKind = (value: string) => {
+        setKind((cur) =>
+            cur.includes(value)
+                ? cur.filter((v) => v !== value)
+                : [...cur, value],
+        );
+    };
+
+    console.group('SearchHeader rerendered');
+    console.log({ kind });
+    console.log(kind === '요양병원');
     console.groupEnd();
 
     return (
@@ -115,27 +123,22 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
                     }}
                 >
                     <Chip
-                        onPress={() => {
-                            setKind("요양병원")
-                        }}
-                        selected={kind === "요양병원"}
+                        onPress={() => toggleKind('요양병원')}
+                        selected={kind.includes('요양병원')}
                     >
                         요양병원
                     </Chip>
 
                     <Chip
-                        onPress={() => {
-                            setKind("요양원")
-                        }}
-                        selected={kind === "요양원"}
+                        onPress={() => toggleKind('요양원')}
+                        selected={kind.includes('요양원')}
                     >
                         요양원
                     </Chip>
+
                     <Chip
-                        onPress={() => {
-                            setKind("주간데이케어센터")
-                        }}
-                        selected={kind === "주간보호케어센터"}
+                        onPress={() => toggleKind('주간보호케어센터')}
+                        selected={kind.includes('주간보호케어센터')}
                     >
                         주간보호케어센터
                     </Chip>

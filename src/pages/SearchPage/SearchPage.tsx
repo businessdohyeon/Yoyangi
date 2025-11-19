@@ -37,12 +37,13 @@ export default function SearchPage() {
 
     // query params
     const [page, setPage] = useState(1);
-    const [kind, setKind] = useState('요양병원');
-    // const [searchQuery, setSearchQuery] = useState('');
 
     console.group('SearchPage rerendered');
     console.log({ facilityArray });
     console.groupEnd();
+
+    // kind를 문자열이 아니라 배열로 변경
+    const [kind, setKind] = useState<string[]>(['요양병원']);
 
     const fetchFacilites = async (targetPage: number, resetFlag: boolean) => {
         setIsLoading(true);
@@ -54,29 +55,27 @@ export default function SearchPage() {
                 `&page=${targetPage}` +
                 `&latitude=${locationInfo?.latitude}` +
                 `&longitude=${locationInfo?.longitude}` +
-                `&kind=${kind}`;
+                `&kind=${kind.join(',')}`; // 핵심 변경
 
             const res = await fetch(url);
             const json = await res.json();
-
-            // const json = apis.mock.getFacilities();
-
-            console.log(url);
-            console.log(json);
-
             const { Response } = json;
+
+            console.group("fetchFacilites");
+            console.log(res);
+            console.log(json);
+            console.log(Response);
+            console.groupEnd();
 
             if (Response !== null && Response !== undefined) {
                 setFacilityArray((cur) =>
                     resetFlag ? Response : [...cur, ...Response],
                 );
                 setPage(targetPage + 1);
-
                 setIsLoading(false);
             }
         } catch (error) {
             console.error(error);
-        } finally {
         }
     };
 
@@ -118,7 +117,7 @@ export default function SearchPage() {
                         zoom: 14,
                     }}
                 >
-                    {facilityArray.map((facilityData) => {
+                    {Array.isArray(facilityArray) && facilityArray.map((facilityData) => {
                         return (
                             <NaverMapMarkerOverlay
                                 key={facilityData.id}
@@ -146,7 +145,7 @@ export default function SearchPage() {
             >
                 {/* 목록 */}
                 <View style={{ padding: 10, gap: 10 }}>
-                    {facilityArray.map((facilityData) => {
+                    {Array.isArray(facilityArray) && facilityArray.map((facilityData) => {
                         return (
                             <SearchResult
                                 key={facilityData.id}
@@ -161,7 +160,6 @@ export default function SearchPage() {
                             style={{ marginVertical: 30 }}
                         />
                     )}
-                    {/* 검색결과 컴포넌트 */}
                 </View>
                 <MoreButton onPress={getMore} />
             </ScrollView>
@@ -185,16 +183,7 @@ export default function SearchPage() {
 function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const navigation = useNavigation();
     const theme = useTheme();
-    const { loginInfo} = useContext(LoginInfoContext);
-
-    useEffect(() => {
-        fetch(apis.urls.getFacilityById(facilityData.id))
-            .then((res) => res.json())
-            .then((json) => console.log(json));
-
-        // const json = apis.mock.getFacilityById();
-        // console.log(json);
-    }, []);
+    const { loginInfo } = useContext(LoginInfoContext);
 
     const userLike = async () => {
         // const res = await fetch(apis.urls.userLike())
@@ -211,7 +200,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
             );
 
             const data = await res.json();
-            
+
             console.log(res);
             console.log(data);
 
@@ -230,9 +219,6 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 backgroundColor: theme.colors.background,
             }}
             onPress={() => {
-                // fetch(apis.urls.getFacilityById(facility.id))
-                //     .then((res) => res.json())
-                //     .then((json) => console.log(json));
                 navigation.navigate('FacilityDetailPage', {
                     id: facilityData.id,
                 });
