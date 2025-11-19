@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import apis from '../../apis';
 import SearchHeader from './SearchHeader';
 
-import { LocationInfoContext } from '../../Context';
+import { LocationInfoContext, LoginInfoContext } from '../../Context';
 import {
     NaverMapMarkerOverlay,
     NaverMapView,
@@ -185,18 +185,42 @@ export default function SearchPage() {
 function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const navigation = useNavigation();
     const theme = useTheme();
+    const { loginInfo} = useContext(LoginInfoContext);
 
     useEffect(() => {
-        // fetch(apis.urls.getFacilityById(facility.id))
-        //     .then((res) => res.json())
-        //     .then((json) => console.log(json));
+        fetch(apis.urls.getFacilityById(facilityData.id))
+            .then((res) => res.json())
+            .then((json) => console.log(json));
 
-        const json = apis.mock.getFacilityById();
+        // const json = apis.mock.getFacilityById();
         // console.log(json);
     }, []);
 
     const userLike = async () => {
         // const res = await fetch(apis.urls.userLike())
+        try {
+            const res = await fetch(
+                `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${loginInfo.token}`,
+                    },
+                },
+            );
+
+            const data = await res.json();
+            
+            console.log(res);
+            console.log(data);
+
+            if (!res.ok) {
+                return;
+            }
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     return (
@@ -259,7 +283,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                             alignItems: 'center',
                         }}
                     >
-                        <IconButton icon={'heart-outline'} onPress={() => {}} />
+                        <IconButton icon={'heart-outline'} onPress={userLike} />
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
