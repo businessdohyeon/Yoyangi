@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import {
     ActivityIndicator,
     Button,
@@ -11,7 +11,6 @@ import {
     useTheme,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-// import { showBorder } from "./common.js"
 import apis from '../../apis';
 import SearchHeader from './SearchHeader';
 
@@ -21,11 +20,10 @@ import {
     NaverMapView,
 } from '@mj-studio/react-native-naver-map';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
+import { FlatList } from 'react-native';
 
 const LIMIT = 10;
 
-// TODO: 라우팅 파라미터로 받아서 하는 게 좋나...?
-// TODO: 앱바에서 검색버튼 클릭해서 들어오는 경우엔 searchbar에 autofocus?
 export default function SearchPage() {
     const navigation = useNavigation();
     const theme = useTheme();
@@ -35,14 +33,7 @@ export default function SearchPage() {
     const [facilityArray, setFacilityArray] = useState<FacilityData_t[]>([]);
     const [isMapShown, setIsMapShown] = useState(false);
 
-    // query params
     const [page, setPage] = useState(1);
-
-    console.group('SearchPage rerendered');
-    console.log({ facilityArray });
-    console.groupEnd();
-
-    // kind를 문자열이 아니라 배열로 변경
     const [kind, setKind] = useState<string[]>(['요양병원']);
 
     const fetchFacilites = async (targetPage: number, resetFlag: boolean) => {
@@ -55,17 +46,11 @@ export default function SearchPage() {
                 `&page=${targetPage}` +
                 `&latitude=${locationInfo?.latitude}` +
                 `&longitude=${locationInfo?.longitude}` +
-                `&kind=${kind.join(',')}`; // 핵심 변경
+                `&kind=${kind.join(',')}`;
 
             const res = await fetch(url);
             const json = await res.json();
             const { Response } = json;
-
-            console.group("fetchFacilites");
-            console.log(res);
-            console.log(json);
-            console.log(Response);
-            console.groupEnd();
 
             if (Response !== null && Response !== undefined) {
                 setFacilityArray((cur) =>
@@ -84,11 +69,7 @@ export default function SearchPage() {
     };
 
     useEffect(() => {
-        console.group('plain useEffect');
-
         fetchFacilites(1, true);
-
-        console.groupEnd();
     }, [kind, locationInfo]);
 
     return (
@@ -98,71 +79,76 @@ export default function SearchPage() {
                 kind={kind}
                 setKind={setKind}
             />
+
+            {/* 지도 */}
             <View
                 style={{
                     display: isMapShown ? 'flex' : 'none',
                     flex: 1,
-                    // padding: 20,
                 }}
             >
                 <NaverMapView
                     style={{ flex: 1 }}
-                    // initialRegion={{
-                    //     latitudeDelta: 0.00,
-                    //     longitudeDelta: 0.00,
-                    // }}
                     initialCamera={{
                         latitude: locationInfo.latitude,
                         longitude: locationInfo.longitude,
                         zoom: 14,
                     }}
                 >
-                    {Array.isArray(facilityArray) && facilityArray.map((facilityData) => {
-                        return (
-                            <NaverMapMarkerOverlay
-                                key={facilityData.id}
-                                latitude={facilityData.latitude}
-                                longitude={facilityData.longitude}
-                                anchor={{ x: 0.5, y: 1 }}
-                                caption={{ text: facilityData.name }}
-                                onTap={() => {
-                                    navigation.navigate('FacilityDetailPage', {
-                                        id: facilityData.id,
-                                    });
-                                }}
-                            />
-                        );
-                    })}
+                    {Array.isArray(facilityArray) &&
+                        facilityArray.map((facilityData) => {
+                            return (
+                                <NaverMapMarkerOverlay
+                                    key={facilityData.id}
+                                    latitude={facilityData.latitude}
+                                    longitude={facilityData.longitude}
+                                    anchor={{ x: 0.5, y: 1 }}
+                                    caption={{ text: facilityData.name }}
+                                    onTap={() => {
+                                        navigation.navigate(
+                                            'FacilityDetailPage',
+                                            {
+                                                id: facilityData.id,
+                                            },
+                                        );
+                                    }}
+                                />
+                            );
+                        })}
                 </NaverMapView>
             </View>
-            <ScrollView
-                style={{ display: isMapShown ? 'none' : 'flex' }}
-                contentContainerStyle={{
-                    gap: 20,
-                    backgroundColor: '#eeeeee',
-                    columnGap: 30,
-                }}
-            >
-                {/* 목록 */}
-                <View style={{ padding: 10, gap: 10 }}>
-                    {Array.isArray(facilityArray) && facilityArray.map((facilityData) => {
-                        return (
-                            <SearchResult
-                                key={facilityData.id}
-                                facilityData={facilityData}
-                            />
-                        );
-                    })}
-                    {isLoading && (
-                        <ActivityIndicator
-                            animating={true}
-                            color={theme.colors.primary}
-                            style={{ marginVertical: 30 }}
-                        />
+            {/* 검색결과 목록 */}
+            {!isMapShown && (
+                <FlatList
+                    data={facilityArray}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <SearchResult facilityData={item} />
                     )}
-                </View>
-                <MoreButton onPress={getMore} />
-            </ScrollView>
+                    contentContainerStyle={{
+                        padding: 10,
+                        backgroundColor: '#eeeeee',
+                        gap: 20,
+                    }}
+                    // onEndReached={getMore}
+                    // onEndReachedThreshold={0.5}
+                    ListFooterComponent={
+                        isLoading ? (
+                            <ActivityIndicator
+                                animating={true}
+                                color={theme.colors.primary}
+                                style={{ marginVertical: 30 }}
+                            />
+                        ) : (
+                            <View style={{ marginBottom: 30 }}>
+                                <Button mode="outlined" onPress={getMore}>
+                                    더보기
+                                </Button>
+                            </View>
+                        )
+                    }
+                />
+            )}
             <FAB
                 icon="map"
                 label="지도보기"
@@ -186,7 +172,6 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const { loginInfo } = useContext(LoginInfoContext);
 
     const userLike = async () => {
-        // const res = await fetch(apis.urls.userLike())
         try {
             const res = await fetch(
                 `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
@@ -200,9 +185,6 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
             );
 
             const data = await res.json();
-
-            console.log(res);
-            console.log(data);
 
             if (!res.ok) {
                 return;
@@ -233,21 +215,16 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 >
                     <View style={{ flex: 6 }}>
                         {facilityData.approval_status ? (
-                            <View style={{}}>
+                            <View>
                                 <Text>"인증시설입니다"</Text>
                             </View>
                         ) : null}
-                        <View style={{}}>
+                        <View>
                             <Text variant="titleMedium">
                                 {facilityData.name}
                             </Text>
                         </View>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                            }}
-                        >
-                            {/* TODO: 별점 */}
+                        <View style={{ flexDirection: 'row' }}>
                             <View style={{ marginRight: 10 }}>
                                 <Text>별점</Text>
                             </View>
@@ -258,7 +235,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                                 <Text>{facilityData.kind}</Text>
                             </View>
                         </View>
-                        <View style={{}}>
+                        <View>
                             <Text>오늘 0700-2100</Text>
                         </View>
                     </View>
@@ -272,6 +249,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                         <IconButton icon={'heart-outline'} onPress={userLike} />
                     </View>
                 </View>
+
                 <View style={{ flexDirection: 'row' }}>
                     <View
                         style={{
@@ -280,13 +258,10 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                             alignItems: 'center',
                         }}
                     >
-                        <Icon
-                            color="gray"
-                            size={30}
-                            source={'hand-heart-outline'}
-                        />
+                        <Icon color="gray" size={30} source={'hand-heart-outline'} />
                         <Text>파킨슨</Text>
                     </View>
+
                     <View
                         style={{
                             flex: 1,
@@ -297,6 +272,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                         <Icon color="gray" size={30} source={'brain'} />
                         <Text>치매</Text>
                     </View>
+
                     <View
                         style={{
                             flex: 1,
@@ -304,13 +280,10 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                             alignItems: 'center',
                         }}
                     >
-                        <Icon
-                            color="gray"
-                            size={30}
-                            source={'shield-cross-outline'}
-                        />
+                        <Icon color="gray" size={30} source={'shield-cross-outline'} />
                         <Text>암</Text>
                     </View>
+
                     <View
                         style={{
                             flex: 1,
@@ -321,6 +294,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                         <Icon color="gray" size={30} source={'heart'} />
                         <Text>중풍</Text>
                     </View>
+
                     <View
                         style={{
                             flex: 1,
@@ -334,21 +308,5 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 </View>
             </Card.Content>
         </Card>
-    );
-}
-
-function MoreButton({ onPress }: any) {
-    return (
-        <View
-            style={{
-                marginTop: 10,
-                marginBottom: 30,
-                paddingHorizontal: 10,
-            }}
-        >
-            <Button mode="outlined" onPress={onPress}>
-                더보기
-            </Button>
-        </View>
     );
 }
