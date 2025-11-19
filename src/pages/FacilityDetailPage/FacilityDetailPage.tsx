@@ -60,6 +60,33 @@ export default function FacilityDetailPage({ route }) {
         }
     };
 
+    const userLike = async () => {
+        // const res = await fetch(apis.urls.userLike())
+        try {
+            const res = await fetch(
+                `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${loginInfo.token}`,
+                    },
+                },
+            );
+
+            const data = await res.json();
+            
+            console.log(res);
+            console.log(data);
+
+            if (!res.ok) {
+                return;
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     useEffect(() => {
         fetchFacilityData();
     }, []);
@@ -129,7 +156,7 @@ export default function FacilityDetailPage({ route }) {
                                 >
                                     <IconButton
                                         icon={'heart'}
-                                        onPress={() => console.log('Pressed')}
+                                        onPress={userLike}
                                         size={30}
                                     />
                                 </View>
