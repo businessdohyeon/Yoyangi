@@ -133,7 +133,6 @@ const LoginPage = () => {
                     >
                         <Image
                             style={{ ...buttonSize }}
-                            style={{ ...buttonSize }}
                             resizeMode="contain"
                             source={src}
                         />
