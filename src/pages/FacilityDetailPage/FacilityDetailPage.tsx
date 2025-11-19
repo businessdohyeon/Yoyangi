@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Image, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Image, ScrollView, View } from 'react-native';
 import {
     ActivityIndicator,
     Button,
@@ -319,6 +319,7 @@ export default function FacilityDetailPage({ route }) {
 }
 
 function Footer({ facilityData }: { facilityData: FacilityData_t }) {
+    const {loginInfo} = useContext(LoginInfoContext);
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
     const theme = useTheme();
@@ -369,8 +370,18 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
                     alignItems: 'center',
                 }}
             >
-                <Button icon={'phone'} onPress={() => {}}>
-                    상담전화걸기
+                <Button
+                    icon={'phone'}
+                    onPress={() => {
+                        navigation.navigate('ChatPage', {
+                            facility_id: facilityData.id,
+                            guardian_id: loginInfo.userId,
+                            sender: loginInfo.userId,
+                            sender_type: "guardian",
+                        });
+                    }}
+                >
+                    상담
                 </Button>
             </View>
             <View
