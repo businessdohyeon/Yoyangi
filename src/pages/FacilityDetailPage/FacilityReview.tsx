@@ -399,7 +399,7 @@ export function FacilityReview({
                     );
                 })}
 
-                <View style={{ ...showBorder }}>
+                <View style={{ }}>
                     <Button
                         icon="camera"
                         mode="contained"

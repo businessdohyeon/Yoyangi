@@ -143,12 +143,12 @@ const LoginPage = () => {
                 <Button mode="outlined" onPress={_handleMore}>
                     전화번호 login
                 </Button> */}
-                <Button mode="outlined" onPress={refreashToken}>
+                {/* <Button mode="outlined" onPress={refreashToken}>
                     refresh token
                 </Button>
                 <Button mode="outlined" onPress={() => AsyncStorage.clear()}>
                     async clear
-                </Button>
+                </Button> */}
             </View>
         </>
     );

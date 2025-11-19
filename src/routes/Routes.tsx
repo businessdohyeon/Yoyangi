@@ -14,6 +14,8 @@ import EditLocationPage from '../pages/EditLocationPage/EditLocationPage.tsx';
 import CommunityDetailPage from '../pages/CommunityDetailPage/CommunityDetailPage.tsx';
 import ReservationPage from '../pages/ReservationPage/ReservationPage.tsx';
 import ReviewForm from '../pages/ReviewForm/ReviewForm.tsx';
+import CommunityDetailScreen from '../pages/CommunityDetailPage/CommunityDetailPage.tsx';
+import CreateCommunityScreen from '../pages/CreateCommunityPage/CreateCommunityPage.tsx';
 
 // Bottom Tabs 정의
 const Tab = createBottomTabNavigator();
@@ -134,9 +136,14 @@ export default function Routes() {
                     name="ReservationPage"
                     component={ReservationPage}
                 />
+                <Stack.Screen name="ReviewForm" component={ReviewForm} />
                 <Stack.Screen
-                    name="ReviewForm"
-                    component={ReviewForm}
+                    name="CommunityDetail"
+                    component={CommunityDetailScreen}
+                />
+                <Stack.Screen
+                    name="CreateCommunity"
+                    component={CreateCommunityScreen}
                 />
             </Stack.Navigator>
         </NavigationContainer>

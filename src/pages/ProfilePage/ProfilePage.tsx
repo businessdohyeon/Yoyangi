@@ -17,15 +17,12 @@ const ProfilePage = () => {
     const navigation = useNavigation();
     const theme = useTheme();
 
+    const user = null;
+
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
-    const user = {
-        name: 'name',
-        email: 'email',
-    };
-
     const handleLoginRedirect = () => {
-        navigation.navigate('LoginScreen');
+        navigation.navigate('LoginPage');
     };
 
     const handleLikesRedirect = () => {

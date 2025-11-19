@@ -1087,10 +1087,15 @@ const getCommunities = () => {
     };
 };
 
+const getReviews = ()=>{
+
+}
+
 const mockApi = {
     getFacilities,
     getFacilityById,
     getCommunities,
+    getReviews,
 };
 
 export default mockApi;
