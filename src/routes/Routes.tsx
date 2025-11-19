@@ -17,6 +17,8 @@ import ReviewForm from '../pages/ReviewForm/ReviewForm.tsx';
 import CommunityDetailScreen from '../pages/CommunityDetailPage/CommunityDetailPage.tsx';
 import CreateCommunityScreen from '../pages/CreateCommunityPage/CreateCommunityPage.tsx';
 import ChatPage from '../pages/ChatPage/ChatPage.tsx';
+import ExamDimentiaPage from '../pages/ExamDimentiaPage/ExamDimentiaPage.tsx';
+import PredictDiseasePage from '../pages/PredictDiseasePage/PredictDiseasePage.tsx';
 
 // Bottom Tabs 정의
 const Tab = createBottomTabNavigator();
@@ -149,6 +151,14 @@ export default function Routes() {
                 <Stack.Screen
                     name="ChatPage"
                     component={ChatPage}
+                />
+                <Stack.Screen
+                    name="PredictDiseasePage"
+                    component={PredictDiseasePage}
+                />
+                <Stack.Screen
+                    name="ExamDimentiaPage"
+                    component={ExamDimentiaPage}
                 />
             </Stack.Navigator>
         </NavigationContainer>

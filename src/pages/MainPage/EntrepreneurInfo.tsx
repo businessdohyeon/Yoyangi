@@ -11,7 +11,7 @@ export default function EntrepreneurInfo() {
 이메일`;
 
     return (
-        <View style={{ backgroundColor: '#ffffff' }}>
+        <View style={{  }}>
             <View style={{ padding: 10 }}>
                 <Text>{entrepreneurInfo}</Text>
             </View>

@@ -19,25 +19,38 @@ import {
     NaverMapMarkerOverlay,
     NaverMapView,
 } from '@mj-studio/react-native-naver-map';
-import { FacilityData_t } from '../../types/FacilityDataScheme';
+import { FacilityData_t, FacilityDataSchema } from '../../types/FacilityDataScheme';
 import { FlatList } from 'react-native';
 
 const LIMIT = 10;
+const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
 
-export default function SearchPage() {
+export default function SearchPage({ route }) {
     const navigation = useNavigation();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
+
+    console.group('SearchPage rendered');
+    console.log(route.params);
+    console.log(route.params?.page);
+    console.log(locationInfo);
+    console.groupEnd();
 
     const [isLoading, setIsLoading] = useState(true);
     const [facilityArray, setFacilityArray] = useState<FacilityData_t[]>([]);
     const [isMapShown, setIsMapShown] = useState(false);
 
     const [page, setPage] = useState(1);
-    const [kind, setKind] = useState<string[]>(['요양병원']);
+    const [kind, setKind] = useState<string[]>(KIND_DEFAULT_VALUE);
 
     const fetchFacilites = async (targetPage: number, resetFlag: boolean) => {
         setIsLoading(true);
+
+        if (!locationInfo) {
+            console.log('this should not trigger?????????');
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const url =
@@ -69,8 +82,13 @@ export default function SearchPage() {
     };
 
     useEffect(() => {
+        console.log('!');
+        setKind(route.params?.kind || KIND_DEFAULT_VALUE);
+    }, [route.params]);
+
+    useEffect(() => {
         fetchFacilites(1, true);
-    }, [kind, locationInfo]);
+    }, [kind]);
 
     return (
         <>
@@ -94,26 +112,34 @@ export default function SearchPage() {
                         zoom: 14,
                     }}
                 >
-                    {Array.isArray(facilityArray) &&
-                        facilityArray.map((facilityData) => {
+                    {facilityArray.map((facilityData) => {
+                        try {
+                            const parsed = FacilityDataSchema.parse(facilityData);
+                            console.log(...parsed);
+
                             return (
                                 <NaverMapMarkerOverlay
-                                    key={facilityData.id}
-                                    latitude={facilityData.latitude}
-                                    longitude={facilityData.longitude}
+                                    key={parsed.id}
+                                    latitude={parsed.latitude}
+                                    longitude={parsed.longitude}
                                     anchor={{ x: 0.5, y: 1 }}
-                                    caption={{ text: facilityData.name }}
+                                    caption={{ text: parsed.name }}
                                     onTap={() => {
                                         navigation.navigate(
                                             'FacilityDetailPage',
                                             {
-                                                id: facilityData.id,
+                                                id: parsed.id,
                                             },
                                         );
                                     }}
                                 />
                             );
-                        })}
+                        } catch (error) {
+                            console.log(facilityData);
+                            console.log(error);
+                            return null;
+                        }
+                    })}
                 </NaverMapView>
             </View>
             {/* 검색결과 목록 */}

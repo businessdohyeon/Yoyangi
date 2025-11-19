@@ -43,7 +43,7 @@ export const FacilityDataSchema = z.object({
     established_date: z.number(),
     longitude: z.number(),
     latitude: z.number(),
-    care_code: z.string(),
+    care_code: z.string().nullable(),
     facility_number: z.string().nullable(),
     average_rating: z.number(),
     review_count: z.number(),

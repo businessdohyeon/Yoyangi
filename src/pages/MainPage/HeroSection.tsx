@@ -110,7 +110,11 @@ function BigButtons() {
                         contentStyle={{ height: '100%' }}
                         icon="camera"
                         mode="elevated"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            navigation.navigate('SearchPage', {
+                                kind: ['요양병원'],
+                            });
+                        }}
                     >
                         주변 요양병원 검색
                     </Button>
@@ -122,7 +126,11 @@ function BigButtons() {
                         contentStyle={{ height: '100%' }}
                         icon="camera"
                         mode="elevated"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            navigation.navigate('SearchPage', {
+                                kind: ['요양원'],
+                            });
+                        }}
                     >
                         주변 요양원 검색
                     </Button>
@@ -134,9 +142,13 @@ function BigButtons() {
                         contentStyle={{ height: '100%' }}
                         icon="camera"
                         mode="elevated"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            navigation.navigate('SearchPage', {
+                                kind: ['주간보호케어센터'],
+                            });
+                        }}
                     >
-                        주변 주간데이케이센터 검색
+                        주변 주간보호케어센터 검색
                     </Button>
                 </View>
             </View>
@@ -154,9 +166,11 @@ function BigButtons() {
                         contentStyle={{ height: '100%' }}
                         icon="camera"
                         mode="elevated"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            navigation.navigate('ExamDimentiaPage');
+                        }}
                     >
-                        Press me
+                        치매 자가 진단
                     </Button>
                 </View>
                 <View style={{ flex: 1, margin: 5 }}>
@@ -166,9 +180,11 @@ function BigButtons() {
                         contentStyle={{ height: '100%' }}
                         icon="camera"
                         mode="elevated"
-                        onPress={() => console.log('Pressed')}
+                        onPress={() => {
+                            navigation.navigate('PredictDiseasePage');
+                        }}
                     >
-                        Press me
+                        질병 예측
                     </Button>
                 </View>
             </View>
