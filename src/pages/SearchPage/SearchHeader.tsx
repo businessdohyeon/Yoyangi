@@ -46,7 +46,6 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
 
     console.group('SearchHeader rerendered');
     console.log({ kind });
-    console.log(kind === '요양병원');
     console.groupEnd();
 
     return (

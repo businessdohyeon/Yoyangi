@@ -79,7 +79,6 @@ export default function SearchPage() {
                 kind={kind}
                 setKind={setKind}
             />
-
             {/* 지도 */}
             <View
                 style={{
@@ -258,7 +257,11 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                             alignItems: 'center',
                         }}
                     >
-                        <Icon color="gray" size={30} source={'hand-heart-outline'} />
+                        <Icon
+                            color="gray"
+                            size={30}
+                            source={'hand-heart-outline'}
+                        />
                         <Text>파킨슨</Text>
                     </View>
 
@@ -280,7 +283,11 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                             alignItems: 'center',
                         }}
                     >
-                        <Icon color="gray" size={30} source={'shield-cross-outline'} />
+                        <Icon
+                            color="gray"
+                            size={30}
+                            source={'shield-cross-outline'}
+                        />
                         <Text>암</Text>
                     </View>
 

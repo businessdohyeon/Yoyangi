@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 
 const LocationInfoSchema = z.object({
-    latitude: z.preprocess((val) => Number(val), z.number()).default(0.0),
-    longitude: z.preprocess((val) => Number(val), z.number()).default(0.0),
+    latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
+    longitude: z.preprocess((val) => Number(val), z.number()).default(126.978),
     roadAddress: z.string().default(''),
 });
 
@@ -52,19 +52,24 @@ export function TotalContextProvider({
 
     const loadLoginInfo = async () => {
         const data = await AsyncStorage.getItem('loginInfo');
+
+        console.group('loadLoginInfo');
+
         if (data) {
             try {
                 const parsed = LoginInfoSchema.parse(JSON.parse(data));
                 setLoginInfo(parsed);
 
-                console.group('getLoginInfo');
                 console.log(parsed);
-                console.groupEnd();
             } catch (e) {
                 console.error('Invalid loginInfo schema', e);
                 setLoginInfo(LoginInfoSchema.parse({}));
             }
+        } else {
+            setLoginInfo(LoginInfoSchema.parse({}));
         }
+
+        console.groupEnd();
     };
 
     const storeLoginInfo = useCallback((value: LoginInfo) => {
@@ -74,18 +79,23 @@ export function TotalContextProvider({
 
     const loadLocationInfo = async () => {
         const data = await AsyncStorage.getItem('locationInfo');
+
+        console.group('getLocationInfo');
+
         if (data) {
             try {
                 const parsed = LocationInfoSchema.parse(JSON.parse(data));
                 setLocationInfo(parsed);
-                console.group('getLocationInfo');
                 console.log(parsed);
-                console.groupEnd();
             } catch (e) {
                 console.error('Invalid locationInfo schema', e);
                 setLocationInfo(LocationInfoSchema.parse({}));
             }
+        } else {
+            setLocationInfo(LocationInfoSchema.parse({}));
         }
+
+        console.groupEnd();
     };
 
     const storeLocationInfo = async (value: LocationInfo) => {
