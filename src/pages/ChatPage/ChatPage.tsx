@@ -54,7 +54,7 @@ export default function ChatPage({ route }) {
 
     return (
         <>
-        <GoBackHeader title={"????"}/>
+        <GoBackHeader title={"상담채팅"}/>
         <View style={styles.container}>
             <FlatList
                 data={messages}
