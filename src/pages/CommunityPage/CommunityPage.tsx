@@ -6,7 +6,6 @@ import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import PlainHeader from '../MainPage/PlainHeader';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { FlatList } from 'react-native';
 
 export default function CommunityPage() {
     const navigation = useNavigation();
