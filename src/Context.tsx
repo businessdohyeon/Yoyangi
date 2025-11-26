@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
+import { setLogoutCallback, setTokenRefreshCallback } from '../utils/auth';
 
 const LocationInfoSchema = z.object({
     latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
@@ -31,10 +32,18 @@ export const LocationInfoContext = createContext<{
 export const LoginInfoContext = createContext<{
     loginInfo: LoginInfo;
     storeLoginInfo: (value: LoginInfo) => void;
+    clearLoginInfo: () => Promise<void>;
+    reloadLoginInfo: () => Promise<void>;
 }>({
     loginInfo: LoginInfoSchema.parse({}),
     storeLoginInfo: async (value) => {
         console.log(value);
+    },
+    clearLoginInfo: async () => {
+        console.log('clearLoginInfo');
+    },
+    reloadLoginInfo: async () => {
+        console.log('reloadLoginInfo');
     },
 });
 
@@ -74,7 +83,30 @@ export function TotalContextProvider({
 
     const storeLoginInfo = useCallback((value: LoginInfo) => {
         setLoginInfo(value);
-        AsyncStorage.setItem('loginInfo', JSON.stringify(value));
+        AsyncStorage.setItem('loginInfo', JSON.stringify(value)).catch((error) => {
+            console.error('Failed to store loginInfo:', error);
+        });
+    }, []);
+
+    const clearLoginInfo = useCallback(async () => {
+        await AsyncStorage.removeItem('loginInfo');
+        setLoginInfo(LoginInfoSchema.parse({}));
+    }, []);
+
+    const reloadLoginInfo = useCallback(async () => {
+        const data = await AsyncStorage.getItem('loginInfo');
+
+        if (data) {
+            try {
+                const parsed = LoginInfoSchema.parse(JSON.parse(data));
+                setLoginInfo(parsed);
+            } catch (e) {
+                console.error('Invalid loginInfo schema', e);
+                setLoginInfo(LoginInfoSchema.parse({}));
+            }
+        } else {
+            setLoginInfo(LoginInfoSchema.parse({}));
+        }
     }, []);
 
     const loadLocationInfo = async () => {
@@ -120,13 +152,17 @@ export function TotalContextProvider({
             await loadLoginInfo();
             await loadLocationInfo();
         })();
-    }, []);
+
+        // 로그아웃 및 토큰 갱신 콜백 설정 (auth.ts에서 사용)
+        setLogoutCallback(clearLoginInfo);
+        setTokenRefreshCallback(reloadLoginInfo);
+    }, [clearLoginInfo, reloadLoginInfo]);
 
     return (
         <LocationInfoContext.Provider
             value={{ locationInfo, storeLocationInfo }}
         >
-            <LoginInfoContext.Provider value={{ loginInfo, storeLoginInfo }}>
+            <LoginInfoContext.Provider value={{ loginInfo, storeLoginInfo, clearLoginInfo, reloadLoginInfo }}>
                 {children}
             </LoginInfoContext.Provider>
         </LocationInfoContext.Provider>

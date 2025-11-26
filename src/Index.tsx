@@ -5,16 +5,6 @@ import Routes from './routes/Routes.tsx';
 
 import { useEffect } from 'react';
 import { TotalContextProvider } from './Context.tsx';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            retry: 1,
-            staleTime: 5 * 60 * 1000, // 5 minutes
-        },
-    },
-});
 
 const Index = () => {
     useEffect(() => {
@@ -22,15 +12,13 @@ const Index = () => {
     }, []);
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <Provider>
-                <TotalContextProvider>
-                    <SafeAreaProvider>
-                        <Routes />
-                    </SafeAreaProvider>
-                </TotalContextProvider>
-            </Provider>
-        </QueryClientProvider>
+        <Provider>
+            <TotalContextProvider>
+                <SafeAreaProvider>
+                    <Routes />
+                </SafeAreaProvider>
+            </TotalContextProvider>
+        </Provider>
     );
 };
 
