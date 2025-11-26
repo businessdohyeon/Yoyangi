@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Avatar, Card, FAB, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
