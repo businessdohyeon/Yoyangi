@@ -1,12 +1,12 @@
 import { useWindowDimensions, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Button, Text, useTheme, ActivityIndicator } from 'react-native-paper';
 
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
 import ReviewCard from './ReviewCard';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
 import apis from '../../apis';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
     ReviewData_t,
     ReviewDataArraySchema,
@@ -21,11 +21,9 @@ export function FacilityReview({
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
 
-    const [isLoading, setIsLoading] = useState(true);
-    const [reviewDataArray, setReviewDataArray] = useState<ReviewData_t[]>([]);
-
-    const fetchReviews = async () => {
-        try {
+    const { data: reviewDataArray = [], isLoading } = useQuery({
+        queryKey: ['facilityReviews', facilityData.id],
+        queryFn: async () => {
             const res = await fetch(
                 apis.urls.getFacilityReviewById(facilityData.id),
             );
@@ -37,17 +35,9 @@ export function FacilityReview({
             const tmp = ReviewDataArraySchema.parse(data);
             console.log(...tmp);
 
-            setReviewDataArray(tmp);
-            setIsLoading(false);
-            // setReview(json.Reviews);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    useEffect(() => {
-        fetchReviews();
-    }, []);
+            return tmp;
+        },
+    });
 
     return (
         <View

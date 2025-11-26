@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
 import {
     ActivityIndicator,
@@ -23,15 +23,15 @@ import {
 import { FacilityNotice } from './FacilityNotice';
 import { FacilityReview } from './FacilityReview';
 import { tileData } from './data';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function FacilityDetailPage({ route }) {
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
     const { id } = route.params;
     const scrollRef = useRef<ScrollView>();
+    const queryClient = useQueryClient();
 
-    const [facilityData, setFacilityData] = useState<FacilityData_t>({});
-    const [isLoading, setIsLoading] = useState(true);
     const [tabIndex, setTabIndex] = useState(0);
 
     console.group('[rerender]: FacilityDetailPage');
@@ -39,10 +39,9 @@ export default function FacilityDetailPage({ route }) {
     console.log(loginInfo);
     console.groupEnd();
 
-    const fetchFacilityData = async () => {
-        // setOsloading(ture) ??
-
-        try {
+    const { data: facilityData = {}, isLoading } = useQuery({
+        queryKey: ['facility', id],
+        queryFn: async () => {
             const res = await fetch(apis.urls.getFacilityById(id));
             const json = await res.json();
             const { Response } = json;
@@ -52,17 +51,12 @@ export default function FacilityDetailPage({ route }) {
             console.log(tmp);
             console.groupEnd();
 
-            setFacilityData(tmp);
-            setIsLoading(false);
-        } catch (error) {
-            console.error(error);
-        } finally {
-        }
-    };
+            return tmp;
+        },
+    });
 
-    const userLike = async () => {
-        // const res = await fetch(apis.urls.userLike())
-        try {
+    const userLikeMutation = useMutation({
+        mutationFn: async () => {
             const res = await fetch(
                 `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
                 {
@@ -74,22 +68,20 @@ export default function FacilityDetailPage({ route }) {
                 },
             );
 
-            const data = await res.json();
-            
-            console.log(res);
-            console.log(data);
-
             if (!res.ok) {
-                return;
+                throw new Error('Failed to like facility');
             }
-        } catch (err) {
-            console.log(err);
-        }
-    };
 
-    useEffect(() => {
-        fetchFacilityData();
-    }, []);
+            return await res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['facility', id] });
+        },
+    });
+
+    const userLike = () => {
+        userLikeMutation.mutate();
+    };
 
     return (
         <>

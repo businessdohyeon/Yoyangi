@@ -14,12 +14,14 @@ import apis from '../../apis';
 import { LoginInfoContext } from '../../Context';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function ReservationPage({ route }) {
     const navigation = useNavigation();
 
     const { facilityId, facilityName } = route.params;
     const { loginInfo } = useContext(LoginInfoContext);
+    const queryClient = useQueryClient();
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
@@ -35,6 +37,37 @@ export default function ReservationPage({ route }) {
         '기타',
     ];
 
+    const reservationMutation = useMutation({
+        mutationFn: async (data: any) => {
+            const res = await fetch(
+                `${apis.urls.server}/facilities/${facilityId}/reservation`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${loginInfo.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                },
+            );
+            
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || '예약 실패');
+            }
+            
+            return await res.json();
+        },
+        onSuccess: (data) => {
+            console.log('예약 성공:', data);
+            queryClient.invalidateQueries({ queryKey: ['facility', facilityId] });
+            navigation.goBack();
+        },
+        onError: (err) => {
+            console.error('예약 실패:', err.message);
+        },
+    });
+
     const form = useForm({
         defaultValues: {
             reserved_date: '',
@@ -47,28 +80,7 @@ export default function ReservationPage({ route }) {
             notes: '',
         },
         onSubmit: async (values) => {
-            try {
-                const res = await fetch(
-                    `${apis.urls.server}/facilities/${facilityId}/reservation`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${loginInfo.token}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(values.value),
-                    },
-                );
-                const data = await res.json();
-                if (!res.ok) {
-                    console.error('예약 실패:', data);
-                    return;
-                }
-                console.log('예약 성공:', data);
-                navigation.goBack();
-            } catch (err) {
-                console.error('예약 실패:', err.message);
-            }
+            reservationMutation.mutate(values.value);
         },
     });
 
@@ -326,6 +338,8 @@ export default function ReservationPage({ route }) {
 
                 <Button
                     mode="contained"
+                    loading={reservationMutation.isPending}
+                    disabled={reservationMutation.isPending}
                     onPress={() => form.handleSubmit()}
                     style={{ marginTop: 20 }}
                 >

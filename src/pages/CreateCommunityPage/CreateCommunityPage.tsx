@@ -6,10 +6,39 @@ import { useNavigation } from '@react-navigation/native'
 import { LoginInfoContext } from '../../Context'
 import apis from '../../apis'
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function CreateCommunityScreen() {
   const navigation = useNavigation()
   const { loginInfo } = React.useContext(LoginInfoContext)
+  const queryClient = useQueryClient()
+
+  const communityMutation = useMutation({
+    mutationFn: async (data: { title: string; content: string }) => {
+      const res = await fetch(`${apis.urls.server}/community`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${loginInfo.token}`,
+        },
+        body: JSON.stringify(data),
+      })
+      
+      if (!res.ok) {
+        throw new Error('Failed to create community post');
+      }
+      
+      return await res.json();
+    },
+    onSuccess: (json) => {
+      console.log(json);
+      queryClient.invalidateQueries({ queryKey: ['community'] });
+      navigation.goBack();
+    },
+    onError: (e) => {
+      console.error('submit error', e)
+    },
+  })
 
   const form = useForm({
     defaultValues: {
@@ -17,27 +46,10 @@ export default function CreateCommunityScreen() {
       content: '',
     },
     onSubmit: async ({ value }) => {
-      try {
-        const res = await fetch(`${apis.urls.server}/community`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${loginInfo.token}`,
-          },
-          body: JSON.stringify({
-            title: value.title,
-            content: value.content,
-          }),
-        })
-        const json = await res.json();
-        console.log(json);
-
-        navigation.goBack();
-      } catch (e) {
-        console.error('submit error', e)
-      } finally {
-
-      }
+      communityMutation.mutate({
+        title: value.title,
+        content: value.content,
+      });
     },
   })
 
@@ -112,8 +124,8 @@ export default function CreateCommunityScreen() {
           {([canSubmit, isSubmitting]) => (
             <Button
               mode="contained"
-              disabled={!canSubmit}
-              loading={isSubmitting}
+              disabled={!canSubmit || communityMutation.isPending}
+              loading={isSubmitting || communityMutation.isPending}
               onPress={() => form.handleSubmit()}
             >
               등록

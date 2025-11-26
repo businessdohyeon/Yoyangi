@@ -6,6 +6,7 @@ import { LoginInfoContext } from '../../Context';
 import { ScrollView } from 'react-native-gesture-handler';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import apis from '../../apis';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // form 초기화
 
@@ -13,6 +14,37 @@ export default function ReviewForm({ route, navigation }) {
     const { facilityId } = route.params;
     const { facilityName } = route.params;
     const { loginInfo } = useContext(LoginInfoContext);
+    const queryClient = useQueryClient();
+
+    const reviewMutation = useMutation({
+        mutationFn: async (formData: FormData) => {
+            const res = await fetch(
+                `${apis.urls.server}/reviews/${facilityId}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${loginInfo.token}`,
+                    },
+                    body: formData,
+                },
+            );
+
+            if (!res.ok) {
+                throw new Error('Failed to submit review');
+            }
+
+            return await res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['facilityReviews', facilityId] });
+            queryClient.invalidateQueries({ queryKey: ['facility', facilityId] });
+            navigation.goBack();
+        },
+        onError: (err) => {
+            console.error(err);
+            Alert.alert('오류', '서버 오류가 발생했습니다');
+        },
+    });
 
     const form = useForm({
         defaultValues: {
@@ -43,29 +75,8 @@ export default function ReviewForm({ route, navigation }) {
                     });
                 }
 
-                const res = await fetch(
-                    `${apis.urls.server}/reviews/${facilityId}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${loginInfo.token}`,
-                        },
-                        body: formData,
-                    },
-                );
-
-                const json = await res.json();
-
-                console.log(json);
-
-                if (!res.ok) {
-                    console.log(res);
-                    return;
-                }
-
-                navigation.goBack();
+                reviewMutation.mutate(formData);
             } catch (err) {
-                // Alert.alert('오류', err.response?.data?.Message || '서버 오류');
                 console.error(err);
             }
         },
@@ -171,8 +182,8 @@ export default function ReviewForm({ route, navigation }) {
                         children={({ canSubmit, isSubmitting }) => (
                             <Button
                                 mode="contained"
-                                loading={isSubmitting}
-                                disabled={!canSubmit}
+                                loading={isSubmitting || reviewMutation.isPending}
+                                disabled={!canSubmit || reviewMutation.isPending}
                                 onPress={form.handleSubmit}
                             >
                                 리뷰 등록

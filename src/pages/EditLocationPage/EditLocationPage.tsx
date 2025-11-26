@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useContext, useState } from 'react';
 import apis from '../../apis';
 import { LocationInfoContext } from '../../Context';
+import { useMutation } from '@tanstack/react-query';
 // import { showBorder } from "./common.js"
 
 const _goBack = () => console.log('Went back');
@@ -18,33 +19,35 @@ const EditLocationPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState(null);
 
-    const onSubmitEditing = async () => {
-        if (searchQuery === '') return;
-
-        try {
+    const geolocationMutation = useMutation({
+        mutationFn: async (location: string) => {
             const res = await fetch(
-                `${apis.urls.getGeoLocaton}?location=${searchQuery}`,
+                `${apis.urls.getGeoLocaton}?location=${location}`,
             );
             const json = await res.json();
             const { Response } = json;
             const { addresses } = Response;
             const tmp = addresses[0];
 
-            const newSearchResult = {
+            return {
                 roadAddress: tmp.roadAddress,
                 latitude: tmp.y,
                 longitude: tmp.x,
             };
-
-            console.log(json);
-
-            setSearchResult(newSearchResult);
+        },
+        onSuccess: (data) => {
+            setSearchResult(data);
             setSearchQuery('');
-        } catch (error) {
-            console.log(error);
-        } finally {
-            console.log('finally');
-        }
+            console.log('Geolocation search successful', data);
+        },
+        onError: (error) => {
+            console.log('Geolocation search error', error);
+        },
+    });
+
+    const onSubmitEditing = () => {
+        if (searchQuery === '') return;
+        geolocationMutation.mutate(searchQuery);
     };
 
     const register = () => {

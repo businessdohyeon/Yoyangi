@@ -11,6 +11,7 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import apis from '../../apis';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 // import { showBorder } from "./common.js"
 
 // TODO: 어느정도되면 Map, FacilityList 컴포넌트 분리, 각각 상태 가져가서 그에 따라 display설정하는 것 잊지말고
@@ -20,20 +21,28 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
     const navigation = useNavigation();
     const theme = useTheme();
     const { width, height } = useWindowDimensions();
+    const queryClient = useQueryClient();
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    const onSearchQuerySubmit = async () => {
+    const searchMutation = useMutation({
+        mutationFn: async (keyword: string) => {
+            const res = await fetch(
+                `${apis.urls.facilities}?keyword=${keyword}`,
+            );
+            const json = await res.json();
+            return json.Response;
+        },
+        onSuccess: (data) => {
+            setFacilityArray(data);
+            queryClient.setQueryData(['facilities', 'search', searchQuery], data);
+        },
+    });
+
+    const onSearchQuerySubmit = () => {
         console.log(`${apis.urls.facilities}?keyword=${searchQuery}`);
-
-        const res = await fetch(
-            `${apis.urls.facilities}?keyword=${searchQuery}`,
-        );
-        const json = await res.json();
-
-        setFacilityArray(json.Response);
-
-        console.log('onSubmit', json);
+        searchMutation.mutate(searchQuery);
+        console.log('onSubmit', searchMutation.data);
     };
 
     const toggleKind = (value: string) => {

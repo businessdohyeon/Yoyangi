@@ -21,6 +21,7 @@ import {
 } from '@mj-studio/react-native-naver-map';
 import { FacilityData_t, FacilityDataSchema } from '../../types/FacilityDataScheme';
 import { FlatList } from 'react-native';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const LIMIT = 10;
 const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
@@ -29,6 +30,7 @@ export default function SearchPage({ route }) {
     const navigation = useNavigation();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
+    const queryClient = useQueryClient();
 
     console.group('SearchPage rendered');
     console.log(route.params);
@@ -36,27 +38,27 @@ export default function SearchPage({ route }) {
     console.log(locationInfo);
     console.groupEnd();
 
-    const [isLoading, setIsLoading] = useState(true);
-    const [facilityArray, setFacilityArray] = useState<FacilityData_t[]>([]);
     const [isMapShown, setIsMapShown] = useState(false);
-
-    const [page, setPage] = useState(1);
     const [kind, setKind] = useState<string[]>(KIND_DEFAULT_VALUE);
 
-    const fetchFacilites = async (targetPage: number, resetFlag: boolean) => {
-        setIsLoading(true);
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetching,
+        isFetchingNextPage,
+        refetch,
+    } = useInfiniteQuery({
+        queryKey: ['facilities', locationInfo?.latitude, locationInfo?.longitude, kind],
+        queryFn: async ({ pageParam = 1 }) => {
+            if (!locationInfo) {
+                return [];
+            }
 
-        if (!locationInfo) {
-            console.log('this should not trigger?????????');
-            setIsLoading(false);
-            return;
-        }
-
-        try {
             const url =
                 `${apis.urls.facilities}` +
                 `?limit=${LIMIT}` +
-                `&page=${targetPage}` +
+                `&page=${pageParam}` +
                 `&latitude=${locationInfo?.latitude}` +
                 `&longitude=${locationInfo?.longitude}` +
                 `&kind=${kind.join(',')}`;
@@ -65,20 +67,21 @@ export default function SearchPage({ route }) {
             const json = await res.json();
             const { Response } = json;
 
-            if (Response !== null && Response !== undefined) {
-                setFacilityArray((cur) =>
-                    resetFlag ? Response : [...cur, ...Response],
-                );
-                setPage(targetPage + 1);
-                setIsLoading(false);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    };
+            return Response !== null && Response !== undefined ? Response : [];
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length === LIMIT ? allPages.length + 1 : undefined;
+        },
+        enabled: !!locationInfo,
+        initialPageParam: 1,
+    });
+
+    const facilityArray = data?.pages.flat() || [];
 
     const getMore = () => {
-        fetchFacilites(page, false);
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
     };
 
     useEffect(() => {
@@ -87,7 +90,7 @@ export default function SearchPage({ route }) {
     }, [route.params]);
 
     useEffect(() => {
-        fetchFacilites(1, true);
+        refetch();
     }, [kind]);
 
     return (
@@ -97,21 +100,22 @@ export default function SearchPage({ route }) {
                 kind={kind}
                 setKind={setKind}
             />
-            {/* 지도 */}
+                    {/* 지도 */}
             <View
                 style={{
                     display: isMapShown ? 'flex' : 'none',
                     flex: 1,
                 }}
             >
-                <NaverMapView
-                    style={{ flex: 1 }}
-                    initialCamera={{
-                        latitude: locationInfo.latitude,
-                        longitude: locationInfo.longitude,
-                        zoom: 14,
-                    }}
-                >
+                {locationInfo && (
+                    <NaverMapView
+                        style={{ flex: 1 }}
+                        initialCamera={{
+                            latitude: locationInfo.latitude,
+                            longitude: locationInfo.longitude,
+                            zoom: 14,
+                        }}
+                    >
                     {facilityArray.map((facilityData) => {
                         try {
                             const parsed = FacilityDataSchema.parse(facilityData);
@@ -140,39 +144,49 @@ export default function SearchPage({ route }) {
                             return null;
                         }
                     })}
-                </NaverMapView>
+                    </NaverMapView>
+                )}
             </View>
             {/* 검색결과 목록 */}
             {!isMapShown && (
-                <FlatList
-                    data={facilityArray}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <SearchResult facilityData={item} />
-                    )}
-                    contentContainerStyle={{
-                        padding: 10,
-                        backgroundColor: '#eeeeee',
-                        gap: 20,
-                    }}
-                    // onEndReached={getMore}
-                    // onEndReachedThreshold={0.5}
-                    ListFooterComponent={
-                        isLoading ? (
-                            <ActivityIndicator
-                                animating={true}
-                                color={theme.colors.primary}
-                                style={{ marginVertical: 30 }}
-                            />
-                        ) : (
-                            <View style={{ marginBottom: 30 }}>
-                                <Button mode="outlined" onPress={getMore}>
-                                    더보기
-                                </Button>
-                            </View>
-                        )
-                    }
-                />
+                isFetching && facilityArray.length === 0 ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator
+                            animating={true}
+                            color={theme.colors.primary}
+                        />
+                    </View>
+                ) : (
+                    <FlatList
+                        data={facilityArray}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <SearchResult facilityData={item} />
+                        )}
+                        contentContainerStyle={{
+                            padding: 10,
+                            backgroundColor: '#eeeeee',
+                            gap: 20,
+                        }}
+                        // onEndReached={getMore}
+                        // onEndReachedThreshold={0.5}
+                        ListFooterComponent={
+                            isFetchingNextPage ? (
+                                <ActivityIndicator
+                                    animating={true}
+                                    color={theme.colors.primary}
+                                    style={{ marginVertical: 30 }}
+                                />
+                            ) : hasNextPage ? (
+                                <View style={{ marginBottom: 30 }}>
+                                    <Button mode="outlined" onPress={getMore}>
+                                        더보기
+                                    </Button>
+                                </View>
+                            ) : null
+                        }
+                    />
+                )
             )}
             <FAB
                 icon="map"
@@ -195,9 +209,10 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const navigation = useNavigation();
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
+    const queryClient = useQueryClient();
 
-    const userLike = async () => {
-        try {
+    const userLikeMutation = useMutation({
+        mutationFn: async () => {
             const res = await fetch(
                 `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
                 {
@@ -209,14 +224,19 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 },
             );
 
-            const data = await res.json();
-
             if (!res.ok) {
-                return;
+                throw new Error('Failed to like facility');
             }
-        } catch (err) {
-            console.log(err);
-        }
+
+            return await res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['facilities'] });
+        },
+    });
+
+    const userLike = () => {
+        userLikeMutation.mutate();
     };
 
     return (

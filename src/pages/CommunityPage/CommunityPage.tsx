@@ -1,65 +1,54 @@
-import { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Avatar, Card, FAB, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
 import PlainHeader from '../MainPage/PlainHeader';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 export default function CommunityPage() {
     const navigation = useNavigation();
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
-    const [lastId, setLastId] = useState(null);
-    const [hasMore, setHasMore] = useState(true);
 
-    useEffect(() => {
-        loadInitial();
-    }, []);
-
-    async function loadInitial() {
-        setLoading(true);
-        try {
-            const res = await fetch(`${apis.urls.server}/community?limit=10`);
-            const json = await res.json();
-            // TODO: {서버 응답 스펙에 맞게 필요시 파싱 조정}
-            setItems(json.Community || json.Communities || []);
-            if ((json.Community || []).length === 0) setHasMore(false);
-            if ((json.Community || []).length > 0)
-                setLastId(
-                    (json.Community || [])[(json.Community || []).length - 1]
-                        .id,
-                );
-        } catch (err) {
-            console.error('list load error', err);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function loadMore() {
-        if (!hasMore || loading) return;
-        setLoading(true);
-        try {
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetching,
+        isFetchingNextPage,
+        refetch,
+        isRefetching,
+    } = useInfiniteQuery({
+        queryKey: ['community'],
+        queryFn: async ({ pageParam }) => {
             const res = await fetch(
                 `${apis.urls.server}/community?limit=10${
-                    lastId ? `&lastId=${lastId}` : ''
+                    pageParam ? `&lastId=${pageParam}` : ''
                 }`,
             );
             const json = await res.json();
-            const newItems = json.Community || json.Communities || [];
-            if (newItems.length === 0) setHasMore(false);
-            else {
-                setItems((prev) => [...prev, ...newItems]);
-                setLastId(newItems[newItems.length - 1].id);
-            }
-        } catch (err) {
-            console.error('loadMore error', err);
-        } finally {
-            setLoading(false);
+            const items = json.Community || json.Communities || [];
+            return items;
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length === 0) return undefined;
+            return lastPage[lastPage.length - 1]?.id;
+        },
+        initialPageParam: undefined,
+    });
+
+    const items = data?.pages.flat() || [];
+    const loading = isFetching && items.length === 0;
+    const refreshing = isRefetching;
+
+    const loadMore = () => {
+        if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
         }
-    }
+    };
+
+    const loadInitial = () => {
+        refetch();
+    };
 
     return (
         <>
@@ -77,7 +66,7 @@ export default function CommunityPage() {
                         refreshing={refreshing}
                         onRefresh={loadInitial}
                         ListFooterComponent={() =>
-                            loading ? (
+                            isFetchingNextPage ? (
                                 <ActivityIndicator style={{ margin: 12 }} />
                             ) : null
                         }

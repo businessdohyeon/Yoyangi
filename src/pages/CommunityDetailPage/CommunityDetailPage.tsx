@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -10,6 +10,7 @@ import {
 import { Card, Title, Paragraph } from 'react-native-paper';
 import apis from '../../apis';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
+import { useQuery } from '@tanstack/react-query';
 
 // TODO: {로그인 상태에서 Authorization 헤더를 넣어야 하는 경우 아래 getAuthHeaders를 수정하세요}
 function getAuthHeaders() {
@@ -29,16 +30,10 @@ function formatDate(iso: any) {
 export default function CommunityDetailScreen({ route }) {
     const navigation = useNavigation();
     const { communityId } = route.params;
-    const [community, setCommunity] = useState(null);
-    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        fetchDetail();
-    }, []);
-
-    async function fetchDetail() {
-        setLoading(true);
-        try {
+    const { data: community, isLoading: loading } = useQuery({
+        queryKey: ['community', communityId],
+        queryFn: async () => {
             const res = await fetch(
                 `${apis.urls.server}/community/${communityId}`,
                 {
@@ -47,13 +42,9 @@ export default function CommunityDetailScreen({ route }) {
             );
             const json = await res.json();
             // TODO: {응답 포맷이 다르면 아래 파싱 조정}
-            setCommunity(json.Community || json.community || null);
-        } catch (err) {
-            console.error('fetchDetail', err);
-        } finally {
-            setLoading(false);
-        }
-    }
+            return json.Community || json.community || null;
+        },
+    });
 
     if (loading || !community)
         return (
