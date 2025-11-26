@@ -75,6 +75,13 @@ export default function FacilityDetailPage({ route }) {
     });
 
     const userLike = () => {
+        if (!loginInfo?.token || loginInfo?.userId === 0) {
+            navigation.navigate('LoginPage', {
+                returnScreen: 'FacilityDetailPage',
+                returnParams: { id },
+            });
+            return;
+        }
         userLikeMutation.mutate();
     };
 

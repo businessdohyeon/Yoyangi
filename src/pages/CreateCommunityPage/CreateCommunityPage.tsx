@@ -8,11 +8,18 @@ import apis from '../../apis'
 import axiosInstance from '../../apis/axios'
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRequireAuth } from '../../hooks/useRequireAuth'
 
 export default function CreateCommunityScreen() {
   const navigation = useNavigation()
   const { loginInfo } = React.useContext(LoginInfoContext)
   const queryClient = useQueryClient()
+  const { isAuthenticated } = useRequireAuth()
+
+  // 로그인하지 않았으면 리다이렉션 처리됨 (useRequireAuth에서)
+  if (!isAuthenticated) {
+    return null; // 로그인 페이지로 리다이렉션 중
+  }
 
   const communityMutation = useMutation({
     mutationFn: async (data: { title: string; content: string }) => {

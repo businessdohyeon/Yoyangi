@@ -8,6 +8,7 @@ import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 // form 초기화
 
@@ -16,6 +17,12 @@ export default function ReviewForm({ route, navigation }) {
     const { facilityName } = route.params;
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
+    const { isAuthenticated } = useRequireAuth();
+
+    // 로그인하지 않았으면 리다이렉션 처리됨 (useRequireAuth에서)
+    if (!isAuthenticated) {
+        return null; // 로그인 페이지로 리다이렉션 중
+    }
 
     const reviewMutation = useMutation({
         mutationFn: async (formData: FormData) => {

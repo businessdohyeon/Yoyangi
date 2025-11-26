@@ -21,7 +21,7 @@ import {
     addSpeechEndListener,
     type SpeechResult,
 } from '@dbkable/react-native-speech-to-text';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import SearchHeader from './SearchHeader';
@@ -229,6 +229,7 @@ export default function SearchPage({ route }) {
 
 function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const navigation = useNavigation();
+    const route = useRoute();
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
@@ -252,6 +253,12 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     });
 
     const userLike = () => {
+        if (!loginInfo?.token || loginInfo?.userId === 0) {
+            navigation.navigate('LoginPage', {
+                returnScreen: 'SearchPage',
+            });
+            return;
+        }
         userLikeMutation.mutate();
     };
 

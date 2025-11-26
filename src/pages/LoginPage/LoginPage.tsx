@@ -1,6 +1,6 @@
 import { Image, Linking, useWindowDimensions, View } from 'react-native';
 import { Button, TouchableRipple, useTheme } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback, useContext, useEffect } from 'react';
 
 import apis from '../../apis';
@@ -15,6 +15,7 @@ const LoginPage = () => {
     const theme = useTheme();
     const { width, height } = useWindowDimensions();
     const { loginInfo, storeLoginInfo } = useContext(LoginInfoContext);
+    const route = useRoute();
 
     console.log('loginInfo', loginInfo);
 
@@ -39,10 +40,20 @@ const LoginPage = () => {
             userId !== null
         ) {
             storeLoginInfo({ provider, token, refreshToken, userId });
-            navigation.goBack();
+            
+            // 로그인 성공 후 원래 페이지로 돌아가기
+            const returnScreen = route.params?.returnScreen;
+            const returnParams = route.params?.returnParams;
+            
+            if (returnScreen) {
+                // 원래 페이지로 돌아가기
+                navigation.navigate(returnScreen, returnParams || {});
+            } else {
+                navigation.goBack();
+            }
         } else {
         }
-    }, []);
+    }, [route.params]);
 
     const refreashToken = async () => {
         try {
