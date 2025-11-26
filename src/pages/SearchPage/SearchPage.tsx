@@ -4,12 +4,23 @@ import {
     ActivityIndicator,
     Button,
     Card,
+    Divider,
     FAB,
     Icon,
     IconButton,
     Text,
     useTheme,
 } from 'react-native-paper';
+import {
+    start,
+    stop,
+    requestPermissions,
+    isAvailable,
+    addSpeechResultListener,
+    addSpeechErrorListener,
+    addSpeechEndListener,
+    type SpeechResult,
+} from '@dbkable/react-native-speech-to-text';
 import { useNavigation } from '@react-navigation/native';
 import apis from '../../apis';
 import SearchHeader from './SearchHeader';
@@ -19,7 +30,10 @@ import {
     NaverMapMarkerOverlay,
     NaverMapView,
 } from '@mj-studio/react-native-naver-map';
-import { FacilityData_t, FacilityDataSchema } from '../../types/FacilityDataScheme';
+import {
+    FacilityData_t,
+    FacilityDataSchema,
+} from '../../types/FacilityDataScheme';
 import { FlatList } from 'react-native';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -100,6 +114,12 @@ export default function SearchPage({ route }) {
                 kind={kind}
                 setKind={setKind}
             />
+            <VoiceButton
+                setIsLoading={setIsLoading}
+                setPage={setPage}
+                setFacilityArray={setFacilityArray}
+            />
+            {/* 지도 */}
                     {/* 지도 */}
             <View
                 style={{
@@ -118,8 +138,9 @@ export default function SearchPage({ route }) {
                     >
                     {facilityArray.map((facilityData) => {
                         try {
-                            const parsed = FacilityDataSchema.parse(facilityData);
-                            console.log(...parsed);
+                            const parsed =
+                                FacilityDataSchema.parse(facilityData);
+                            console.log(parsed);
 
                             return (
                                 <NaverMapMarkerOverlay
@@ -361,5 +382,113 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 </View>
             </Card.Content>
         </Card>
+    );
+}
+
+function VoiceButton({ setIsLoading, setPage, setFacilityArray }) {
+    const [transcript, setTranscript] = useState('');
+    const [isListening, setIsListening] = useState(false);
+    const [serverResponse, setServerResponse] = useState({});
+
+    async function sendSTTResultToServer(userSentence: string) {
+        setIsLoading(true);
+
+        try {
+            const res = await fetch(`${apis.urls.server}/search/voice`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usersentence: '용산역 근처 요양병원 찾아줘',
+                }),
+            });
+            const json = await res.json();
+            const { Response } = json;
+
+            if (Response !== null && Response !== undefined) {
+                setFacilityArray(Response);
+                setPage(1);
+                setIsLoading(false);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        // Listen for results
+        const resultListener = addSpeechResultListener(
+            (result: SpeechResult) => {
+                setTranscript(result.transcript);
+                console.log('Confidence:', result.confidence);
+            },
+        );
+
+        // Listen for errors
+        const errorListener = addSpeechErrorListener((error) => {
+            console.error('Speech error:', error);
+            setIsListening(false);
+        });
+
+        // Listen for end of speech
+        const endListener = addSpeechEndListener(() => {
+            console.log('ended');
+            setIsListening(false);
+
+            sendSTTResultToServer(transcript);
+        });
+
+        // Cleanup
+        return () => {
+            resultListener.remove();
+            errorListener.remove();
+            endListener.remove();
+        };
+    }, []);
+
+    const handleStart = async () => {
+        try {
+            const available = await isAvailable();
+            if (!available) {
+                console.log('Speech recognition not available');
+                return;
+            }
+
+            const hasPermission = await requestPermissions();
+            if (!hasPermission) {
+                console.log('Permission denied');
+                return;
+            }
+
+            console.log('right before test');
+
+            await start({ language: 'ko-KR' });
+            setIsListening(true);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleStop = async () => {
+        try {
+            await stop();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    return (
+        <View>
+            <Text>{'text'}</Text>
+            <Text>{transcript || 'Press start to begin'}</Text>
+            <Divider />
+            <Text>{'결과'}</Text>
+            <Text>{JSON.stringify(serverResponse)}</Text>
+            <Divider />
+            <Button onPress={isListening ? handleStop : handleStart}>
+                {isListening ? 'Stop' : 'Start'}
+            </Button>
+        </View>
     );
 }
