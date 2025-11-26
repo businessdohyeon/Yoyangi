@@ -3,8 +3,9 @@ import { Appbar, Button, Searchbar, Text, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useContext, useState } from 'react';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import { LocationInfoContext } from '../../Context';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 // import { showBorder } from "./common.js"
 
 const _goBack = () => console.log('Went back');
@@ -19,13 +20,15 @@ const EditLocationPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResult, setSearchResult] = useState(null);
 
+    const queryClient = useQueryClient();
+
     const geolocationMutation = useMutation({
         mutationFn: async (location: string) => {
-            const res = await fetch(
-                `${apis.urls.getGeoLocaton}?location=${location}`,
+            const response = await axiosInstance.get(
+                apis.urls.getGeoLocaton.replace(apis.urls.server, ''),
+                { params: { location } },
             );
-            const json = await res.json();
-            const { Response } = json;
+            const { Response } = response.data;
             const { addresses } = Response;
             const tmp = addresses[0];
 
@@ -38,6 +41,8 @@ const EditLocationPage = () => {
         onSuccess: (data) => {
             setSearchResult(data);
             setSearchQuery('');
+            // 위치 검색 결과 캐싱 (5분)
+            queryClient.setQueryData(['geolocation', searchQuery], data);
             console.log('Geolocation search successful', data);
         },
         onError: (error) => {

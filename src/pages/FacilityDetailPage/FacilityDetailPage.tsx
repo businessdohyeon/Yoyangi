@@ -12,6 +12,7 @@ import {
 
 import { showBorder } from '../../common';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
@@ -42,9 +43,8 @@ export default function FacilityDetailPage({ route }) {
     const { data: facilityData = {}, isLoading } = useQuery({
         queryKey: ['facility', id],
         queryFn: async () => {
-            const res = await fetch(apis.urls.getFacilityById(id));
-            const json = await res.json();
-            const { Response } = json;
+            const response = await axiosInstance.get(`/facilities/${id}`);
+            const { Response } = response.data;
             const tmp = FacilityDataSchema.parse(Response);
 
             console.group('fetchFacilityData');
@@ -53,26 +53,21 @@ export default function FacilityDetailPage({ route }) {
 
             return tmp;
         },
+        staleTime: 5 * 60 * 1000, // 5분 캐싱 (시설 정보는 자주 변하지 않음)
     });
 
     const userLikeMutation = useMutation({
         mutationFn: async () => {
-            const res = await fetch(
-                `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+            const response = await axiosInstance.post(
+                `/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+                {},
                 {
-                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${loginInfo.token}`,
                     },
                 },
             );
-
-            if (!res.ok) {
-                throw new Error('Failed to like facility');
-            }
-
-            return await res.json();
+            return response.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['facility', id] });

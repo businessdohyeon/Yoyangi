@@ -23,6 +23,7 @@ import {
 } from '@dbkable/react-native-speech-to-text';
 import { useNavigation } from '@react-navigation/native';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import SearchHeader from './SearchHeader';
 
 import { LocationInfoContext, LoginInfoContext } from '../../Context';
@@ -70,17 +71,16 @@ export default function SearchPage({ route }) {
                 return [];
             }
 
-            const url =
-                `${apis.urls.facilities}` +
-                `?limit=${LIMIT}` +
-                `&page=${pageParam}` +
-                `&latitude=${locationInfo?.latitude}` +
-                `&longitude=${locationInfo?.longitude}` +
-                `&kind=${kind.join(',')}`;
+            const params = {
+                limit: LIMIT,
+                page: pageParam,
+                latitude: locationInfo.latitude,
+                longitude: locationInfo.longitude,
+                kind: kind.join(','),
+            };
 
-            const res = await fetch(url);
-            const json = await res.json();
-            const { Response } = json;
+            const response = await axiosInstance.get(apis.urls.facilities.replace(apis.urls.server, ''), { params });
+            const { Response } = response.data;
 
             return Response !== null && Response !== undefined ? Response : [];
         },
@@ -89,6 +89,7 @@ export default function SearchPage({ route }) {
         },
         enabled: !!locationInfo && searchResults === null,
         initialPageParam: 1,
+        staleTime: 30 * 1000, // 30초 캐싱
     });
 
     const facilityArray = searchResults !== null ? searchResults : (data?.pages.flat() || []);
@@ -234,22 +235,16 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
 
     const userLikeMutation = useMutation({
         mutationFn: async () => {
-            const res = await fetch(
-                `${apis.urls.server}/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+            const response = await axiosInstance.post(
+                `/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+                {},
                 {
-                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${loginInfo.token}`,
                     },
                 },
             );
-
-            if (!res.ok) {
-                throw new Error('Failed to like facility');
-            }
-
-            return await res.json();
+            return response.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['facilities'] });
@@ -392,22 +387,10 @@ function VoiceButton({ setSearchResults }) {
 
     const voiceSearchMutation = useMutation({
         mutationFn: async (userSentence: string) => {
-            const res = await fetch(`${apis.urls.server}/search/voice`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    usersentence: userSentence,
-                }),
+            const response = await axiosInstance.post('/search/voice', {
+                usersentence: userSentence,
             });
-            
-            if (!res.ok) {
-                throw new Error('Voice search failed');
-            }
-            
-            const json = await res.json();
-            return json.Response;
+            return response.data.Response;
         },
         onSuccess: (data) => {
             if (data !== null && data !== undefined) {

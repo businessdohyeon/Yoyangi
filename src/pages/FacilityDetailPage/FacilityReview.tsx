@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import ReviewCard from './ReviewCard';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
 import {
     ReviewData_t,
@@ -24,19 +25,17 @@ export function FacilityReview({
     const { data: reviewDataArray = [], isLoading } = useQuery({
         queryKey: ['facilityReviews', facilityData.id],
         queryFn: async () => {
-            const res = await fetch(
-                apis.urls.getFacilityReviewById(facilityData.id),
-            );
-            const json = await res.json();
-            const { data } = json;
+            const response = await axiosInstance.get(`/reviews/${facilityData.id}`);
+            const { data } = response.data;
 
-            console.log(json);
+            console.log(response.data);
 
             const tmp = ReviewDataArraySchema.parse(data);
             console.log(...tmp);
 
             return tmp;
         },
+        staleTime: 60 * 1000, // 1분 캐싱 (리뷰는 새로 추가될 수 있음)
     });
 
     return (

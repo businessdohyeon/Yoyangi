@@ -3,8 +3,10 @@ import { ActivityIndicator, Avatar, Card, FAB, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import PlainHeader from '../MainPage/PlainHeader';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { FlatList } from 'react-native';
 
 export default function CommunityPage() {
     const navigation = useNavigation();
@@ -20,13 +22,12 @@ export default function CommunityPage() {
     } = useInfiniteQuery({
         queryKey: ['community'],
         queryFn: async ({ pageParam }) => {
-            const res = await fetch(
-                `${apis.urls.server}/community?limit=10${
-                    pageParam ? `&lastId=${pageParam}` : ''
-                }`,
-            );
-            const json = await res.json();
-            const items = json.Community || json.Communities || [];
+            const params = { limit: 10 };
+            if (pageParam) {
+                params.lastId = pageParam;
+            }
+            const response = await axiosInstance.get('/community', { params });
+            const items = response.data.Community || response.data.Communities || [];
             return items;
         },
         getNextPageParam: (lastPage, allPages) => {
@@ -34,6 +35,7 @@ export default function CommunityPage() {
             return lastPage[lastPage.length - 1]?.id;
         },
         initialPageParam: undefined,
+        staleTime: 60 * 1000, // 1분 캐싱 (커뮤니티 글은 새로 추가될 수 있음)
     });
 
     const items = data?.pages.flat() || [];

@@ -11,6 +11,7 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 // import { showBorder } from "./common.js"
 
@@ -27,11 +28,11 @@ export default function SearchHeader({ setSearchResults, kind, setKind }) {
 
     const searchMutation = useMutation({
         mutationFn: async (keyword: string) => {
-            const res = await fetch(
-                `${apis.urls.facilities}?keyword=${keyword}`,
+            const response = await axiosInstance.get(
+                apis.urls.facilities.replace(apis.urls.server, ''),
+                { params: { keyword } },
             );
-            const json = await res.json();
-            return json.Response;
+            return response.data.Response;
         },
         onSuccess: (data) => {
             setSearchResults(data);

@@ -6,6 +6,7 @@ import { LoginInfoContext } from '../../Context';
 import { ScrollView } from 'react-native-gesture-handler';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // form 초기화
@@ -18,22 +19,17 @@ export default function ReviewForm({ route, navigation }) {
 
     const reviewMutation = useMutation({
         mutationFn: async (formData: FormData) => {
-            const res = await fetch(
-                `${apis.urls.server}/reviews/${facilityId}`,
+            const response = await axiosInstance.post(
+                `/reviews/${facilityId}`,
+                formData,
                 {
-                    method: 'POST',
                     headers: {
                         Authorization: `Bearer ${loginInfo.token}`,
+                        'Content-Type': 'multipart/form-data',
                     },
-                    body: formData,
                 },
             );
-
-            if (!res.ok) {
-                throw new Error('Failed to submit review');
-            }
-
-            return await res.json();
+            return response.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['facilityReviews', facilityId] });

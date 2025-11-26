@@ -11,6 +11,7 @@ import {
 import { useForm } from '@tanstack/react-form';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
@@ -39,24 +40,16 @@ export default function ReservationPage({ route }) {
 
     const reservationMutation = useMutation({
         mutationFn: async (data: any) => {
-            const res = await fetch(
-                `${apis.urls.server}/facilities/${facilityId}/reservation`,
+            const response = await axiosInstance.post(
+                `/facilities/${facilityId}/reservation`,
+                data,
                 {
-                    method: 'POST',
                     headers: {
                         Authorization: `Bearer ${loginInfo.token}`,
-                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data),
                 },
             );
-            
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.message || '예약 실패');
-            }
-            
-            return await res.json();
+            return response.data;
         },
         onSuccess: (data) => {
             console.log('예약 성공:', data);

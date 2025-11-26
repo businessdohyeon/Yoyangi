@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useQuery } from '@tanstack/react-query';
 
@@ -34,16 +35,13 @@ export default function CommunityDetailScreen({ route }) {
     const { data: community, isLoading: loading } = useQuery({
         queryKey: ['community', communityId],
         queryFn: async () => {
-            const res = await fetch(
-                `${apis.urls.server}/community/${communityId}`,
-                {
-                    headers: { ...getAuthHeaders() },
-                },
-            );
-            const json = await res.json();
+            const response = await axiosInstance.get(`/community/${communityId}`, {
+                headers: { ...getAuthHeaders() },
+            });
             // TODO: {응답 포맷이 다르면 아래 파싱 조정}
-            return json.Community || json.community || null;
+            return response.data.Community || response.data.community || null;
         },
+        staleTime: 2 * 60 * 1000, // 2분 캐싱
     });
 
     if (loading || !community)

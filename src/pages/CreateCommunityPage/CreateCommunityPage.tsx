@@ -5,6 +5,7 @@ import { useForm } from '@tanstack/react-form'
 import { useNavigation } from '@react-navigation/native'
 import { LoginInfoContext } from '../../Context'
 import apis from '../../apis'
+import axiosInstance from '../../apis/axios'
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
@@ -15,20 +16,12 @@ export default function CreateCommunityScreen() {
 
   const communityMutation = useMutation({
     mutationFn: async (data: { title: string; content: string }) => {
-      const res = await fetch(`${apis.urls.server}/community`, {
-        method: 'POST',
+      const response = await axiosInstance.post('/community', data, {
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${loginInfo.token}`,
         },
-        body: JSON.stringify(data),
-      })
-      
-      if (!res.ok) {
-        throw new Error('Failed to create community post');
-      }
-      
-      return await res.json();
+      });
+      return response.data;
     },
     onSuccess: (json) => {
       console.log(json);
