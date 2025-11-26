@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { View } from 'react-native';
 import {
     ActivityIndicator,
@@ -54,6 +54,7 @@ export default function SearchPage({ route }) {
 
     const [isMapShown, setIsMapShown] = useState(false);
     const [kind, setKind] = useState<string[]>(KIND_DEFAULT_VALUE);
+    const [searchResults, setSearchResults] = useState<FacilityData_t[] | null>(null);
 
     const {
         data,
@@ -86,11 +87,11 @@ export default function SearchPage({ route }) {
         getNextPageParam: (lastPage, allPages) => {
             return lastPage.length === LIMIT ? allPages.length + 1 : undefined;
         },
-        enabled: !!locationInfo,
+        enabled: !!locationInfo && searchResults === null,
         initialPageParam: 1,
     });
 
-    const facilityArray = data?.pages.flat() || [];
+    const facilityArray = searchResults !== null ? searchResults : (data?.pages.flat() || []);
 
     const getMore = () => {
         if (hasNextPage && !isFetchingNextPage) {
@@ -104,20 +105,19 @@ export default function SearchPage({ route }) {
     }, [route.params]);
 
     useEffect(() => {
+        setSearchResults(null); // 검색 결과를 초기화하고 일반 쿼리로 돌아감
         refetch();
     }, [kind]);
 
     return (
         <>
             <SearchHeader
-                setFacilityArray={setFacilityArray}
+                setSearchResults={setSearchResults}
                 kind={kind}
                 setKind={setKind}
             />
             <VoiceButton
-                setIsLoading={setIsLoading}
-                setPage={setPage}
-                setFacilityArray={setFacilityArray}
+                setSearchResults={setSearchResults}
             />
             {/* 지도 */}
                     {/* 지도 */}
@@ -385,36 +385,47 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     );
 }
 
-function VoiceButton({ setIsLoading, setPage, setFacilityArray }) {
+function VoiceButton({ setSearchResults }) {
     const [transcript, setTranscript] = useState('');
     const [isListening, setIsListening] = useState(false);
     const [serverResponse, setServerResponse] = useState({});
 
-    async function sendSTTResultToServer(userSentence: string) {
-        setIsLoading(true);
-
-        try {
+    const voiceSearchMutation = useMutation({
+        mutationFn: async (userSentence: string) => {
             const res = await fetch(`${apis.urls.server}/search/voice`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    usersentence: '용산역 근처 요양병원 찾아줘',
+                    usersentence: userSentence,
                 }),
             });
-            const json = await res.json();
-            const { Response } = json;
-
-            if (Response !== null && Response !== undefined) {
-                setFacilityArray(Response);
-                setPage(1);
-                setIsLoading(false);
+            
+            if (!res.ok) {
+                throw new Error('Voice search failed');
             }
-        } catch (error) {
-            console.error(error);
+            
+            const json = await res.json();
+            return json.Response;
+        },
+        onSuccess: (data) => {
+            if (data !== null && data !== undefined) {
+                setSearchResults(data);
+                setServerResponse(data);
+            }
+        },
+        onError: (error) => {
+            console.error('Voice search error:', error);
+        },
+    });
+
+    const sendSTTResultToServer = useCallback((userSentence: string) => {
+        if (!userSentence) {
+            return;
         }
-    }
+        voiceSearchMutation.mutate(userSentence);
+    }, [voiceSearchMutation]);
 
     useEffect(() => {
         // Listen for results
@@ -435,8 +446,6 @@ function VoiceButton({ setIsLoading, setPage, setFacilityArray }) {
         const endListener = addSpeechEndListener(() => {
             console.log('ended');
             setIsListening(false);
-
-            sendSTTResultToServer(transcript);
         });
 
         // Cleanup
@@ -446,6 +455,13 @@ function VoiceButton({ setIsLoading, setPage, setFacilityArray }) {
             endListener.remove();
         };
     }, []);
+
+    // transcript가 변경되고 listening이 끝나면 검색 실행
+    useEffect(() => {
+        if (!isListening && transcript) {
+            sendSTTResultToServer(transcript);
+        }
+    }, [isListening, transcript, sendSTTResultToServer]);
 
     const handleStart = async () => {
         try {

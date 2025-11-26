@@ -17,7 +17,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 // TODO: 어느정도되면 Map, FacilityList 컴포넌트 분리, 각각 상태 가져가서 그에 따라 display설정하는 것 잊지말고
 // -> 한번 한 컴포넌트로 합치고 분리하는 게 나을 듯
 
-export default function SearchHeader({ setFacilityArray, kind, setKind }) {
+export default function SearchHeader({ setSearchResults, kind, setKind }) {
     const navigation = useNavigation();
     const theme = useTheme();
     const { width, height } = useWindowDimensions();
@@ -34,7 +34,7 @@ export default function SearchHeader({ setFacilityArray, kind, setKind }) {
             return json.Response;
         },
         onSuccess: (data) => {
-            setFacilityArray(data);
+            setSearchResults(data);
             queryClient.setQueryData(['facilities', 'search', searchQuery], data);
         },
     });
