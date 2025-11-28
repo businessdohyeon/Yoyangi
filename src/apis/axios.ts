@@ -34,29 +34,29 @@ function processQueue(error: any, token: string | null = null) {
 
 // 요청 인터셉터 - 토큰 추가
 // TODO
-// axiosInstance.interceptors.request.use(
-//     async (config) => {
-//         // 요청에 Authorization 헤더가 없으면 AsyncStorage에서 토큰 가져와서 추가
-//         // 이미 Authorization 헤더가 있으면 사용자가 명시적으로 설정한 것이므로 그대로 사용
-//         if (config.headers && !config.headers.Authorization) {
-//             try {
-//                 const loginInfoData = await AsyncStorage.getItem('loginInfo');
-//                 if (loginInfoData) {
-//                     const loginInfo = LoginInfoSchema.parse(JSON.parse(loginInfoData));
-//                     if (loginInfo.token && loginInfo.token.length > 0) {
-//                         config.headers.Authorization = `Bearer ${loginInfo.token}`;
-//                     }
-//                 }
-//             } catch (error) {
-//                 console.error('Failed to get token from storage:', error);
-//             }
-//         }
-//         return config;
-//     },
-//     (error) => {
-//         return Promise.reject(error);
-//     },
-// );
+axiosInstance.interceptors.request.use(
+    async (config) => {
+        // 요청에 Authorization 헤더가 없으면 AsyncStorage에서 토큰 가져와서 추가
+        // 이미 Authorization 헤더가 있으면 사용자가 명시적으로 설정한 것이므로 그대로 사용
+        if (config.headers && !config.headers.Authorization) {
+            try {
+                const loginInfoData = await AsyncStorage.getItem('loginInfo');
+                if (loginInfoData) {
+                    const loginInfo = LoginInfoSchema.parse(JSON.parse(loginInfoData));
+                    if (loginInfo.token && loginInfo.token.length > 0) {
+                        config.headers.Authorization = `Bearer ${loginInfo.token}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to get token from storage:', error);
+            }
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    },
+);
 
 // 응답 인터셉터 - 401 처리 및 토큰 갱신
 axiosInstance.interceptors.response.use(

@@ -23,6 +23,7 @@ import PredictDiseasePage from '../pages/PredictDiseasePage/PredictDiseasePage.t
 import ConsultationHistory from '../pages/ConsultationHistory/ConsultationHistory.tsx';
 import ReservationHistory from '../pages/ReservationHistory/ReservationHistory.tsx';
 import LikedOrganizations from '../pages/LikedOrganizations/LikedOrganizations.tsx';
+import ReservationDetailPage from '../pages/ReservationDetailPage/ReservationDetailPage.tsx';
 
 // Bottom Tabs 정의
 const Tab = createBottomTabNavigator();
@@ -175,6 +176,10 @@ export default function Routes() {
                 <Stack.Screen
                     name="ConsultationHistory"
                     component={ConsultationHistory}
+                />
+                <Stack.Screen
+                    name="ReservationDetailPage"
+                    component={ReservationDetailPage}
                 />
             </Stack.Navigator>
         </NavigationContainer>
