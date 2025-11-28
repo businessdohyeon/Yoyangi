@@ -1,4 +1,4 @@
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Alert } from 'react-native';
 import {
     Avatar,
     Button,
@@ -11,40 +11,65 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import PlainHeader from '../MainPage/PlainHeader';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { LoginInfoContext } from '../../Context';
+
+// 아이콘 컴포넌트를 렌더 함수 외부에 선언하여 렌더 시마다 새 컴포넌트가 생성되는 것을 방지
+const HeartIcon = (props: any) => <List.Icon {...props} icon="heart" />;
+const CalendarIcon = (props: any) => <List.Icon {...props} icon="calendar" />;
+const ChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
 
 const ProfilePage = () => {
     const navigation = useNavigation();
+    const nav = navigation as any;
     const theme = useTheme();
+    const ctx: any = useContext(LoginInfoContext as any);
+    const { loginInfo, clearLoginInfo } = ctx;
 
-    const user = null;
+    console.log(loginInfo);
+
+    // 로그인 여부 판단: context의 기본값은 객체지만 userId가 0이면 비로그인 상태로 간주
+    const isLoggedIn = Boolean(
+        loginInfo && loginInfo.userId && Number(loginInfo.userId) > 0,
+    );
 
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
     const handleLoginRedirect = () => {
-        navigation.navigate('LoginPage');
+        nav.navigate('LoginPage');
     };
 
     const handleLikesRedirect = () => {
-        navigation.navigate('LikedOrganizations');
+        nav.navigate('LikedOrganizations');
     };
 
     const handleReservationsRedirect = () => {
-        navigation.navigate('ReservationHistory');
+        nav.navigate('ReservationHistory');
     };
 
     const handleConsultationsRedirect = () => {
-        navigation.navigate('ConsultationHistory');
+        nav.navigate('ConsultationHistory');
     };
 
     const handleEditProfile = () => {
-        navigation.navigate('EditProfile');
+        nav.navigate('EditProfile');
     };
 
     const handleLogout = () => {
         Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
             { text: '취소', style: 'cancel' },
-            { text: '확인', onPress: () => onLogout && onLogout() },
+            {
+                text: '확인',
+                onPress: async () => {
+                    try {
+                        await clearLoginInfo();
+                        // 로그아웃 후 홈(또는 로그인) 화면으로 이동
+                        (navigation as any).navigate('MainPage');
+                    } catch (e) {
+                        console.error('clearLoginInfo failed', e);
+                    }
+                },
+            },
         ]);
     };
 
@@ -70,7 +95,7 @@ const ProfilePage = () => {
                                 size={80}
                                 source={{
                                     uri:
-                                        user?.avatar ||
+                                        loginInfo?.avatar ||
                                         'https://via.placeholder.com/80',
                                 }}
                             />
@@ -78,11 +103,13 @@ const ProfilePage = () => {
                                 variant="titleLarge"
                                 style={{ marginTop: 10 }}
                             >
-                                {user ? user.name : '로그인이 필요함'}
+                                {isLoggedIn
+                                    ? loginInfo.name
+                                    : '로그인이 필요함'}
                             </Text>
-                            {user ? (
+                            {isLoggedIn ? (
                                 <Text variant="bodyMedium">
-                                    이메일: {user.email}
+                                    이메일: {loginInfo.email}
                                 </Text>
                             ) : (
                                 <Button
@@ -96,7 +123,7 @@ const ProfilePage = () => {
                         </Card.Content>
                     </Card>
                 </View>
-                {user && (
+                {isLoggedIn && (
                     <>
                         <View style={{ paddingHorizontal: 20 }}>
                             <Button
@@ -119,17 +146,17 @@ const ProfilePage = () => {
                             <List.Section>
                                 <List.Item
                                     title="좋아요한 기관"
-                                    left={() => <List.Icon icon="heart" />}
+                                    left={HeartIcon}
                                     onPress={handleLikesRedirect}
                                 />
                                 <List.Item
                                     title="예약 기록"
-                                    left={() => <List.Icon icon="calendar" />}
+                                    left={CalendarIcon}
                                     onPress={handleReservationsRedirect}
                                 />
                                 <List.Item
                                     title="상담 기록"
-                                    left={() => <List.Icon icon="chat" />}
+                                    left={ChatIcon}
                                     onPress={handleConsultationsRedirect}
                                 />
                             </List.Section>

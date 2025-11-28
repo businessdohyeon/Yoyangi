@@ -20,6 +20,9 @@ import CreateCommunityScreen from '../pages/CreateCommunityPage/CreateCommunityP
 import ChatPage from '../pages/ChatPage/ChatPage.tsx';
 import ExamDimentiaPage from '../pages/ExamDimentiaPage/ExamDimentiaPage.tsx';
 import PredictDiseasePage from '../pages/PredictDiseasePage/PredictDiseasePage.tsx';
+import ConsultationHistory from '../pages/ConsultationHistory/ConsultationHistory.tsx';
+import ReservationHistory from '../pages/ReservationHistory/ReservationHistory.tsx';
+import LikedOrganizations from '../pages/LikedOrganizations/LikedOrganizations.tsx';
 
 // Bottom Tabs 정의
 const Tab = createBottomTabNavigator();
@@ -160,6 +163,18 @@ export default function Routes() {
                 <Stack.Screen
                     name="ExamDimentiaPage"
                     component={ExamDimentiaPage}
+                />
+                <Stack.Screen
+                    name="LikedOrganizations"
+                    component={LikedOrganizations}
+                />
+                <Stack.Screen
+                    name="ReservationHistory"
+                    component={ReservationHistory}
+                />
+                <Stack.Screen
+                    name="ConsultationHistory"
+                    component={ConsultationHistory}
                 />
             </Stack.Navigator>
         </NavigationContainer>
