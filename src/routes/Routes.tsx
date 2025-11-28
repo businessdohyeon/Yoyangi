@@ -1,6 +1,7 @@
 import { BottomNavigation, Icon, useTheme } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/Navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { navigationRef } from '../utils/navigationRef';
 
@@ -117,7 +118,7 @@ const BottomTabs = () => {
 };
 
 // Root Route (Stack) 정의
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function Routes() {
     return (
@@ -126,20 +127,20 @@ export default function Routes() {
                 <Stack.Screen name="Tabs" component={BottomTabs} />
                 <Stack.Screen
                     name="FacilityDetailPage"
-                    component={FacilityDetailPage}
+                    component={FacilityDetailPage as any}
                 />
                 <Stack.Screen
                     name="NotificationPage"
-                    component={NotificationPage}
+                    component={NotificationPage as any}
                 />
-                <Stack.Screen name="LoginPage" component={LoginPage} />
+                <Stack.Screen name="LoginPage" component={LoginPage as any} />
                 <Stack.Screen
                     name="EditLocationPage"
-                    component={EditLocationPage}
+                    component={EditLocationPage as any}
                 />
                 <Stack.Screen
                     name="CommunityDetailPage"
-                    component={CommunityDetailPage}
+                    component={CommunityDetailPage as any}
                 />
                 <Stack.Screen
                     name="ReservationPage"
@@ -148,44 +149,38 @@ export default function Routes() {
                 <Stack.Screen name="ReviewForm" component={ReviewForm} />
                 <Stack.Screen
                     name="CommunityDetail"
-                    component={CommunityDetailScreen}
+                    component={CommunityDetailScreen as any}
                 />
                 <Stack.Screen
                     name="CreateCommunity"
-                    component={CreateCommunityScreen}
+                    component={CreateCommunityScreen as any}
                 />
-                <Stack.Screen
-                    name="ChatPage"
-                    component={ChatPage}
-                />
+                <Stack.Screen name="ChatPage" component={ChatPage as any} />
                 <Stack.Screen
                     name="PredictDiseasePage"
-                    component={PredictDiseasePage}
+                    component={PredictDiseasePage as any}
                 />
                 <Stack.Screen
                     name="ExamDimentiaPage"
-                    component={ExamDimentiaPage}
+                    component={ExamDimentiaPage as any}
                 />
                 <Stack.Screen
                     name="LikedOrganizations"
-                    component={LikedOrganizations}
+                    component={LikedOrganizations as any}
                 />
                 <Stack.Screen
                     name="ReservationHistory"
-                    component={ReservationHistory}
+                    component={ReservationHistory as any}
                 />
                 <Stack.Screen
                     name="ConsultationHistory"
-                    component={ConsultationHistory}
+                    component={ConsultationHistory as any}
                 />
                 <Stack.Screen
                     name="ReservationDetailPage"
                     component={ReservationDetailPage}
                 />
-                <Stack.Screen
-                    name="ReviewDetail"
-                    component={ReviewDetail}
-                />
+                <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
             </Stack.Navigator>
         </NavigationContainer>
     );

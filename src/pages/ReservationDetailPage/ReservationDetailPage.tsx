@@ -13,14 +13,17 @@ import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
 import apis from '../../apis';
+import { ScreenProps } from '../../types/Navigation';
 
-export default function ReservationDetailPage({ route }: any) {
+export default function ReservationDetailPage({
+    route,
+}: ScreenProps<'ReservationDetailPage'>) {
     const theme = useTheme();
     const ctx: any = useContext(LoginInfoContext as any);
     const { loginInfo } = ctx;
 
     // route param 이름이 reservation_id 라고 가정
-    const reservation_id = route?.params?.reservation_id;
+    const reservation_id = route.params?.reservation_id;
 
     const fetchReservationDetail = async () => {
         const res = await axiosInstance.get(

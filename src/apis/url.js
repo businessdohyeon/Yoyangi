@@ -14,12 +14,14 @@ const urls = {
     getFacilityReviewById: (facilityId) => `${API_PREFIX}/reviews/${facilityId}`,
     getReviewByIds: (facilityId, reviewId) => `${API_PREFIX}/reviews/${facilityId}/${reviewId}`,
     createReview: (facilityId) => `${API_PREFIX}/reviews/${facilityId}`,
+    editReview: (facilityId, reviewId) => `${API_PREFIX}/reviews/${facilityId}/${reviewId}`,
+    reportReview: (reviewId) => `${API_PREFIX}/reviews/${reviewId}/report`,
 
     // SNS login endpoints
     snsLogin: (provider) => `${API_PREFIX}/user/sns/login/${provider}`,
-    loginNaver: `${API_PREFIX}/user/sns/login/naver`,
-    loginKakao: `${API_PREFIX}/user/sns/login/kakao`,
-    loginGoogle: `${API_PREFIX}/user/sns/login/google`,
+    // loginNaver: `${API_PREFIX}/user/sns/login/naver`,
+    // loginKakao: `${API_PREFIX}/user/sns/login/kakao`,
+    // loginGoogle: `${API_PREFIX}/user/sns/login/google`,
     loginRefreshToken: `${API_PREFIX}/user/sns/login/refresh-token`,
 
     // community

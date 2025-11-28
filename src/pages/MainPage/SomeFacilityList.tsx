@@ -81,7 +81,7 @@ export default function SomeFacilityList() {
             <View style={{ marginBottom: 20 }}>
                 <Button
                     mode="outlined"
-                    onPress={() => navigation.navigate('SearchPage')}
+                    onPress={() => (navigation as any).navigate('SearchPage')}
                 >
                     <Text variant="labelLarge">더보기</Text>
                 </Button>

@@ -25,6 +25,7 @@ import {
     type SpeechResult,
 } from '@dbkable/react-native-speech-to-text';
 import { useNavigation } from '@react-navigation/native';
+import { ScreenProps } from '../../types/Navigation';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 
@@ -47,8 +48,10 @@ import {
 const LIMIT = 10;
 const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
 
-export default function SearchPage({ route }: any) {
-    const navigation = useNavigation();
+export default function SearchPage({
+    route,
+    navigation,
+}: ScreenProps<'SearchPage'>) {
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
     // queryClient not used in this component
@@ -94,7 +97,9 @@ export default function SearchPage({ route }: any) {
                 kind: kind.join(','),
             };
 
-            const response = await axiosInstance.get(apis.urls.facilities, { params });
+            const response = await axiosInstance.get(apis.urls.facilities, {
+                params,
+            });
             const { Response } = response.data;
 
             return Response !== null && Response !== undefined ? Response : [];
@@ -529,10 +534,9 @@ export function SearchHeader({
 
     const searchMutation = useMutation({
         mutationFn: async (keyword: string) => {
-            const response = await axiosInstance.get(
-                apis.urls.facilities,
-                { params: { keyword } },
-            );
+            const response = await axiosInstance.get(apis.urls.facilities, {
+                params: { keyword },
+            });
             return response.data.Response;
         },
         onSuccess: (data) => {

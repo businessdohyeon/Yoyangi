@@ -7,8 +7,8 @@ import {
     Title,
     Paragraph,
 } from 'react-native-paper';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { useCallback, useContext, useEffect } from 'react';
+import { ScreenProps } from '../../types/Navigation';
 
 import apis from '../../apis';
 import { LoginInfoContext } from '../../Context';
@@ -16,12 +16,10 @@ import naverLoginBtnImg from './btnG_완성형.png';
 import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
 import googleLoginBtnImg from './web_light_sq_SI.png';
 
-const LoginPage = () => {
-    const navigation = useNavigation();
+function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
     const theme = useTheme();
     const { width } = useWindowDimensions();
     const { loginInfo, storeLoginInfo } = useContext(LoginInfoContext);
-    const route = useRoute();
 
     const handleUrl = useCallback(
         (event: any) => {
@@ -45,8 +43,8 @@ const LoginPage = () => {
                         userId: Number(userId),
                     } as any);
 
-                    const returnScreen = (route as any).params?.returnScreen;
-                    const returnParams = (route as any).params?.returnParams;
+                    const returnScreen = (route as any)?.params?.returnScreen;
+                    const returnParams = (route as any)?.params?.returnParams;
                     if (returnScreen) {
                         (navigation as any).navigate(
                             returnScreen as any,
@@ -162,6 +160,6 @@ const LoginPage = () => {
             </Card>
         </View>
     );
-};
+}
 
 export default LoginPage;

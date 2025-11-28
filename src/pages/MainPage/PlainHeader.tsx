@@ -18,7 +18,7 @@ export default function PlainHeader() {
                 icon="map-marker"
                 iconColor={theme.colors.primary}
                 onPress={() => {
-                    navigation.navigate('EditLocationPage');
+                    (navigation as any).navigate('EditLocationPage');
                 }}
             />
             <Appbar.Content title={locationInfo?.displayName} />
@@ -26,12 +26,12 @@ export default function PlainHeader() {
                 icon="magnify"
                 onPress={() => {
                     // TODO: searchPage로 리다이렉션 할 때 seachbox에 focus된 채로?
-                    navigation.navigate('SearchPage');
+                    (navigation as any).navigate('SearchPage');
                 }}
             />
             <Appbar.Action
                 icon="bell"
-                onPress={() => navigation.navigate('NotificationPage')}
+                onPress={() => (navigation as any).navigate('NotificationPage')}
             />
         </Appbar.Header>
     );

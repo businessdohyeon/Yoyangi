@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
-import { Alert } from 'react-native';
-import { TextInput, Button, Card } from 'react-native-paper';
+import { Alert, Text, View, Image } from 'react-native';
+import { TextInput, Button, Card, IconButton } from 'react-native-paper';
+import {
+    launchImageLibrary,
+    ImageLibraryOptions,
+} from 'react-native-image-picker';
 import { useForm } from '@tanstack/react-form';
 import { LoginInfoContext } from '../../Context';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -10,23 +14,38 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
+import { ScreenProps } from '../../types/Navigation';
 
 // form 초기화
 
-export default function ReviewForm({ route, navigation }) {
-    const { facilityId } = route.params;
-    const { facilityName } = route.params;
+export default function ReviewForm({
+    route,
+    navigation,
+}: ScreenProps<'ReviewForm'>) {
+    const { facilityId } = route.params || {};
+    const { facilityName } = route.params || {};
+    const reviewId = (route.params as any)?.reviewId;
+    const initialValues = (route.params as any)?.initialValues;
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
     const { isAuthenticated } = useRequireAuth();
 
-    // 로그인하지 않았으면 리다이렉션 처리됨 (useRequireAuth에서)
-    if (!isAuthenticated) {
-        return null; // 로그인 페이지로 리다이렉션 중
-    }
-
     const reviewMutation = useMutation({
         mutationFn: async (formData: FormData) => {
+            if (reviewId) {
+                // edit existing review with PATCH to same endpoint
+                const response = await axiosInstance.patch(
+                    apis.urls.editReview(facilityId, reviewId),
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${loginInfo.token}`,
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    },
+                );
+                return response.data;
+            }
             const response = await axiosInstance.post(
                 apis.urls.createReview(facilityId),
                 formData,
@@ -56,10 +75,16 @@ export default function ReviewForm({ route, navigation }) {
 
     const form = useForm({
         defaultValues: {
-            content: '',
-            rating: '',
-            reservationId: '',
-            images: [],
+            content: initialValues?.content ?? '',
+            rating:
+                initialValues?.rating !== undefined
+                    ? String(initialValues.rating)
+                    : '',
+            reservationId:
+                initialValues?.reservationId !== undefined
+                    ? String(initialValues.reservationId)
+                    : '',
+            images: initialValues?.images ?? [],
         },
         onSubmit: async (values) => {
             try {
@@ -78,13 +103,13 @@ export default function ReviewForm({ route, navigation }) {
                     Array.isArray(values.value.images) &&
                     values.value.images.length > 0
                 ) {
-                    values.value.images.forEach((img, idx) => {
+                    values.value.images.forEach((img: any, idx: number) => {
                         if (img?.uri) {
-                            formData.append('files', {
+                            formData.append('images', {
                                 uri: img.uri,
                                 name: `review_${idx}.jpg`,
                                 type: 'image/jpeg',
-                            });
+                            } as any);
                         }
                     });
                 }
@@ -95,6 +120,9 @@ export default function ReviewForm({ route, navigation }) {
             }
         },
     });
+
+    // 인증 상태가 준비되지 않았으면 아무 것도 렌더링하지 않음
+    if (!isAuthenticated) return null;
 
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
@@ -120,9 +148,9 @@ export default function ReviewForm({ route, navigation }) {
                                     onBlur={field.handleBlur}
                                     multiline
                                 />
-                                {field.state.meta.error ? (
+                                {(field.state as any).meta?.error ? (
                                     <Text style={{ color: 'red' }}>
-                                        {field.state.meta.error}
+                                        {(field.state as any).meta?.error}
                                     </Text>
                                 ) : null}
                             </>
@@ -133,7 +161,10 @@ export default function ReviewForm({ route, navigation }) {
                         name="rating"
                         validators={{
                             onChange: ({ value }) =>
-                                !value || isNaN(value) || value < 1 || value > 5
+                                !value ||
+                                isNaN(Number(value)) ||
+                                Number(value) < 1 ||
+                                Number(value) > 5
                                     ? '평점은 1~5 사이여야 함'
                                     : undefined,
                         }}
@@ -146,9 +177,9 @@ export default function ReviewForm({ route, navigation }) {
                                     onChangeText={field.handleChange}
                                     onBlur={field.handleBlur}
                                 />
-                                {field.state.meta.error ? (
+                                {(field.state as any).meta?.error ? (
                                     <Text style={{ color: 'red' }}>
-                                        {field.state.meta.error}
+                                        {(field.state as any).meta?.error}
                                     </Text>
                                 ) : null}
                             </>
@@ -159,7 +190,7 @@ export default function ReviewForm({ route, navigation }) {
                         name="reservationId"
                         validators={{
                             onChange: ({ value }) =>
-                                value && isNaN(value)
+                                value && isNaN(Number(value))
                                     ? '숫자만 입력 가능'
                                     : undefined,
                         }}
@@ -176,17 +207,85 @@ export default function ReviewForm({ route, navigation }) {
                         )}
                     />
 
-                    {/* 이미지 업로드 예시 - 간단히 로컬 배열에 저장 */}
-                    {/* 실제로는 react-native-image-picker 등을 통해 처리 */}
-                    <Button
-                        mode="outlined"
-                        onPress={() =>
-                            Alert.alert('TODO', '이미지 선택 기능 구현 필요')
-                        }
-                        style={{ marginVertical: 10 }}
-                    >
-                        이미지 추가
-                    </Button>
+                    {/** 로그인 인증이 아직 완료되지 않았으면 렌더링 중단 (hooks는 이미 호출됨) */}
+                    {/** Guard: hooks already called above */}
+                    {/** 실제 렌더링 바로 전에 인증 상태 확인 */}
+                    {/** (컴포넌트 레벨에서 return을 사용하기 위해 JSX 밖으로 이동) */}
+
+                    <form.Field
+                        name="images"
+                        children={(field) => {
+                            const pickImages = async () => {
+                                const opts: ImageLibraryOptions = {
+                                    mediaType: 'photo',
+                                    selectionLimit: 4, // match server limit
+                                };
+                                try {
+                                    const res = await launchImageLibrary(opts);
+                                    if (res.didCancel) return;
+                                    const assets = res.assets || [];
+                                    const newImgs = assets
+                                        .map((a) => a?.uri)
+                                        .filter(Boolean)
+                                        .map((uri) => ({ uri } as any));
+                                    const cur = Array.isArray(field.state.value)
+                                        ? field.state.value
+                                        : [];
+                                    field.handleChange([...cur, ...newImgs]);
+                                } catch (e) {
+                                    console.error('image pick error', e);
+                                }
+                            };
+
+                            const removeImage = (idx: number) => {
+                                const cur = Array.isArray(field.state.value)
+                                    ? [...field.state.value]
+                                    : [];
+                                cur.splice(idx, 1);
+                                field.handleChange(cur);
+                            };
+
+                            return (
+                                <View style={{ marginVertical: 8 }}>
+                                    <Button
+                                        mode="outlined"
+                                        onPress={pickImages}
+                                        style={{ marginBottom: 8 }}
+                                    >
+                                        이미지 추가
+                                    </Button>
+
+                                    <View style={styles.imagePreviewRow}>
+                                        {(field.state.value || []).map(
+                                            (img: any, idx: number) => (
+                                                <View
+                                                    key={idx}
+                                                    style={styles.previewItem}
+                                                >
+                                                    <Image
+                                                        source={{
+                                                            uri: img.uri,
+                                                        }}
+                                                        style={
+                                                            styles.previewImg
+                                                        }
+                                                    />
+                                                    <IconButton
+                                                        icon="close"
+                                                        size={16}
+                                                        onPress={() =>
+                                                            removeImage(idx)
+                                                        }
+                                                        style={styles.removeBtn}
+                                                    />
+                                                </View>
+                                            ),
+                                        )}
+                                    </View>
+                                </View>
+                            );
+                        }}
+                    />
 
                     <form.Subscribe
                         selector={(state) => ({
@@ -204,7 +303,7 @@ export default function ReviewForm({ route, navigation }) {
                                 }
                                 onPress={form.handleSubmit}
                             >
-                                리뷰 등록
+                                {reviewId ? '수정하기' : '등록하기'}
                             </Button>
                         )}
                     />
@@ -213,3 +312,27 @@ export default function ReviewForm({ route, navigation }) {
         </SafeAreaView>
     );
 }
+
+const styles = {
+    imagePreviewRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    } as any,
+    previewItem: {
+        position: 'relative',
+        marginRight: 8,
+    } as any,
+    previewImg: {
+        width: 80,
+        height: 80,
+        borderRadius: 6,
+        backgroundColor: '#eee',
+    } as any,
+    removeBtn: {
+        position: 'absolute',
+        top: -6,
+        right: -6,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+    } as any,
+};

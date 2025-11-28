@@ -13,8 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
 import apis from '../../apis';
+import { ScreenProps } from '../../types/Navigation';
 
-export default function ReviewDetail({ route }: any) {
+export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
     const theme = useTheme();
     const { facilityId, reviewId } = route.params || {};
 

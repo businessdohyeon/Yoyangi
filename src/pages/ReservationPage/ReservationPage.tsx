@@ -14,15 +14,19 @@ import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
+import { ScreenProps } from '../../types/Navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
 
-export default function ReservationPage({ route }) {
-    const navigation = useNavigation();
+export default function ReservationPage({
+    route,
+    navigation,
+}: ScreenProps<'ReservationPage'>) {
+    // const navigation = useNavigation();
 
-    const { facilityId, facilityName } = route.params;
+    const { facilityId, facilityName } = route.params || {};
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
     const { isAuthenticated } = useRequireAuth();

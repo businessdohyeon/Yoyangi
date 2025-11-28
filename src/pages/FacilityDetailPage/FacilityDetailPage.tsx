@@ -1,9 +1,8 @@
 import { useContext, useRef, useState } from 'react';
-import { Image, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
     ActivityIndicator,
     Button,
-    Icon,
     IconButton,
     Text,
     TouchableRipple,
@@ -13,10 +12,9 @@ import {
 import { showBorder } from '../../common';
 import axiosInstance from '../../apis/axios';
 import { useNavigation } from '@react-navigation/native';
-import {
-    SafeAreaView,
-    useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList, ScreenProps } from '../../types/Navigation';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
 import { LoginInfoContext } from '../../Context';
 import {
@@ -25,15 +23,23 @@ import {
 } from '../../types/FacilityDataScheme';
 import { FacilityNotice } from './FacilityNotice';
 import { FacilityReview } from './FacilityReview';
-import { tileData } from './data';
+// import { tileData } from './data';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apis from '../../apis';
+import { FacilityInfo } from './FacilityInfo';
+import HeroSection from './HeroSection';
 
-export default function FacilityDetailPage({ route }) {
+export default function FacilityDetailPage({
+    route,
+}: ScreenProps<'FacilityDetailPage'>) {
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
-    const { id } = route.params;
-    const scrollRef = useRef<ScrollView>();
+    const id = route.params?.facilityId ?? (route.params as any)?.id;
+    const scrollRef = useRef<ScrollView | null>(null);
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamList, 'FacilityDetailPage'>
+        >();
     const queryClient = useQueryClient();
 
     const [tabIndex, setTabIndex] = useState(0);
@@ -43,7 +49,7 @@ export default function FacilityDetailPage({ route }) {
     console.log(loginInfo);
     console.groupEnd();
 
-    const { data: facilityData = {}, isLoading } = useQuery({
+    const { data: facilityData = {} as FacilityData_t, isLoading } = useQuery({
         queryKey: ['facility', id],
         queryFn: async () => {
             const response = await axiosInstance.get(
@@ -58,7 +64,7 @@ export default function FacilityDetailPage({ route }) {
 
             return tmp;
         },
-        staleTime: 5 * 60 * 1000, // 5분 캐싱 (시설 정보는 자주 변하지 않음)
+        staleTime: 5 * 60 * 1000,
     });
 
     const userLikeMutation = useMutation({
@@ -102,119 +108,10 @@ export default function FacilityDetailPage({ route }) {
                     <ActivityIndicator style={{ marginVertical: 50 }} />
                 ) : (
                     <>
-                        {/* kinda hero section */}
-                        <View
-                            style={{ backgroundColor: theme.colors.background }}
-                        >
-                            {/* banner */}
-                            <View style={{}}>
-                                <View style={{ height: 350, flex: 1 }}>
-                                    <Image
-                                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
-                                        style={{ flex: 1 }}
-                                    />
-                                </View>
-                            </View>
-                            {/* 주요 정보들 */}
-                            <View
-                                style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    backgroundColor: theme.colors.background,
-                                }}
-                            >
-                                <View style={{ flex: 5, padding: 10 }}>
-                                    {!facilityData.approval_status ? (
-                                        <View style={{}}>
-                                            <Text>"인증시설입니다"</Text>
-                                        </View>
-                                    ) : null}
-                                    <View style={{}}>
-                                        <Text variant="titleLarge">
-                                            {facilityData.name}
-                                        </Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <View style={{ marginRight: 10 }}>
-                                            <Text>별점</Text>
-                                        </View>
-                                        <View style={{ marginRight: 10 }}>
-                                            <Text>{`${facilityData.sggu_name} ${facilityData.sido_name}`}</Text>
-                                        </View>
-                                        <View style={{ marginRight: 10 }}>
-                                            <Text>{facilityData.kind}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                                <View
-                                    style={{
-                                        flex: 1,
-                                        justifyContent: 'flex-start',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <IconButton
-                                        icon={'heart'}
-                                        onPress={userLike}
-                                        size={30}
-                                    />
-                                </View>
-                            </View>
-                            {/* 주소랑 당일 운영시간 */}
-                            {/* // TODO: add link to the part */}
-                            <View style={{ padding: 10 }}>
-                                <View>
-                                    <Text>{facilityData.address}</Text>
-                                </View>
-                                <View>
-                                    <Text>대충 운영시간</Text>
-                                </View>
-                                <View>
-                                    <Text>{facilityData.url || 'url...'}</Text>
-                                </View>
-                            </View>
-                            {/* 타일 정보판 */}
-                            <View
-                                style={{
-                                    height: 250,
-                                    backgroundColor: '#eeeeee',
-                                    marginVertical: 20,
-                                }}
-                            >
-                                {tileData.map((row, idx) => {
-                                    return (
-                                        <View
-                                            key={`tileDataRow${idx}`}
-                                            style={{
-                                                flex: 1,
-                                                flexDirection: 'row',
-                                            }}
-                                        >
-                                            {row.map((item) => (
-                                                <View
-                                                    key={item.label}
-                                                    style={{
-                                                        flex: 1,
-                                                        justifyContent:
-                                                            'center',
-                                                        alignItems: 'center',
-                                                    }}
-                                                >
-                                                    <Icon
-                                                        source={item.iconSource}
-                                                        size={40}
-                                                        color={item.iconColor}
-                                                    />
-                                                    <Text variant="labelSmall">
-                                                        {item.label}
-                                                    </Text>
-                                                </View>
-                                            ))}
-                                        </View>
-                                    );
-                                })}
-                            </View>
-                        </View>
+                        <HeroSection
+                            facilityData={facilityData}
+                            userLike={userLike}
+                        />
                         {/* 이동버튼 */}
                         <View
                             style={{
@@ -308,8 +205,7 @@ export default function FacilityDetailPage({ route }) {
                         >
                             {/* 병원정보 */}
                             {tabIndex === 0 ? (
-                                // <FacilityInfo facilityData={facilityData} />
-                                <Text>adf</Text>
+                                <FacilityInfo facilityData={facilityData} />
                             ) : tabIndex === 1 ? (
                                 <FacilityNotice facilityData={facilityData} />
                             ) : (
@@ -346,8 +242,8 @@ export default function FacilityDetailPage({ route }) {
 
 function Footer({ facilityData }: { facilityData: FacilityData_t }) {
     const { loginInfo } = useContext(LoginInfoContext);
-    const insets = useSafeAreaInsets();
-    const navigation = useNavigation();
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const theme = useTheme();
 
     return (
@@ -355,9 +251,7 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
             style={{
                 ...showBorder,
                 flexDirection: 'row',
-                height: 80,
                 backgroundColor: theme.colors.background,
-                paddingBottom: insets.bottom,
             }}
         >
             <View

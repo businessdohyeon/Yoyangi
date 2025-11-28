@@ -8,7 +8,10 @@ export function useRequireAuth(redirectIfNotLoggedIn: boolean = true) {
     const route = useRoute();
     const hasRedirected = useRef(false);
 
-    const isAuthenticated = loginInfo?.token && loginInfo?.token.length > 0 && loginInfo?.userId > 0;
+    const isAuthenticated =
+        loginInfo?.token &&
+        loginInfo?.token.length > 0 &&
+        loginInfo?.userId > 0;
 
     useEffect(() => {
         if (!redirectIfNotLoggedIn) {
@@ -18,7 +21,7 @@ export function useRequireAuth(redirectIfNotLoggedIn: boolean = true) {
         if (!isAuthenticated && !hasRedirected.current) {
             hasRedirected.current = true;
             // 현재 route params를 저장하여 로그인 후 돌아올 수 있도록 함
-            navigation.navigate('LoginPage', {
+            (navigation as any).navigate('LoginPage', {
                 returnScreen: route.name,
                 returnParams: route.params,
             });

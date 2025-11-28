@@ -25,8 +25,11 @@ export default function CommunityPage() {
             if (pageParam) {
                 params.lastId = pageParam;
             }
-            const response = await axiosInstance.get(apis.urls.communities, { params });
-            const items = response.data.Community || response.data.Communities || [];
+            const response = await axiosInstance.get(apis.urls.communities, {
+                params,
+            });
+            const items =
+                response.data.Community || response.data.Communities || [];
             return items;
         },
         getNextPageParam: (lastPage, allPages) => {
@@ -83,7 +86,7 @@ export default function CommunityPage() {
                         bottom: 0,
                     }}
                     onPress={() => {
-                        navigation.navigate('CreateCommunity');
+                        (navigation as any).navigate('CreateCommunity');
                     }}
                 />
             </View>
@@ -108,7 +111,9 @@ function PostCard({ item }) {
     // console.log(item);
 
     const onPress = () => {
-        navigation.navigate('CommunityDetail', { communityId: item.id });
+        (navigation as any).navigate('CommunityDetail', {
+            communityId: item.id,
+        });
     };
 
     return (

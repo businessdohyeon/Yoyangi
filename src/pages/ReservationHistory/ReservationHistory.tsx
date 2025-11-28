@@ -159,9 +159,13 @@ export default function ReservationHistory() {
                                     onPress={() => {
                                         console.log(item);
 
-                                        nav.navigate('ReservationDetailPage', {
-                                            reservation_id: item.reservation_id,
-                                        });
+                                        (nav as any).navigate(
+                                            'ReservationDetailPage',
+                                            {
+                                                reservation_id:
+                                                    item.reservation_id,
+                                            },
+                                        );
                                     }}
                                 >
                                     <Card.Content>

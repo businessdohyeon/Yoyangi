@@ -111,7 +111,7 @@ function BigButtons() {
                         icon="camera"
                         mode="elevated"
                         onPress={() => {
-                            navigation.navigate('SearchPage', {
+                            (navigation as any).navigate('SearchPage', {
                                 kind: ['요양병원'],
                             });
                         }}
@@ -127,7 +127,7 @@ function BigButtons() {
                         icon="camera"
                         mode="elevated"
                         onPress={() => {
-                            navigation.navigate('SearchPage', {
+                            (navigation as any).navigate('SearchPage', {
                                 kind: ['요양원'],
                             });
                         }}
@@ -143,7 +143,7 @@ function BigButtons() {
                         icon="camera"
                         mode="elevated"
                         onPress={() => {
-                            navigation.navigate('SearchPage', {
+                            (navigation as any).navigate('SearchPage', {
                                 kind: ['주간보호케어센터'],
                             });
                         }}
@@ -167,7 +167,7 @@ function BigButtons() {
                         icon="camera"
                         mode="elevated"
                         onPress={() => {
-                            navigation.navigate('ExamDimentiaPage');
+                            (navigation as any).navigate('ExamDimentiaPage');
                         }}
                     >
                         치매 자가 진단
@@ -181,7 +181,7 @@ function BigButtons() {
                         icon="camera"
                         mode="elevated"
                         onPress={() => {
-                            navigation.navigate('PredictDiseasePage');
+                            (navigation as any).navigate('PredictDiseasePage');
                         }}
                     >
                         질병 예측

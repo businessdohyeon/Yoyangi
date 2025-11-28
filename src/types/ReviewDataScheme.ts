@@ -9,10 +9,11 @@ export const ReviewDataSchema = z.object({
     id: z.number(),
     user_id: z.number(),
     content: z.string(),
-    images: z.array(z.any()), // TODO: 이후 세부 구현
+    images: z.array(z.string()), // 배열은 S3 URL 문자열 목록으로 기대
+    reservation_id: z.number().optional(),
     rating: z.number(),
     visited: z.boolean(),
-    created_at: z.string().datetime(),
+    created_at: z.string(),
     user: UserSchema,
 });
 
