@@ -149,7 +149,7 @@ export default function SearchPage({ route }) {
                             zoom: 14,
                         }}
                     >
-                        {facilityArray.map((facilityData) => {
+                        {isMapShown && facilityArray.map((facilityData) => {
                             try {
                                 const parsed =
                                     FacilityDataSchema.parse(facilityData);
