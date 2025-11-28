@@ -79,7 +79,7 @@ export default function SearchPage({ route }) {
                 kind: kind.join(','),
             };
 
-            const response = await axiosInstance.get(apis.urls.facilities.replace(apis.urls.server, ''), { params });
+            const response = await axiosInstance.get("/facilities", { params });
             const { Response } = response.data;
 
             return Response !== null && Response !== undefined ? Response : [];

@@ -149,16 +149,16 @@ const LoginPage = () => {
                         />
                     </TouchableRipple>
                 ))}
-                {/* TODO
-                <Button mode="outlined" onPress={_handleMore}>
+                {/* TODO */}
+                {/* <Button mode="outlined" onPress={_handleMore}>
                     전화번호 login
                 </Button> */}
                 {/* <Button mode="outlined" onPress={refreashToken}>
                     refresh token
-                </Button>
+                </Button> */}
                 <Button mode="outlined" onPress={() => AsyncStorage.clear()}>
                     async clear
-                </Button> */}
+                </Button>
             </View>
         </>
     );

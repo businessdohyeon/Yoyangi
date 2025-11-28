@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
-import { setLogoutCallback, setTokenRefreshCallback } from '../utils/auth';
+import { setLogoutCallback, setTokenRefreshCallback } from './utils/auth';
 
 const LocationInfoSchema = z.object({
     latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
