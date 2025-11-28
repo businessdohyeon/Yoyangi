@@ -37,6 +37,12 @@ const urls = {
     CommunityFormPage: `${API_PREFIX}/community`,
     reportCommunity: (communityId) =>
         `${API_PREFIX}/community/${communityId}/report`,
+    comment: (communityId) => `${API_PREFIX}/community/${communityId}/comment`,
+    commentById: (communityId, commentId) =>
+        `${API_PREFIX}/community/${communityId}/comment/${commentId}`,
+    commnetById: (communityId, commentId) =>
+        `${API_PREFIX}/community/${communityId}/comment/${commentId}`,
+    reportCommnet: (communityId, commentId) => `${API_PREFIX}/community/${communityId}/comment/${commentId}/report`,
 
     // user favorites
     userLike: (userId, facilityId) =>
