@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoginInfoContext } from '../../Context';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
+import apis from '../../apis';
 
 export default function ReservationHistory() {
     const nav = useNavigation();
@@ -23,7 +24,7 @@ export default function ReservationHistory() {
     const { loginInfo } = ctx;
 
     const fetchReservations = async () => {
-        const res = await axiosInstance.get(`/facilities/reservations/list`, {
+        const res = await axiosInstance.get(apis.urls.reservationsList, {
             headers: {
                 Authorization: `Bearer ${loginInfo.token}`,
                 'Content-Type': 'application/json',
@@ -122,7 +123,9 @@ export default function ReservationHistory() {
                                                     // 이전에는 headers를 두번째 인자로 전달해버려서
                                                     // axios가 이를 request body로 취급했고 Authorization 헤더가 전송되지 않았습니다.
                                                     await axiosInstance.patch(
-                                                        `/facilities/reservations/${item.reservation_id}`,
+                                                        apis.urls.cancelReservationById(
+                                                            item.reservation_id,
+                                                        ),
                                                         {},
                                                         {
                                                             headers: {

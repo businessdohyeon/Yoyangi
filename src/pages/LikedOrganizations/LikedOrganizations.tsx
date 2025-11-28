@@ -8,6 +8,7 @@ import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
+import apis from '../../apis';
 
 export default function LikedOrganizations() {
     const theme = useTheme();
@@ -25,7 +26,7 @@ export default function LikedOrganizations() {
 
     const fetchFavorites = async () => {
         const res = await axiosInstance.get(
-            `/user/${loginInfo.userId}/favorites`,
+            apis.urls.getFavorites(loginInfo.userId),
             {
                 headers: {
                     Authorization: `Bearer ${loginInfo.token}`,

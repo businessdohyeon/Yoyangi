@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import apis from '../../apis';
 
 export default function ReservationPage({ route }) {
     const navigation = useNavigation();
@@ -48,7 +49,7 @@ export default function ReservationPage({ route }) {
     const reservationMutation = useMutation({
         mutationFn: async (data: any) => {
             const response = await axiosInstance.post(
-                `/facilities/${facilityId}/reservation`,
+                apis.urls.crateReservation(facilityId),
                 data,
                 {
                     headers: {

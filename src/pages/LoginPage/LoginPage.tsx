@@ -1,6 +1,5 @@
 import { Image, Linking, useWindowDimensions, View } from 'react-native';
 import {
-    Button,
     TouchableRipple,
     useTheme,
     Text,
@@ -13,7 +12,6 @@ import { useCallback, useContext, useEffect } from 'react';
 
 import apis from '../../apis';
 import { LoginInfoContext } from '../../Context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import naverLoginBtnImg from './btnG_완성형.png';
 import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
 import googleLoginBtnImg from './web_light_sq_SI.png';
@@ -65,31 +63,6 @@ const LoginPage = () => {
         [storeLoginInfo, route, navigation],
     );
 
-    const refreashToken = async () => {
-        try {
-            const res = await fetch(
-                `${apis.urls.server}/user/sns/login/refresh-token`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        refreshToken: loginInfo.refreshToken,
-                    }),
-                },
-            );
-
-            if (!res.ok) {
-                console.log(res);
-                return;
-            }
-
-            const json = await res.json();
-            storeLoginInfo({ ...loginInfo, token: json.token });
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     useEffect(() => {
         Linking.getInitialURL().then((initialUrl) => {
             if (initialUrl) handleUrl(initialUrl);
@@ -105,7 +78,7 @@ const LoginPage = () => {
     const openAuth = async (provider: string) => {
         try {
             await Linking.openURL(
-                `${apis.urls.server}/user/sns/login/${provider}`,
+                `${apis.urls.server}/api/user/sns/login/${provider}`,
             );
         } catch (e) {
             console.warn('openURL failed', e);

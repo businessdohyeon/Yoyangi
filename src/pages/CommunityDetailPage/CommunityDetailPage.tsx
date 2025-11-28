@@ -12,6 +12,7 @@ import axiosInstance from '../../apis/axios';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import apis from '../../apis';
 
 // TODO: {로그인 상태에서 Authorization 헤더를 넣어야 하는 경우 아래 getAuthHeaders를 수정하세요}
 function getAuthHeaders() {
@@ -36,7 +37,7 @@ export default function CommunityDetailScreen({ route }) {
         queryKey: ['community', communityId],
         queryFn: async () => {
             const response = await axiosInstance.get(
-                `/community/${communityId}`,
+                apis.urls.getCommunityById(communityId),
                 {
                     headers: { ...getAuthHeaders() },
                 },

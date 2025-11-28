@@ -12,6 +12,7 @@ import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
+import apis from '../../apis';
 
 export default function ReviewDetail({ route }: any) {
     const theme = useTheme();
@@ -19,7 +20,7 @@ export default function ReviewDetail({ route }: any) {
 
     const fetchReview = async () => {
         const res = await axiosInstance.get(
-            `/reviews/${facilityId}/${reviewId}`,
+            apis.urls.getReviewByIds(facilityId, reviewId),
         );
         return res.data?.data ?? null;
     };

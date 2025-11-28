@@ -1,25 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { Image, ScrollView, useWindowDimensions, View } from 'react-native';
-import {
-    ActivityIndicator,
-    Appbar,
-    Button,
-    Card,
-    Icon,
-    IconButton,
-    SegmentedButtons,
-    Text,
-    useTheme,
-} from 'react-native-paper';
-
-// import { showBorder } from "./common.js"
-import { showBorder } from '../../common';
-import apis from '../../apis';
+import { Appbar, useTheme } from 'react-native-paper';
 import { CommonActions, useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
-export default function GoBackHeader({ title }) {
+export default function GoBackHeader({ title }: { title: string }) {
     const navigation = useNavigation();
     const theme = useTheme();
 

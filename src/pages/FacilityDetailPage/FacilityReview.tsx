@@ -8,6 +8,7 @@ import { FacilityData_t } from '../../types/FacilityDataScheme';
 import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
 import { ReviewDataArraySchema } from '../../types/ReviewDataScheme';
+import apis from '../../apis';
 
 export function FacilityReview({
     facilityData,
@@ -22,7 +23,7 @@ export function FacilityReview({
         queryKey: ['facilityReviews', facilityData.id],
         queryFn: async () => {
             const response = await axiosInstance.get(
-                `/reviews/${facilityData.id}`,
+                apis.urls.getFacilityReviewById(facilityData.id),
             );
             const { data } = response.data;
 

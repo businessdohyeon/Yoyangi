@@ -9,6 +9,7 @@ import axiosInstance from '../../apis/axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import apis from '../../apis';
 
 // form 초기화
 
@@ -27,7 +28,7 @@ export default function ReviewForm({ route, navigation }) {
     const reviewMutation = useMutation({
         mutationFn: async (formData: FormData) => {
             const response = await axiosInstance.post(
-                `/reviews/${facilityId}`,
+                apis.urls.createReview(facilityId),
                 formData,
                 {
                     headers: {

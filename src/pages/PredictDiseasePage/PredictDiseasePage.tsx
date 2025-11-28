@@ -5,6 +5,7 @@ import * as ImagePicker from 'react-native-image-picker';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// TODO: remove mockdata
 const mockdata = {
     data: {
         image_quality: 93.5578,

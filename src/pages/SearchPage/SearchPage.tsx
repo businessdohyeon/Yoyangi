@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import {
     ActivityIndicator,
@@ -24,7 +24,7 @@ import {
     addSpeechEndListener,
     type SpeechResult,
 } from '@dbkable/react-native-speech-to-text';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 
@@ -47,11 +47,11 @@ import {
 const LIMIT = 10;
 const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
 
-export default function SearchPage({ route }) {
+export default function SearchPage({ route }: any) {
     const navigation = useNavigation();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
-    const queryClient = useQueryClient();
+    // queryClient not used in this component
 
     console.group('SearchPage rendered');
     console.log(route.params);
@@ -60,7 +60,9 @@ export default function SearchPage({ route }) {
     console.groupEnd();
 
     const [isMapShown, setIsMapShown] = useState(false);
-    const [kind, setKind] = useState<string[]>(KIND_DEFAULT_VALUE);
+    const [kind, setKind] = useState<string[]>(
+        route?.params?.kind || KIND_DEFAULT_VALUE,
+    );
     const [searchResults, setSearchResults] = useState<FacilityData_t[] | null>(
         null,
     );
@@ -92,7 +94,7 @@ export default function SearchPage({ route }) {
                 kind: kind.join(','),
             };
 
-            const response = await axiosInstance.get('/facilities', { params });
+            const response = await axiosInstance.get(apis.urls.facilities, { params });
             const { Response } = response.data;
 
             return Response !== null && Response !== undefined ? Response : [];
@@ -105,8 +107,11 @@ export default function SearchPage({ route }) {
         staleTime: 30 * 1000, // 30초 캐싱
     });
 
-    const facilityArray =
-        searchResults !== null ? searchResults : data?.pages.flat() || [];
+    const facilityArray = useMemo(() => {
+        return searchResults !== null
+            ? searchResults
+            : data?.pages.flat() || [];
+    }, [searchResults, data]);
 
     const getMore = () => {
         if (hasNextPage && !isFetchingNextPage) {
@@ -114,22 +119,25 @@ export default function SearchPage({ route }) {
         }
     };
 
-    useEffect(() => {
-        console.log('!');
-        setKind(route.params?.kind || KIND_DEFAULT_VALUE);
-    }, [route.params]);
+    // route.params-based 초기값을 state 초기화에 반영했으므로 추가적인 effect는 제거
 
-    useEffect(() => {
-        setSearchResults(null); // 검색 결과를 초기화하고 일반 쿼리로 돌아감
+    // kind 변경시 검색 결과를 리셋하고 쿼리 재요청하는 helper
+    const setKindAndReset = (updater: React.SetStateAction<string[]>) => {
+        setKind((prev) =>
+            typeof updater === 'function'
+                ? (updater as Function)(prev)
+                : (updater as string[]),
+        );
+        setSearchResults(null);
         refetch();
-    }, [kind]);
+    };
 
     return (
         <>
             <SearchHeader
                 setSearchResults={setSearchResults}
                 kind={kind}
-                setKind={setKind}
+                setKind={setKindAndReset}
             />
             <VoiceButton setSearchResults={setSearchResults} />
             {/* 지도 */}
@@ -149,35 +157,36 @@ export default function SearchPage({ route }) {
                             zoom: 14,
                         }}
                     >
-                        {isMapShown && facilityArray.map((facilityData) => {
-                            try {
-                                const parsed =
-                                    FacilityDataSchema.parse(facilityData);
-                                console.log(parsed);
+                        {isMapShown &&
+                            facilityArray.map((facilityData) => {
+                                try {
+                                    const parsed =
+                                        FacilityDataSchema.parse(facilityData);
+                                    console.log(parsed);
 
-                                return (
-                                    <NaverMapMarkerOverlay
-                                        key={parsed.id}
-                                        latitude={parsed.latitude}
-                                        longitude={parsed.longitude}
-                                        anchor={{ x: 0.5, y: 1 }}
-                                        caption={{ text: parsed.name }}
-                                        onTap={() => {
-                                            navigation.navigate(
-                                                'FacilityDetailPage',
-                                                {
-                                                    id: parsed.id,
-                                                },
-                                            );
-                                        }}
-                                    />
-                                );
-                            } catch (error) {
-                                console.log(facilityData);
-                                console.log(error);
-                                return null;
-                            }
-                        })}
+                                    return (
+                                        <NaverMapMarkerOverlay
+                                            key={parsed.id}
+                                            latitude={parsed.latitude}
+                                            longitude={parsed.longitude}
+                                            anchor={{ x: 0.5, y: 1 }}
+                                            caption={{ text: parsed.name }}
+                                            onTap={() => {
+                                                (navigation as any).navigate(
+                                                    'FacilityDetailPage',
+                                                    {
+                                                        id: parsed.id,
+                                                    },
+                                                );
+                                            }}
+                                        />
+                                    );
+                                } catch (error) {
+                                    console.log(facilityData);
+                                    console.log(error);
+                                    return null;
+                                }
+                            })}
                     </NaverMapView>
                 )}
             </View>
@@ -246,7 +255,6 @@ export default function SearchPage({ route }) {
 
 function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const navigation = useNavigation();
-    const route = useRoute();
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
@@ -254,7 +262,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     const userLikeMutation = useMutation({
         mutationFn: async () => {
             const response = await axiosInstance.post(
-                `/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+                apis.urls.userLike(loginInfo.userId, facilityData.id),
                 {},
                 {
                     headers: {
@@ -271,7 +279,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
 
     const userLike = () => {
         if (!loginInfo?.token || loginInfo?.userId === 0) {
-            navigation.navigate('LoginPage', {
+            (navigation as any).navigate('LoginPage', {
                 returnScreen: 'SearchPage',
             });
             return;
@@ -286,7 +294,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 backgroundColor: theme.colors.background,
             }}
             onPress={() => {
-                navigation.navigate('FacilityDetailPage', {
+                (navigation as any).navigate('FacilityDetailPage', {
                     id: facilityData.id,
                 });
             }}
@@ -503,10 +511,18 @@ function VoiceButton({
     );
 }
 
-export function SearchHeader({ setSearchResults, kind, setKind }) {
+export function SearchHeader({
+    setSearchResults,
+    kind,
+    setKind,
+}: {
+    setSearchResults: (data: any) => void;
+    kind: string[];
+    setKind: React.Dispatch<React.SetStateAction<string[]>>;
+}) {
     const navigation = useNavigation();
     const theme = useTheme();
-    const { width, height } = useWindowDimensions();
+    const { width } = useWindowDimensions();
     const queryClient = useQueryClient();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -514,7 +530,7 @@ export function SearchHeader({ setSearchResults, kind, setKind }) {
     const searchMutation = useMutation({
         mutationFn: async (keyword: string) => {
             const response = await axiosInstance.get(
-                apis.urls.facilities.replace(apis.urls.server, ''),
+                apis.urls.facilities,
                 { params: { keyword } },
             );
             return response.data.Response;
@@ -535,7 +551,7 @@ export function SearchHeader({ setSearchResults, kind, setKind }) {
     };
 
     const toggleKind = (value: string) => {
-        setKind((cur) =>
+        setKind((cur: string[]) =>
             cur.includes(value)
                 ? cur.filter((v) => v !== value)
                 : [...cur, value],
@@ -576,7 +592,7 @@ export function SearchHeader({ setSearchResults, kind, setKind }) {
                 {/* TODO: ripple이 안되는데.. 흠... */}
                 <TouchableRipple
                     onPress={() => {
-                        navigation.navigate('EditLocationPage');
+                        (navigation as any).navigate('EditLocationPage');
                     }}
                     style={{
                         backgroundColor: '#eeeeee',

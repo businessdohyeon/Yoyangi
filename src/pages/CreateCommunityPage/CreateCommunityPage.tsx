@@ -9,6 +9,7 @@ import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import apis from '../../apis';
 
 export default function CreateCommunityScreen() {
     const navigation = useNavigation();
@@ -23,7 +24,7 @@ export default function CreateCommunityScreen() {
 
     const communityMutation = useMutation({
         mutationFn: async (data: { title: string; content: string }) => {
-            const response = await axiosInstance.post('/community', data, {
+            const response = await axiosInstance.post(apis.urls.createCommunity, data, {
                 headers: {
                     Authorization: `Bearer ${loginInfo.token}`,
                 },

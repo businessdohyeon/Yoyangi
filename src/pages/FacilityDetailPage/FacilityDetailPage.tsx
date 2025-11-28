@@ -27,6 +27,7 @@ import { FacilityNotice } from './FacilityNotice';
 import { FacilityReview } from './FacilityReview';
 import { tileData } from './data';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import apis from '../../apis';
 
 export default function FacilityDetailPage({ route }) {
     const theme = useTheme();
@@ -45,7 +46,9 @@ export default function FacilityDetailPage({ route }) {
     const { data: facilityData = {}, isLoading } = useQuery({
         queryKey: ['facility', id],
         queryFn: async () => {
-            const response = await axiosInstance.get(`/facilities/${id}`);
+            const response = await axiosInstance.get(
+                apis.urls.getFacilityById(id),
+            );
             const { Response } = response.data;
             const tmp = FacilityDataSchema.parse(Response);
 
@@ -61,7 +64,7 @@ export default function FacilityDetailPage({ route }) {
     const userLikeMutation = useMutation({
         mutationFn: async () => {
             const response = await axiosInstance.post(
-                `/user/${loginInfo.userId}/favorites/${facilityData.id}`,
+                apis.urls.userLike(loginInfo.userId, facilityData.id),
                 {},
                 {
                     headers: {

@@ -25,7 +25,7 @@ export default function CommunityPage() {
             if (pageParam) {
                 params.lastId = pageParam;
             }
-            const response = await axiosInstance.get('/community', { params });
+            const response = await axiosInstance.get(apis.urls.communities, { params });
             const items = response.data.Community || response.data.Communities || [];
             return items;
         },

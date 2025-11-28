@@ -12,6 +12,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
+import apis from '../../apis';
 
 export default function ReservationDetailPage({ route }: any) {
     const theme = useTheme();
@@ -23,7 +24,7 @@ export default function ReservationDetailPage({ route }: any) {
 
     const fetchReservationDetail = async () => {
         const res = await axiosInstance.get(
-            `/facilities/reservations/${reservation_id}`,
+            apis.urls.reservationById(reservation_id),
             {
                 headers: {
                     Authorization: `Bearer ${loginInfo.token}`,
