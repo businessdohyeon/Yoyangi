@@ -1,10 +1,6 @@
 import React from 'react';
-import { View, ScrollView, Image } from 'react-native';
-import { TextInput, Button, Text, IconButton } from 'react-native-paper';
-import {
-    launchImageLibrary,
-    ImageLibraryOptions,
-} from 'react-native-image-picker';
+import { View, ScrollView } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
 import { useForm } from '@tanstack/react-form';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LoginInfoContext } from '../../Context';
@@ -27,9 +23,10 @@ export default function CommunityFormPage() {
     const queryClient = useQueryClient();
     const { isAuthenticated } = useRequireAuth();
 
+    // TODO: 수정하면 이미지는 바꿔치기가 아니라 추가가 되네
+
     const communityMutation = useMutation({
-        mutationFn: async (data: any) => {
-            const isForm = data && typeof data.append === 'function';
+        mutationFn: async (data: { title: string; content: string }) => {
             if (communityId) {
                 // edit existing community post
                 const response = await axiosInstance.patch(
@@ -38,9 +35,6 @@ export default function CommunityFormPage() {
                     {
                         headers: {
                             Authorization: `Bearer ${loginInfo.token}`,
-                            ...(isForm
-                                ? { 'Content-Type': 'multipart/form-data' }
-                                : {}),
                         },
                     },
                 );
@@ -54,9 +48,6 @@ export default function CommunityFormPage() {
                 {
                     headers: {
                         Authorization: `Bearer ${loginInfo.token}`,
-                        ...(isForm
-                            ? { 'Content-Type': 'multipart/form-data' }
-                            : {}),
                     },
                 },
             );
@@ -76,34 +67,12 @@ export default function CommunityFormPage() {
         defaultValues: {
             title: initialValuesFromRoute?.title ?? '',
             content: initialValuesFromRoute?.content ?? '',
-            images:
-                ((initialValuesFromRoute as any)?.images || []).map(
-                    (u: string) => ({ uri: u }),
-                ) || [],
         },
         onSubmit: async ({ value }) => {
-            try {
-                // build FormData for multipart upload
-                const formData = new FormData();
-                formData.append('title', value.title);
-                formData.append('content', value.content);
-
-                if (Array.isArray(value.images) && value.images.length > 0) {
-                    value.images.forEach((img: any, idx: number) => {
-                        if (img?.uri) {
-                            formData.append('images', {
-                                uri: img.uri,
-                                name: `community_${idx}.jpg`,
-                                type: 'image/jpeg',
-                            } as any);
-                        }
-                    });
-                }
-
-                communityMutation.mutate(formData as any);
-            } catch (err) {
-                console.error(err);
-            }
+            communityMutation.mutate({
+                title: value.title,
+                content: value.content,
+            });
         },
     });
 
@@ -185,77 +154,6 @@ export default function CommunityFormPage() {
 
                 <View style={{ height: 32 }} />
 
-                <form.Field
-                    name="images"
-                    children={(field) => {
-                        const pickImages = async () => {
-                            const opts: ImageLibraryOptions = {
-                                mediaType: 'photo',
-                                selectionLimit: 4,
-                            };
-                            try {
-                                const res = await launchImageLibrary(opts);
-                                if (res.didCancel) return;
-                                const assets = res.assets || [];
-                                const newImgs = assets
-                                    .map((a) => a?.uri)
-                                    .filter(Boolean)
-                                    .map((uri) => ({ uri } as any));
-                                const cur = Array.isArray(field.state.value)
-                                    ? field.state.value
-                                    : [];
-                                field.handleChange([...cur, ...newImgs]);
-                            } catch (e) {
-                                console.error('image pick error', e);
-                            }
-                        };
-
-                        const removeImage = (idx: number) => {
-                            const cur = Array.isArray(field.state.value)
-                                ? [...field.state.value]
-                                : [];
-                            cur.splice(idx, 1);
-                            field.handleChange(cur);
-                        };
-
-                        return (
-                            <View style={{ marginVertical: 8 }}>
-                                <Button
-                                    mode="outlined"
-                                    onPress={pickImages}
-                                    style={{ marginBottom: 8 }}
-                                >
-                                    이미지 추가
-                                </Button>
-
-                                <View style={styles.imagePreviewRow}>
-                                    {(field.state.value || []).map(
-                                        (img: any, idx: number) => (
-                                            <View
-                                                key={idx}
-                                                style={styles.previewItem}
-                                            >
-                                                <Image
-                                                    source={{ uri: img.uri }}
-                                                    style={styles.previewImg}
-                                                />
-                                                <IconButton
-                                                    icon="close"
-                                                    size={16}
-                                                    onPress={() =>
-                                                        removeImage(idx)
-                                                    }
-                                                    style={styles.removeBtn}
-                                                />
-                                            </View>
-                                        ),
-                                    )}
-                                </View>
-                            </View>
-                        );
-                    }}
-                />
-
                 <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
                 >
@@ -280,27 +178,3 @@ export default function CommunityFormPage() {
         </SafeAreaView>
     );
 }
-
-const styles = {
-    imagePreviewRow: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-    } as any,
-    previewItem: {
-        position: 'relative',
-        marginRight: 8,
-    } as any,
-    previewImg: {
-        width: 80,
-        height: 80,
-        borderRadius: 6,
-        backgroundColor: '#eee',
-    } as any,
-    removeBtn: {
-        position: 'absolute',
-        top: -6,
-        right: -6,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-    } as any,
-};

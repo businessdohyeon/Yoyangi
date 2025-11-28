@@ -14,6 +14,10 @@ import {
     TextInput,
 } from 'react-native-paper';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/Navigation';
+import { ReviewData_t } from '../../types/ReviewDataScheme';
 import { useForm } from '@tanstack/react-form';
 import apis from '../../apis';
 
@@ -33,38 +37,18 @@ function StarRow({ rating = 0 }) {
 
 type ImageItem = { uri: string };
 
-type ReviewCardProps = {
-    author: string;
-    avatarUri?: string;
-    rating?: number;
-    date?: string;
-    content?: string;
-    images?: Array<ImageItem | string>;
-    tags?: string[];
-    onPress?: () => void;
-    onEdit?: () => void;
-    onReport?: () => void;
-    reviewId?: number;
-    style?: any;
+type Props = {
+    reviewData: ReviewData_t;
+    isOwner?: boolean;
+    facilityId: number;
 };
 
-export default function ReviewCard({
-    author,
-    avatarUri,
-    rating,
-    date,
-    content,
-    images,
-    tags,
-    onPress,
-    onEdit,
-    onReport,
-    reviewId,
-    style,
-}: ReviewCardProps) {
+export default function ReviewCard({ reviewData, isOwner, facilityId }: Props) {
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
     const [reportVisible, setReportVisible] = useState(false);
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const categories = [
         'DUPLICATE_SPAM',
@@ -87,7 +71,7 @@ export default function ReviewCard({
     const reportMutation = useMutation({
         mutationFn: async (payload: { category: string; reason?: string }) => {
             return axiosInstance.post(
-                apis.urls.reportReview(reviewId),
+                apis.urls.reportReview(reviewData.id),
                 payload,
                 {
                     headers: { Authorization: `Bearer ${loginInfo?.token}` },
@@ -120,12 +104,7 @@ export default function ReviewCard({
     });
 
     const handleReport = () => {
-        if (onReport) {
-            onReport();
-            return;
-        }
-
-        if (!reviewId) {
+        if (!reviewData?.id) {
             Alert.alert('오류', '신고할 리뷰 ID가 없습니다.');
             return;
         }
@@ -138,24 +117,29 @@ export default function ReviewCard({
         setReportVisible(true);
     };
     return (
-        <Card style={[styles.card, style]} onPress={onPress}>
+        <Card style={styles.card}>
             <Card.Title
-                title={author}
-                subtitle={date}
+                title={reviewData.user?.name ?? '작성자'}
+                subtitle={reviewData.created_at}
                 left={(props) =>
-                    avatarUri ? (
-                        <Avatar.Image {...props} source={{ uri: avatarUri }} />
+                    reviewData.user ? (
+                        <Avatar.Text
+                            {...props}
+                            label={(reviewData.user.name || '?')[0]}
+                        />
                     ) : (
-                        <Avatar.Text {...props} label={author[0] || '?'} />
+                        <Avatar.Text {...props} label={'?'} />
                     )
                 }
             />
 
             <Card.Content>
                 <View style={styles.rowBetween}>
-                    <StarRow rating={rating} />
+                    <StarRow rating={reviewData.rating} />
                     <Chip compact>
-                        {rating ? `${rating.toFixed(1)}` : '평점 없음'}
+                        {reviewData.rating !== undefined
+                            ? `${reviewData.rating.toFixed(1)}`
+                            : '평점 없음'}
                     </Chip>
                 </View>
 
@@ -164,56 +148,79 @@ export default function ReviewCard({
                     numberOfLines={4}
                     ellipsizeMode="tail"
                 >
-                    {content}
+                    {reviewData.content}
                 </Paragraph>
 
-                {images && images.length > 0 ? (
+                {reviewData.images && reviewData.images.length > 0 ? (
                     <View style={styles.imageRow}>
-                        {images.slice(0, 3).map((img, idx) => {
-                            const source =
-                                typeof img === 'string' ? { uri: img } : img;
-                            return (
-                                <TouchableOpacity
-                                    key={`${idx}-${
-                                        typeof img === 'string'
-                                            ? img
-                                            : img.uri || idx
-                                    }`}
-                                    activeOpacity={0.8}
-                                    onPress={() => {}}
-                                >
-                                    <Image
-                                        source={source}
-                                        style={styles.imageThumb}
-                                    />
-                                </TouchableOpacity>
-                            );
-                        })}
-                        {images.length > 3 ? (
+                        {reviewData.images
+                            .slice(0, 3)
+                            .map((img: any, idx: number) => {
+                                const uri =
+                                    typeof img === 'string'
+                                        ? img
+                                        : (img && img.uri) || String(idx);
+                                const source = { uri };
+                                return (
+                                    <TouchableOpacity
+                                        key={`${idx}-${uri}`}
+                                        activeOpacity={0.8}
+                                        onPress={() => {}}
+                                    >
+                                        <Image
+                                            source={source}
+                                            style={styles.imageThumb}
+                                        />
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        {reviewData.images.length > 3 ? (
                             <View style={styles.moreOverlay}>
                                 <Text style={styles.moreText}>
-                                    +{images.length - 3}
+                                    +{reviewData.images.length - 3}
                                 </Text>
                             </View>
                         ) : null}
                     </View>
                 ) : null}
 
-                {tags && tags.length > 0 ? (
-                    <View style={styles.tagsRow}>
-                        {tags.map((t, i) => (
-                            <Chip key={i} style={styles.tag} compact>
-                                {t}
-                            </Chip>
-                        ))}
-                    </View>
-                ) : null}
+                {/* tags not provided directly - skip */}
             </Card.Content>
 
             <Card.Actions>
-                <Button onPress={onPress}>자세히</Button>
-                {onEdit ? <Button onPress={onEdit}>수정하기</Button> : null}
-                <Button onPress={handleReport}>신고</Button>
+                <Button
+                    onPress={() =>
+                        navigation.navigate('ReviewDetail', {
+                            facilityId,
+                            reviewId: reviewData.id,
+                        })
+                    }
+                >
+                    자세히
+                </Button>
+                {isOwner ? (
+                    <Button
+                        onPress={() =>
+                            navigation.navigate('ReviewForm', {
+                                facilityId,
+                                reviewId: reviewData.id,
+                                initialValues: {
+                                    content: reviewData.content,
+                                    rating: String(reviewData.rating ?? ''),
+                                    reservationId:
+                                        (reviewData as any).reservation_id ??
+                                        (reviewData as any).reservationId ??
+                                        '',
+                                    images: [],
+                                },
+                            })
+                        }
+                    >
+                        수정하기
+                    </Button>
+                ) : (
+                    <Button onPress={handleReport}>신고</Button>
+                )}
             </Card.Actions>
 
             <Portal>

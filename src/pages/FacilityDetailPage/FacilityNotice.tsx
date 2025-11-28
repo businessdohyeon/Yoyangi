@@ -4,6 +4,9 @@ import { Button, Text, useTheme } from 'react-native-paper';
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
+import { useEffect } from 'react';
+import axiosInstance from '../../apis/axios';
+import apis from '../../apis';
 
 export function FacilityNotice({
     facilityData,
@@ -13,6 +16,27 @@ export function FacilityNotice({
     const navigation = useNavigation();
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
+
+    const fetchMenu = async () => {
+        const res = await axiosInstance.get(apis.urls.getFacilityMenu(facilityData.id));
+
+        // TODO
+
+        console.log(res);
+    }
+
+    const fetchNotices = async () => {
+        const res = await axiosInstance.get(apis.urls.getFacilityNotices(facilityData.id));
+
+        // TODO
+
+        console.log(res);
+    }
+
+    useEffect(()=>{
+        fetchMenu();
+        fetchNotices();
+    }, []);
 
     return (
         <View

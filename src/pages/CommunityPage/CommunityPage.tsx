@@ -1,11 +1,44 @@
-import { FlatList, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Avatar, Card, FAB, Text } from 'react-native-paper';
+import { FlatList, StyleSheet, View, Image, Alert } from 'react-native';
+import {
+    ActivityIndicator,
+    Avatar,
+    Button,
+    Card,
+    FAB,
+    Text,
+    Portal,
+    Dialog,
+    Chip,
+    TextInput,
+} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import PlainHeader from '../MainPage/PlainHeader';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import {
+    useInfiniteQuery,
+    useMutation,
+    useQueryClient,
+} from '@tanstack/react-query';
+import { useForm } from '@tanstack/react-form';
+import { useContext, useState } from 'react';
+import { LoginInfoContext } from '../../Context';
+
+type User = {
+    id: number;
+    name: string;
+};
+
+export type CommunityItem = {
+    id: number;
+    title: string;
+    createdAt: string;
+    content?: string;
+    images?: string[];
+    totalComments?: string | number;
+    user?: User;
+};
 
 export default function CommunityPage() {
     const navigation = useNavigation();
@@ -18,21 +51,24 @@ export default function CommunityPage() {
         isFetchingNextPage,
         refetch,
         isRefetching,
-    } = useInfiniteQuery({
+    } = useInfiniteQuery<CommunityItem[]>({
         queryKey: ['community'],
         queryFn: async ({ pageParam }) => {
-            const params = { limit: 10 };
+            const params: Record<string, any> = { limit: 10 };
             if (pageParam) {
                 params.lastId = pageParam;
             }
             const response = await axiosInstance.get(apis.urls.communities, {
                 params,
             });
-            const items =
+
+            console.log(response);
+
+            const items: CommunityItem[] =
                 response.data.Community || response.data.Communities || [];
             return items;
         },
-        getNextPageParam: (lastPage, allPages) => {
+        getNextPageParam: (lastPage, _allPages) => {
             if (lastPage.length === 0) return undefined;
             return lastPage[lastPage.length - 1]?.id;
         },
@@ -64,15 +100,15 @@ export default function CommunityPage() {
                     <FlatList
                         data={items}
                         keyExtractor={(i) => String(i.id)}
-                        renderItem={({ item }) => <PostCard item={item} />}
+                        renderItem={({ item }: { item: CommunityItem }) => (
+                            <PostCard item={item} />
+                        )}
                         onEndReached={loadMore}
                         onEndReachedThreshold={0.5}
                         refreshing={refreshing}
                         onRefresh={loadInitial}
-                        ListFooterComponent={() =>
-                            isFetchingNextPage ? (
-                                <ActivityIndicator style={{ margin: 12 }} />
-                            ) : null
+                        ListFooterComponent={
+                            <FooterIndicator isLoading={isFetchingNextPage} />
                         }
                     />
                 )}
@@ -86,7 +122,7 @@ export default function CommunityPage() {
                         bottom: 0,
                     }}
                     onPress={() => {
-                        (navigation as any).navigate('CreateCommunity');
+                        (navigation as any).navigate('CommunityFormPage');
                     }}
                 />
             </View>
@@ -94,21 +130,30 @@ export default function CommunityPage() {
     );
 }
 
-function formatDate(iso) {
+function formatDate(iso: string) {
     try {
         return new Date(iso).toLocaleString();
     } catch (e) {
+        console.warn(e);
         return iso;
     }
 }
 
-function PostCard({ item }) {
+function FooterIndicator({ isLoading }: { isLoading: boolean }) {
+    return isLoading ? <ActivityIndicator style={{ margin: 12 }} /> : null;
+}
+
+function PostCard({ item }: { item: CommunityItem }) {
     const navigation = useNavigation();
+    const { loginInfo } = useContext(LoginInfoContext);
+    const { userId } = loginInfo;
+    const queryClient = useQueryClient();
+    const [reportVisible, setReportVisible] = useState(false);
     const snippet = item.content
         ? item.content.split('\n').slice(0, 3).join('\n')
         : '';
 
-    // console.log(item);
+    console.log(item);
 
     const onPress = () => {
         (navigation as any).navigate('CommunityDetail', {
@@ -116,8 +161,82 @@ function PostCard({ item }) {
         });
     };
 
+    const editBtn = () => {
+        (navigation as any).navigate('CommunityFormPage', {
+            communityId: item.id,
+            initialValues: { title: item.title, content: item.content ?? '' },
+        });
+    };
+
+    // delete handled by handleDelete
+
+    const reportMutation = useMutation({
+        mutationFn: async (payload: { category: string; reason?: string }) => {
+            return axiosInstance.post(
+                apis.urls.reportCommunity(item.id),
+                payload,
+                {
+                    headers: { Authorization: `Bearer ${loginInfo?.token}` },
+                },
+            );
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['community'] });
+            setReportVisible(false);
+            Alert.alert('완료', '신고가 접수되었습니다.');
+        },
+        onError: (err) => {
+            console.error('report error', err);
+            Alert.alert('오류', '신고에 실패했습니다.');
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            return axiosInstance.delete(apis.urls.getCommunityById(item.id), {
+                headers: { Authorization: `Bearer ${loginInfo?.token}` },
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['community'] });
+            Alert.alert('삭제 완료', '게시물이 삭제되었습니다.');
+        },
+        onError: (err) => {
+            console.error('delete error', err);
+            Alert.alert('오류', '삭제에 실패했습니다.');
+        },
+    });
+
+    const handleDelete = () => {
+        Alert.alert('게시물 삭제', '정말로 게시물을 삭제하시겠습니까?', [
+            { text: '취소', style: 'cancel' },
+            {
+                text: '삭제',
+                style: 'destructive',
+                onPress: () => deleteMutation.mutate(),
+            },
+        ]);
+    };
+
+    const form = useForm({
+        defaultValues: { category: '', reason: '' },
+        onSubmit: async (values) => {
+            if (!values.value.category) {
+                Alert.alert('선택 필요', '신고 유형을 선택해주세요.');
+                return;
+            }
+            reportMutation.mutate({
+                category: values.value.category,
+                reason: values.value.reason,
+            });
+        },
+    });
+
+    // show up to 4 images in a 2x2 grid placed before the text
+    const images = Array.isArray(item.images) ? item.images.slice(0, 4) : [];
+
     return (
-        <Card style={{ margin: 10, paddingVertical: 20 }} onPress={onPress}>
+        <Card style={{ margin: 10, paddingVertical: 8 }} onPress={onPress}>
             <Card.Content>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Avatar.Text
@@ -135,21 +254,128 @@ function PostCard({ item }) {
                     </View>
                     <View style={{ justifyContent: 'center' }}>
                         <Text style={styles.commentCount}>
-                            {item.totalComments || 0}
+                            {Number(item.totalComments) || 0}
                         </Text>
                         <Text style={styles.meta}>답글</Text>
                     </View>
                 </View>
+                {images.length > 0 && (
+                    <View style={styles.imageGrid}>
+                        {images.map((uri, idx) => (
+                            <Image
+                                key={`${item.id}-img-${idx}`}
+                                source={{ uri }}
+                                style={styles.gridImage}
+                                resizeMode="cover"
+                            />
+                        ))}
+                    </View>
+                )}
                 <Text numberOfLines={3} style={styles.paragraph}>
                     {snippet}
                 </Text>
+                {userId === item.user?.id && (
+                    <View>
+                        <Button onPress={editBtn}>수정</Button>
+                        <Button
+                            onPress={handleDelete}
+                            loading={deleteMutation.status === 'pending'}
+                            disabled={deleteMutation.status === 'pending'}
+                        >
+                            삭제
+                        </Button>
+                    </View>
+                )}
+                <Button onPress={() => setReportVisible(true)}>신고</Button>
+                <Portal>
+                    <Dialog
+                        visible={reportVisible}
+                        onDismiss={() => setReportVisible(false)}
+                    >
+                        <Dialog.Title>게시물 신고</Dialog.Title>
+                        <Dialog.Content>
+                            <form.Field
+                                name="category"
+                                children={(field) => (
+                                    <View
+                                        style={{
+                                            flexDirection: 'row',
+                                            flexWrap: 'wrap',
+                                            gap: 8,
+                                        }}
+                                    >
+                                        {[
+                                            'DUPLICATE_SPAM',
+                                            'AD_PROMOTION',
+                                            'ABUSE_HATE',
+                                            'PRIVACY_LEAK',
+                                            'SEXUAL_CONTENT',
+                                            'ETC',
+                                        ].map((c) => (
+                                            <Chip
+                                                key={c}
+                                                mode="outlined"
+                                                selected={
+                                                    field.state.value === c
+                                                }
+                                                onPress={() =>
+                                                    field.handleChange(c)
+                                                }
+                                                style={{
+                                                    marginRight: 6,
+                                                    marginBottom: 6,
+                                                }}
+                                            >
+                                                {c}
+                                            </Chip>
+                                        ))}
+                                    </View>
+                                )}
+                            />
+
+                            <form.Field
+                                name="reason"
+                                children={(field) => (
+                                    <TextInput
+                                        label="신고 사유 (선택적)"
+                                        value={field.state.value}
+                                        onChangeText={field.handleChange}
+                                        multiline
+                                        style={{ marginTop: 12 }}
+                                    />
+                                )}
+                            />
+                        </Dialog.Content>
+                        <Dialog.Actions>
+                            <Button onPress={() => setReportVisible(false)}>
+                                취소
+                            </Button>
+                            <form.Subscribe
+                                selector={(s) => ({
+                                    canSubmit: s.canSubmit,
+                                    isSubmitting: s.isSubmitting,
+                                })}
+                                children={({ canSubmit, isSubmitting }) => (
+                                    <Button
+                                        mode="contained"
+                                        loading={
+                                            isSubmitting ||
+                                            reportMutation.status === 'pending'
+                                        }
+                                        disabled={
+                                            !canSubmit ||
+                                            reportMutation.status === 'pending'
+                                        }
+                                        onPress={() => form.handleSubmit()}
+                                    >
+                                        신고 제출
+                                    </Button>
+                                )}
+                            />
+                        </Dialog.Actions>
+                    </Dialog>
+                </Portal>
             </Card.Content>
-            {Array.isArray(item.images) && item.images.length > 0 && (
-                <Card.Cover
-                    source={{ uri: item.images[0] }}
-                    style={{ height: 200, margin: 10 }}
-                />
-            )}
         </Card>
     );
 }
@@ -160,4 +386,16 @@ const styles = StyleSheet.create({
     meta: { color: '#666', fontSize: 12 },
     paragraph: { marginTop: 8 },
     commentCount: { fontWeight: '700', textAlign: 'center' },
+    imageGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: 10,
+        marginTop: 8,
+        marginBottom: 4,
+    },
+    gridImage: {
+        width: '50%',
+        height: 140,
+        backgroundColor: '#eee',
+    },
 });

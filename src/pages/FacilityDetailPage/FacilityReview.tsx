@@ -1,11 +1,6 @@
 import React, { useContext } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { Button, Text, useTheme } from 'react-native-paper';
-
-// import { showBorder } from '../../common';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../types/Navigation';
 import ReviewCard from './ReviewCard';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
 import axiosInstance from '../../apis/axios';
@@ -13,17 +8,13 @@ import { useQuery } from '@tanstack/react-query';
 import { ReviewDataArraySchema } from '../../types/ReviewDataScheme';
 import apis from '../../apis';
 import { LoginInfoContext } from '../../Context';
-// LoginInfoContext not needed in this component
 
 export function FacilityReview({
     facilityData,
 }: {
     facilityData: FacilityData_t;
 }) {
-    const navigation =
-        useNavigation<
-            NativeStackNavigationProp<RootStackParamList, 'ReviewDetail'>
-        >();
+    // navigation moved into ReviewCard
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
     const { loginInfo } = useContext(LoginInfoContext);
@@ -110,44 +101,9 @@ export function FacilityReview({
                     return (
                         <ReviewCard
                             key={reviewData.id}
-                            reviewId={reviewData.id}
-                            author={reviewData.user.name}
-                            avatarUri="https://.../avatar.jpg"
-                            rating={reviewData.rating}
-                            date={reviewData.created_at}
-                            content={reviewData.content}
-                            images={reviewData.images}
-                            tags={['청결', '접근성']}
-                            style={{}}
-                            onPress={() =>
-                                navigation.navigate('ReviewDetail', {
-                                    facilityId: facilityData.id,
-                                    reviewId: reviewData.id,
-                                })
-                            }
-                            onEdit={
-                                isOwner
-                                    ? () =>
-                                          navigation.navigate('ReviewForm', {
-                                              facilityId: facilityData.id,
-                                              facilityName: facilityData.name,
-                                              reviewId: reviewData.id,
-                                              initialValues: {
-                                                  content: reviewData.content,
-                                                  rating: String(
-                                                      reviewData.rating ?? '',
-                                                  ),
-                                                  reservationId:
-                                                      (reviewData as any)
-                                                          .reservation_id ??
-                                                      (reviewData as any)
-                                                          .reservationId ??
-                                                      '',
-                                                  images: [],
-                                              },
-                                          })
-                                    : undefined
-                            }
+                            reviewData={reviewData}
+                            isOwner={isOwner}
+                            facilityId={facilityData.id}
                         />
                     );
                 })}

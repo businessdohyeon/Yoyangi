@@ -28,7 +28,7 @@ export type RootStackParamList = {
           }
         | undefined;
     CommunityDetail: undefined;
-    CreateCommunity: undefined;
+    CommunityFormPage: undefined;
     ChatPage:
         | {
               facility_id: number;

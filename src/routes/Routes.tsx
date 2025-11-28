@@ -17,7 +17,7 @@ import CommunityDetailPage from '../pages/CommunityDetailPage/CommunityDetailPag
 import ReservationPage from '../pages/ReservationPage/ReservationPage.tsx';
 import ReviewForm from '../pages/ReviewForm/ReviewForm.tsx';
 import CommunityDetailScreen from '../pages/CommunityDetailPage/CommunityDetailPage.tsx';
-import CreateCommunityScreen from '../pages/CreateCommunityPage/CreateCommunityPage.tsx';
+import CommunityFormPage from '../pages/CreateCommunityPage/CreateCommunityPage.tsx';
 import ChatPage from '../pages/ChatPage/ChatPage.tsx';
 import ExamDimentiaPage from '../pages/ExamDimentiaPage/ExamDimentiaPage.tsx';
 import PredictDiseasePage from '../pages/PredictDiseasePage/PredictDiseasePage.tsx';
@@ -152,8 +152,8 @@ export default function Routes() {
                     component={CommunityDetailScreen as any}
                 />
                 <Stack.Screen
-                    name="CreateCommunity"
-                    component={CreateCommunityScreen as any}
+                    name="CommunityFormPage"
+                    component={CommunityFormPage as any}
                 />
                 <Stack.Screen name="ChatPage" component={ChatPage as any} />
                 <Stack.Screen
