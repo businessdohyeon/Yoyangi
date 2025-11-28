@@ -175,14 +175,6 @@ const LoginPage = () => {
                                 />
                             </TouchableRipple>
                         ))}
-
-                        <Button
-                            mode="text"
-                            onPress={() => AsyncStorage.clear()}
-                            style={{ alignSelf: 'center', marginTop: 4 }}
-                        >
-                            개발: AsyncStorage 초기화
-                        </Button>
                     </View>
                 </Card.Content>
 

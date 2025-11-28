@@ -21,8 +21,7 @@ export default function PlainHeader() {
                     navigation.navigate('EditLocationPage');
                 }}
             />
-            {/* TODO: 현재위치 가져오는거 */}
-            <Appbar.Content title={locationInfo?.roadAddress} />
+            <Appbar.Content title={locationInfo?.displayName} />
             <Appbar.Action
                 icon="magnify"
                 onPress={() => {

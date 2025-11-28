@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import PlainHeader from '../MainPage/PlainHeader';
 import { useContext, useState } from 'react';
 import { LoginInfoContext } from '../../Context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // 아이콘 컴포넌트를 렌더 함수 외부에 선언하여 렌더 시마다 새 컴포넌트가 생성되는 것을 방지
 const HeartIcon = (props: any) => <List.Icon {...props} icon="heart" />;
@@ -191,6 +192,13 @@ const ProfilePage = () => {
                         </View>
                     </>
                 )}
+                <Button
+                    mode="text"
+                    onPress={() => AsyncStorage.clear()}
+                    style={{ alignSelf: 'center', marginTop: 4 }}
+                >
+                    개발: AsyncStorage 초기화
+                </Button>
             </ScrollView>
         </>
     );

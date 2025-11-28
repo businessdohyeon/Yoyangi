@@ -81,7 +81,6 @@ export default function ReviewDetail({ route }: any) {
                                 </Text>
                             </Card.Content>
                         </Card>
-
                         {review.reply ? (
                             <Card style={{ marginBottom: 12 }}>
                                 <Card.Content>

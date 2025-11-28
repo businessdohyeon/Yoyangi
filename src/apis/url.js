@@ -3,7 +3,6 @@ const PORT = 8080;
 const IP = 'localhost';
 const SERVER = `http://${IP}:${PORT}`;
 
-// TODO: 별로 맘에 안드는데....
 const urls = {
     // server base (keep full URL for axios baseURL or socket connections)
     server: SERVER,

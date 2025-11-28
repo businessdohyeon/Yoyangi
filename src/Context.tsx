@@ -7,6 +7,7 @@ const LocationInfoSchema = z.object({
     latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
     longitude: z.preprocess((val) => Number(val), z.number()).default(126.978),
     roadAddress: z.string().default(''),
+    displayName: z.string().default(''),
 });
 
 const LoginInfoSchema = z.object({
@@ -83,9 +84,11 @@ export function TotalContextProvider({
 
     const storeLoginInfo = useCallback((value: LoginInfo) => {
         setLoginInfo(value);
-        AsyncStorage.setItem('loginInfo', JSON.stringify(value)).catch((error) => {
-            console.error('Failed to store loginInfo:', error);
-        });
+        AsyncStorage.setItem('loginInfo', JSON.stringify(value)).catch(
+            (error) => {
+                console.error('Failed to store loginInfo:', error);
+            },
+        );
     }, []);
 
     const clearLoginInfo = useCallback(async () => {
@@ -162,7 +165,14 @@ export function TotalContextProvider({
         <LocationInfoContext.Provider
             value={{ locationInfo, storeLocationInfo }}
         >
-            <LoginInfoContext.Provider value={{ loginInfo, storeLoginInfo, clearLoginInfo, reloadLoginInfo }}>
+            <LoginInfoContext.Provider
+                value={{
+                    loginInfo,
+                    storeLoginInfo,
+                    clearLoginInfo,
+                    reloadLoginInfo,
+                }}
+            >
                 {children}
             </LoginInfoContext.Provider>
         </LocationInfoContext.Provider>
