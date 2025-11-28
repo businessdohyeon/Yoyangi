@@ -11,10 +11,12 @@ import {
 } from 'react-native-paper';
 
 import { showBorder } from '../../common';
-import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+    SafeAreaView,
+    useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import GoBackHeader from './GoBackHeader';
 import { LoginInfoContext } from '../../Context';
 import {
@@ -86,7 +88,7 @@ export default function FacilityDetailPage({ route }) {
     };
 
     return (
-        <>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={facilityData.name} />
             <ScrollView
                 contentContainerStyle={{
@@ -335,12 +337,12 @@ export default function FacilityDetailPage({ route }) {
             </ScrollView>
             {/* footer */}
             <Footer facilityData={facilityData} />
-        </>
+        </SafeAreaView>
     );
 }
 
 function Footer({ facilityData }: { facilityData: FacilityData_t }) {
-    const {loginInfo} = useContext(LoginInfoContext);
+    const { loginInfo } = useContext(LoginInfoContext);
     const insets = useSafeAreaInsets();
     const navigation = useNavigation();
     const theme = useTheme();
@@ -398,7 +400,7 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
                             facility_id: facilityData.id,
                             guardian_id: loginInfo.userId,
                             sender: loginInfo.userId,
-                            sender_type: "guardian",
+                            sender_type: 'guardian',
                         });
                     }}
                 >

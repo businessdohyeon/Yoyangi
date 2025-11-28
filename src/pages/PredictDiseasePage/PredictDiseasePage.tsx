@@ -3,6 +3,7 @@ import { StyleSheet, Image, ScrollView, Alert, View } from 'react-native';
 import { Button, ActivityIndicator, Text, Card } from 'react-native-paper';
 import * as ImagePicker from 'react-native-image-picker';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const mockdata = {
     data: {
@@ -105,10 +106,10 @@ const PredictDiseasePage = () => {
     };
 
     return (
-        <>
-            <GoBackHeader title={"피부 질병 예측"}/>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
+            <GoBackHeader title={'피부 질병 예측'} />
             <ScrollView contentContainerStyle={styles.container}>
-                 {image && (
+                {image && (
                     <Image
                         source={{ uri: image.uri }}
                         style={styles.image}
@@ -152,7 +153,7 @@ const PredictDiseasePage = () => {
                     </View>
                 )}
             </ScrollView>
-        </>
+        </SafeAreaView>
     );
 };
 

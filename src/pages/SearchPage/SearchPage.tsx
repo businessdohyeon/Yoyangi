@@ -1,14 +1,17 @@
-import { useContext, useEffect, useState, useCallback } from 'react';
-import { View } from 'react-native';
+import { useContext, useEffect, useState } from 'react';
+import { useWindowDimensions, View } from 'react-native';
 import {
     ActivityIndicator,
+    Appbar,
     Button,
     Card,
-    Divider,
+    Chip,
     FAB,
     Icon,
     IconButton,
+    Searchbar,
     Text,
+    TouchableRipple,
     useTheme,
 } from 'react-native-paper';
 import {
@@ -24,7 +27,6 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
-import SearchHeader from './SearchHeader';
 
 import { LocationInfoContext, LoginInfoContext } from '../../Context';
 import {
@@ -36,7 +38,11 @@ import {
     FacilityDataSchema,
 } from '../../types/FacilityDataScheme';
 import { FlatList } from 'react-native';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+    useInfiniteQuery,
+    useMutation,
+    useQueryClient,
+} from '@tanstack/react-query';
 
 const LIMIT = 10;
 const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
@@ -55,7 +61,9 @@ export default function SearchPage({ route }) {
 
     const [isMapShown, setIsMapShown] = useState(false);
     const [kind, setKind] = useState<string[]>(KIND_DEFAULT_VALUE);
-    const [searchResults, setSearchResults] = useState<FacilityData_t[] | null>(null);
+    const [searchResults, setSearchResults] = useState<FacilityData_t[] | null>(
+        null,
+    );
 
     const {
         data,
@@ -65,7 +73,12 @@ export default function SearchPage({ route }) {
         isFetchingNextPage,
         refetch,
     } = useInfiniteQuery({
-        queryKey: ['facilities', locationInfo?.latitude, locationInfo?.longitude, kind],
+        queryKey: [
+            'facilities',
+            locationInfo?.latitude,
+            locationInfo?.longitude,
+            kind,
+        ],
         queryFn: async ({ pageParam = 1 }) => {
             if (!locationInfo) {
                 return [];
@@ -79,7 +92,7 @@ export default function SearchPage({ route }) {
                 kind: kind.join(','),
             };
 
-            const response = await axiosInstance.get("/facilities", { params });
+            const response = await axiosInstance.get('/facilities', { params });
             const { Response } = response.data;
 
             return Response !== null && Response !== undefined ? Response : [];
@@ -92,7 +105,8 @@ export default function SearchPage({ route }) {
         staleTime: 30 * 1000, // 30초 캐싱
     });
 
-    const facilityArray = searchResults !== null ? searchResults : (data?.pages.flat() || []);
+    const facilityArray =
+        searchResults !== null ? searchResults : data?.pages.flat() || [];
 
     const getMore = () => {
         if (hasNextPage && !isFetchingNextPage) {
@@ -117,11 +131,9 @@ export default function SearchPage({ route }) {
                 kind={kind}
                 setKind={setKind}
             />
-            <VoiceButton
-                setSearchResults={setSearchResults}
-            />
+            <VoiceButton setSearchResults={setSearchResults} />
             {/* 지도 */}
-                    {/* 지도 */}
+            {/* 지도 */}
             <View
                 style={{
                     display: isMapShown ? 'flex' : 'none',
@@ -137,42 +149,48 @@ export default function SearchPage({ route }) {
                             zoom: 14,
                         }}
                     >
-                    {facilityArray.map((facilityData) => {
-                        try {
-                            const parsed =
-                                FacilityDataSchema.parse(facilityData);
-                            console.log(parsed);
+                        {facilityArray.map((facilityData) => {
+                            try {
+                                const parsed =
+                                    FacilityDataSchema.parse(facilityData);
+                                console.log(parsed);
 
-                            return (
-                                <NaverMapMarkerOverlay
-                                    key={parsed.id}
-                                    latitude={parsed.latitude}
-                                    longitude={parsed.longitude}
-                                    anchor={{ x: 0.5, y: 1 }}
-                                    caption={{ text: parsed.name }}
-                                    onTap={() => {
-                                        navigation.navigate(
-                                            'FacilityDetailPage',
-                                            {
-                                                id: parsed.id,
-                                            },
-                                        );
-                                    }}
-                                />
-                            );
-                        } catch (error) {
-                            console.log(facilityData);
-                            console.log(error);
-                            return null;
-                        }
-                    })}
+                                return (
+                                    <NaverMapMarkerOverlay
+                                        key={parsed.id}
+                                        latitude={parsed.latitude}
+                                        longitude={parsed.longitude}
+                                        anchor={{ x: 0.5, y: 1 }}
+                                        caption={{ text: parsed.name }}
+                                        onTap={() => {
+                                            navigation.navigate(
+                                                'FacilityDetailPage',
+                                                {
+                                                    id: parsed.id,
+                                                },
+                                            );
+                                        }}
+                                    />
+                                );
+                            } catch (error) {
+                                console.log(facilityData);
+                                console.log(error);
+                                return null;
+                            }
+                        })}
                     </NaverMapView>
                 )}
             </View>
             {/* 검색결과 목록 */}
-            {!isMapShown && (
-                isFetching && facilityArray.length === 0 ? (
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {!isMapShown &&
+                (isFetching && facilityArray.length === 0 ? (
+                    <View
+                        style={{
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
                         <ActivityIndicator
                             animating={true}
                             color={theme.colors.primary}
@@ -208,8 +226,7 @@ export default function SearchPage({ route }) {
                             ) : null
                         }
                     />
-                )
-            )}
+                ))}
             <FAB
                 icon="map"
                 label="지도보기"
@@ -387,38 +404,17 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
     );
 }
 
-function VoiceButton({ setSearchResults }) {
+function VoiceButton({
+    setSearchResults,
+}: {
+    setSearchResults: (data: any) => void;
+}) {
     const [transcript, setTranscript] = useState('');
     const [isListening, setIsListening] = useState(false);
-    const [serverResponse, setServerResponse] = useState({});
+    const theme = useTheme();
 
-    const voiceSearchMutation = useMutation({
-        mutationFn: async (userSentence: string) => {
-            const response = await axiosInstance.post('/search/voice', {
-                usersentence: userSentence,
-            });
-            return response.data.Response;
-        },
-        onSuccess: (data) => {
-            if (data !== null && data !== undefined) {
-                setSearchResults(data);
-                setServerResponse(data);
-            }
-        },
-        onError: (error) => {
-            console.error('Voice search error:', error);
-        },
-    });
-
-    const sendSTTResultToServer = useCallback((userSentence: string) => {
-        if (!userSentence) {
-            return;
-        }
-        voiceSearchMutation.mutate(userSentence);
-    }, [voiceSearchMutation]);
-
+    // Listen for STT events
     useEffect(() => {
-        // Listen for results
         const resultListener = addSpeechResultListener(
             (result: SpeechResult) => {
                 setTranscript(result.transcript);
@@ -426,19 +422,16 @@ function VoiceButton({ setSearchResults }) {
             },
         );
 
-        // Listen for errors
         const errorListener = addSpeechErrorListener((error) => {
             console.error('Speech error:', error);
             setIsListening(false);
         });
 
-        // Listen for end of speech
         const endListener = addSpeechEndListener(() => {
             console.log('ended');
             setIsListening(false);
         });
 
-        // Cleanup
         return () => {
             resultListener.remove();
             errorListener.remove();
@@ -446,12 +439,27 @@ function VoiceButton({ setSearchResults }) {
         };
     }, []);
 
-    // transcript가 변경되고 listening이 끝나면 검색 실행
+    // When listening stops and we have a transcript, perform a search using the transcript
     useEffect(() => {
+        console.log(transcript);
+
         if (!isListening && transcript) {
-            sendSTTResultToServer(transcript);
+            (async () => {
+                try {
+                    const searchQuery = transcript;
+                    const url = `${
+                        apis.urls.facilities
+                    }?keyword=${encodeURIComponent(searchQuery)}`;
+                    const response = await axiosInstance.get(url);
+                    const result = response.data?.Response ?? response.data;
+
+                    setSearchResults(result);
+                } catch (e) {
+                    console.error('voice search failed', e);
+                }
+            })();
         }
-    }, [isListening, transcript, sendSTTResultToServer]);
+    }, [isListening, transcript, setSearchResults]);
 
     const handleStart = async () => {
         try {
@@ -467,10 +475,9 @@ function VoiceButton({ setSearchResults }) {
                 return;
             }
 
-            console.log('right before test');
-
             await start({ language: 'ko-KR' });
             setIsListening(true);
+            setTranscript('');
         } catch (error) {
             console.error(error);
         }
@@ -485,16 +492,155 @@ function VoiceButton({ setSearchResults }) {
     };
 
     return (
-        <View>
-            <Text>{'text'}</Text>
-            <Text>{transcript || 'Press start to begin'}</Text>
-            <Divider />
-            <Text>{'결과'}</Text>
-            <Text>{JSON.stringify(serverResponse)}</Text>
-            <Divider />
-            <Button onPress={isListening ? handleStop : handleStart}>
-                {isListening ? 'Stop' : 'Start'}
-            </Button>
+        <View style={{ position: 'absolute', right: 16, top: 16, zIndex: 50 }}>
+            <IconButton
+                icon={isListening ? 'microphone' : 'microphone-outline'}
+                size={30}
+                iconColor={isListening ? theme.colors.primary : undefined}
+                onPress={isListening ? handleStop : handleStart}
+            />
         </View>
+    );
+}
+
+export function SearchHeader({ setSearchResults, kind, setKind }) {
+    const navigation = useNavigation();
+    const theme = useTheme();
+    const { width, height } = useWindowDimensions();
+    const queryClient = useQueryClient();
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const searchMutation = useMutation({
+        mutationFn: async (keyword: string) => {
+            const response = await axiosInstance.get(
+                apis.urls.facilities.replace(apis.urls.server, ''),
+                { params: { keyword } },
+            );
+            return response.data.Response;
+        },
+        onSuccess: (data) => {
+            setSearchResults(data);
+            queryClient.setQueryData(
+                ['facilities', 'search', searchQuery],
+                data,
+            );
+        },
+    });
+
+    const onSearchQuerySubmit = () => {
+        console.log(`${apis.urls.facilities}?keyword=${searchQuery}`);
+        searchMutation.mutate(searchQuery);
+        console.log('onSubmit', searchMutation.data);
+    };
+
+    const toggleKind = (value: string) => {
+        setKind((cur) =>
+            cur.includes(value)
+                ? cur.filter((v) => v !== value)
+                : [...cur, value],
+        );
+    };
+
+    console.group('SearchHeader rerendered');
+    console.log({ kind });
+    console.groupEnd();
+
+    return (
+        <Appbar.Header
+            elevated
+            style={{
+                flexDirection: 'column',
+                height: 'auto',
+                backgroundColor: theme.colors.background,
+            }}
+        >
+            {/* 검색박스 */}
+            <Searchbar
+                placeholder="증상, 진료과, 병원을 검색해보세요"
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+                mode="view"
+                icon={'magnify'}
+                showDivider={false}
+                style={{
+                    backgroundColor: theme.colors.background,
+                    // ...showBorder
+                }}
+                onSubmitEditing={onSearchQuerySubmit}
+                // autoFocus={true}
+            />
+            {/* 검색관련 */}
+            <View style={{}}>
+                {/* 위치설정 */}
+                {/* TODO: ripple이 안되는데.. 흠... */}
+                <TouchableRipple
+                    onPress={() => {
+                        navigation.navigate('EditLocationPage');
+                    }}
+                    style={{
+                        backgroundColor: '#eeeeee',
+                        paddingHorizontal: 10,
+                        width: width,
+                    }}
+                    rippleColor="rgba(0, 0, 0, .32)"
+                >
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            marginVertical: 10,
+                        }}
+                    >
+                        <View
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Icon source={'map-marker'} size={20} />
+                        </View>
+                        <View style={{ flex: 6, justifyContent: 'center' }}>
+                            <Text>현재위치</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: 'center' }}>
+                            <Text>변경</Text>
+                        </View>
+                    </View>
+                </TouchableRipple>
+                {/* 필터 */}
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        backgroundColor: theme.colors.background,
+                        padding: 10,
+                        paddingHorizontal: 10,
+                        justifyContent: 'space-around',
+                        width: width,
+                    }}
+                >
+                    <Chip
+                        onPress={() => toggleKind('요양병원')}
+                        selected={kind.includes('요양병원')}
+                    >
+                        요양병원
+                    </Chip>
+
+                    <Chip
+                        onPress={() => toggleKind('요양원')}
+                        selected={kind.includes('요양원')}
+                    >
+                        요양원
+                    </Chip>
+
+                    <Chip
+                        onPress={() => toggleKind('주간보호케어센터')}
+                        selected={kind.includes('주간보호케어센터')}
+                    >
+                        주간보호케어센터
+                    </Chip>
+                </View>
+            </View>
+        </Appbar.Header>
     );
 }

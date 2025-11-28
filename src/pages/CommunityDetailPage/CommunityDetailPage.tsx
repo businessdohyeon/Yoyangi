@@ -8,10 +8,10 @@ import {
     ScrollView,
 } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
-import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useQuery } from '@tanstack/react-query';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // TODO: {로그인 상태에서 Authorization 헤더를 넣어야 하는 경우 아래 getAuthHeaders를 수정하세요}
 function getAuthHeaders() {
@@ -35,9 +35,12 @@ export default function CommunityDetailScreen({ route }) {
     const { data: community, isLoading: loading } = useQuery({
         queryKey: ['community', communityId],
         queryFn: async () => {
-            const response = await axiosInstance.get(`/community/${communityId}`, {
-                headers: { ...getAuthHeaders() },
-            });
+            const response = await axiosInstance.get(
+                `/community/${communityId}`,
+                {
+                    headers: { ...getAuthHeaders() },
+                },
+            );
             // TODO: {응답 포맷이 다르면 아래 파싱 조정}
             return response.data.Community || response.data.community || null;
         },
@@ -57,7 +60,7 @@ export default function CommunityDetailScreen({ route }) {
         );
 
     return (
-        <>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={community.title} />
             <ScrollView style={styles.container}>
                 <Card style={{ margin: 12 }}>
@@ -121,7 +124,7 @@ export default function CommunityDetailScreen({ route }) {
                     )}
                 </View>
             </ScrollView>
-        </>
+        </SafeAreaView>
     );
 }
 

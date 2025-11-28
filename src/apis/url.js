@@ -5,17 +5,38 @@ const SERVER = `http://${IP}:${PORT}`;
 
 // TODO: 별로 맘에 안드는데....
 const urls = {
+    // server base (keep full URL for axios baseURL or socket connections)
     server: SERVER,
-    facilities: `${SERVER}/facilities`,
-    getFacilityById: (id) => `${SERVER}/facilities/${id}`,
-    getFacilityReviewById: (id) => `${SERVER}/reviews/${id}`,
-    loginNaver: `${SERVER}/user/sns/login/naver`,
-    logiKakao: `${SERVER}/user/sns/login/kakao`,
-    loginGoogle: `${SERVER}ㄹ/user/sns/login/google`,
-    communites: `${SERVER}/community`,
-    userLike: (userId, facilityId) =>
-        `${SERVER}/user/${userId}/favorites/${facilityId}`,
-    getGeoLocaton: `${SERVER}/user/geolocation`,
+
+    // API paths (no SERVER prefix) — can be used directly with axios baseURL
+    facilities: '/facilities',
+    getFacilityById: (id) => `/facilities/${id}`,
+    getFacilityReviewById: (id) => `/reviews/${id}`,
+
+    // SNS login endpoints
+    loginNaver: '/user/sns/login/naver',
+    loginKakao: '/user/sns/login/kakao',
+    loginGoogle: '/user/sns/login/google',
+    loginRefreshToken: '/user/sns/login/refresh-token',
+
+    // community
+    communities: '/community',
+
+    // user favorites
+    userLike: (userId, facilityId) => `/user/${userId}/favorites/${facilityId}`,
+    getFavorites: (userId) => `/user/${userId}/favorites`,
+
+    // geolocation
+    getGeoLocation: '/user/geolocation',
+
+    // reservations
+    reservationsList: '/facilities/reservations/list',
+    reservationById: (id) => `/facilities/reservations/${id}`,
+    createFacilityReservation: (facilityId) =>
+        `/facilities/${facilityId}/reservation`,
+
+    // search
+    searchVoice: '/search/voice',
 };
 
 export default urls;

@@ -24,6 +24,7 @@ import ConsultationHistory from '../pages/ConsultationHistory/ConsultationHistor
 import ReservationHistory from '../pages/ReservationHistory/ReservationHistory.tsx';
 import LikedOrganizations from '../pages/LikedOrganizations/LikedOrganizations.tsx';
 import ReservationDetailPage from '../pages/ReservationDetailPage/ReservationDetailPage.tsx';
+import ReviewDetail from '../pages/ReviewDetail/ReviewDetail.tsx';
 
 // Bottom Tabs 정의
 const Tab = createBottomTabNavigator();
@@ -180,6 +181,10 @@ export default function Routes() {
                 <Stack.Screen
                     name="ReservationDetailPage"
                     component={ReservationDetailPage}
+                />
+                <Stack.Screen
+                    name="ReviewDetail"
+                    component={ReviewDetail}
                 />
             </Stack.Navigator>
         </NavigationContainer>

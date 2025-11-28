@@ -1,17 +1,13 @@
 import { useWindowDimensions, View } from 'react-native';
-import { Button, Text, useTheme, ActivityIndicator } from 'react-native-paper';
+import { Button, Text, useTheme } from 'react-native-paper';
 
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
 import ReviewCard from './ReviewCard';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
-import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
-import {
-    ReviewData_t,
-    ReviewDataArraySchema,
-} from '../../types/ReviewDataScheme';
+import { ReviewDataArraySchema } from '../../types/ReviewDataScheme';
 
 export function FacilityReview({
     facilityData,
@@ -25,7 +21,9 @@ export function FacilityReview({
     const { data: reviewDataArray = [], isLoading } = useQuery({
         queryKey: ['facilityReviews', facilityData.id],
         queryFn: async () => {
-            const response = await axiosInstance.get(`/reviews/${facilityData.id}`);
+            const response = await axiosInstance.get(
+                `/reviews/${facilityData.id}`,
+            );
             const { data } = response.data;
 
             console.log(response.data);
@@ -381,14 +379,15 @@ export function FacilityReview({
                             onPress={() =>
                                 // TODO
                                 navigation.navigate('ReviewDetail', {
-                                    id: reviewData.id,
+                                    facilityId: facilityData.id,
+                                    reviewId: reviewData.id,
                                 })
                             }
                         />
                     );
                 })}
 
-                <View style={{ }}>
+                <View style={{}}>
                     <Button
                         icon="camera"
                         mode="contained"

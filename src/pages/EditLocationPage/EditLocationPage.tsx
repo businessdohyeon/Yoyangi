@@ -6,6 +6,8 @@ import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { LocationInfoContext } from '../../Context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // import { showBorder } from "./common.js"
 
 const _goBack = () => console.log('Went back');
@@ -60,20 +62,9 @@ const EditLocationPage = () => {
         storeLocationInfo(searchResult);
     };
 
-
     return (
-        <>
-            <Appbar.Header>
-                <Appbar.Action icon="map-marker" onPress={_handleSearch} />
-                <Appbar.Content title={locationInfo?.roadAddress} />
-                <Appbar.Action
-                    icon="magnify"
-                    onPress={() => {
-                        navigation.navigate('SearchPage');
-                    }}
-                />
-                <Appbar.Action icon="bell" onPress={_handleMore} />
-            </Appbar.Header>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
+            <GoBackHeader title={"위치 설정"}/>
             <ScrollView
                 contentContainerStyle={{
                     gap: 30,
@@ -123,7 +114,7 @@ const EditLocationPage = () => {
                     )}
                 </View>
             </ScrollView>
-        </>
+        </SafeAreaView>
     );
 };
 

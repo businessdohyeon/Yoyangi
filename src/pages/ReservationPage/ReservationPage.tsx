@@ -10,13 +10,13 @@ import {
 } from 'react-native-paper';
 import { useForm } from '@tanstack/react-form';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ReservationPage({ route }) {
     const navigation = useNavigation();
@@ -60,7 +60,9 @@ export default function ReservationPage({ route }) {
         },
         onSuccess: (data) => {
             console.log('예약 성공:', data);
-            queryClient.invalidateQueries({ queryKey: ['facility', facilityId] });
+            queryClient.invalidateQueries({
+                queryKey: ['facility', facilityId],
+            });
             navigation.goBack();
         },
         onError: (err) => {
@@ -88,7 +90,7 @@ export default function ReservationPage({ route }) {
         text.replace(/\D/g, '').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
 
     return (
-        <>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={`${facilityName} 예약`} />
             <ScrollView contentContainerStyle={{ padding: 16 }}>
                 <Text variant="titleLarge">예약 정보 입력</Text>
@@ -346,6 +348,6 @@ export default function ReservationPage({ route }) {
                     예약하기
                 </Button>
             </ScrollView>
-        </>
+        </SafeAreaView>
     );
 }

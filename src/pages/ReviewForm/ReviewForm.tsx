@@ -5,10 +5,10 @@ import { useForm } from '@tanstack/react-form';
 import { LoginInfoContext } from '../../Context';
 import { ScrollView } from 'react-native-gesture-handler';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
-import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // form 초기화
 
@@ -39,8 +39,12 @@ export default function ReviewForm({ route, navigation }) {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['facilityReviews', facilityId] });
-            queryClient.invalidateQueries({ queryKey: ['facility', facilityId] });
+            queryClient.invalidateQueries({
+                queryKey: ['facilityReviews', facilityId],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['facility', facilityId],
+            });
             navigation.goBack();
         },
         onError: (err) => {
@@ -63,10 +67,16 @@ export default function ReviewForm({ route, navigation }) {
                 formData.append('rating', Number(values.value.rating));
 
                 if (values.value.reservationId)
-                    formData.append('reservationId', values.value.reservationId);
+                    formData.append(
+                        'reservationId',
+                        values.value.reservationId,
+                    );
 
                 // 이미지가 있을 때만 formData에 추가
-                if (Array.isArray(values.value.images) && values.value.images.length > 0) {
+                if (
+                    Array.isArray(values.value.images) &&
+                    values.value.images.length > 0
+                ) {
                     values.value.images.forEach((img, idx) => {
                         if (img?.uri) {
                             formData.append('files', {
@@ -86,7 +96,7 @@ export default function ReviewForm({ route, navigation }) {
     });
 
     return (
-        <>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={`${facilityName} 후기 쓰기`} />
             <ScrollView style={{ flex: 1, padding: 16 }}>
                 <Card style={{ padding: 16 }}>
@@ -185,8 +195,12 @@ export default function ReviewForm({ route, navigation }) {
                         children={({ canSubmit, isSubmitting }) => (
                             <Button
                                 mode="contained"
-                                loading={isSubmitting || reviewMutation.isPending}
-                                disabled={!canSubmit || reviewMutation.isPending}
+                                loading={
+                                    isSubmitting || reviewMutation.isPending
+                                }
+                                disabled={
+                                    !canSubmit || reviewMutation.isPending
+                                }
                                 onPress={form.handleSubmit}
                             >
                                 리뷰 등록
@@ -195,6 +209,6 @@ export default function ReviewForm({ route, navigation }) {
                     />
                 </Card>
             </ScrollView>
-        </>
+        </SafeAreaView>
     );
 }

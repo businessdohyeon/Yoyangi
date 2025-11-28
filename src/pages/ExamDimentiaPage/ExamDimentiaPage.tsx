@@ -13,6 +13,7 @@ import {
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import patternImg from './patternImg.png';
 import paintingImg from './painting.png';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExamDimentiaPage() {
     // 선택지 방식으로 변경 (0점 / 정답점)
@@ -69,7 +70,7 @@ export default function ExamDimentiaPage() {
     };
 
     return (
-        <>
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={'치매 간단 검사'} />
             <ScrollView contentContainerStyle={styles.scroll}>
                 <Card style={styles.card}>
@@ -260,7 +261,7 @@ export default function ExamDimentiaPage() {
                     </Card>
                 )}
             </ScrollView>
-        </>
+        </SafeAreaView>
     );
 }
 

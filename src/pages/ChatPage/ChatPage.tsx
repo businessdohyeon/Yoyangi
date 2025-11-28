@@ -4,6 +4,7 @@ import { TextInput, Button, Card, Text } from 'react-native-paper';
 import io from 'socket.io-client';
 import apis from '../../apis';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ChatPage({ route }) {
     console.log(route.params);
@@ -13,7 +14,6 @@ export default function ChatPage({ route }) {
     const [input, setInput] = useState('');
     const socketRef = useRef(null);
 
-
     useEffect(() => {
         socketRef.current = io(`${apis.urls.server}`, {
             transports: ['websocket'],
@@ -22,7 +22,7 @@ export default function ChatPage({ route }) {
         socketRef.current.emit('joinRoom', { facility_id, guardian_id });
 
         socketRef.current.on('chatHistory', (data) => {
-            console.log("chatHistory");
+            console.log('chatHistory');
             console.log(data);
             setMessages(data);
         });
@@ -53,43 +53,43 @@ export default function ChatPage({ route }) {
     };
 
     return (
-        <>
-        <GoBackHeader title={"상담채팅"}/>
-        <View style={styles.container}>
-            <FlatList
-                data={messages}
-                keyExtractor={(item) =>
-                    item.id?.toString() || Math.random().toString()
-                }
-                renderItem={({ item }) => (
-                    <Card style={styles.messageCard}>
-                        <Card.Content>
-                            <Text style={styles.sender}>
-                                ({item.sender_type}) {item.sender_id}
-                            </Text>
-                            <Text>{item.content}</Text>
-                        </Card.Content>
-                    </Card>
-                )}
-            />
-            <View style={styles.inputContainer}>
-                <TextInput
-                    mode="outlined"
-                    value={input}
-                    onChangeText={setInput}
-                    style={styles.input}
-                    placeholder="메시지를 입력하세요"
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
+            <GoBackHeader title={'상담채팅'} />
+            <View style={styles.container}>
+                <FlatList
+                    data={messages}
+                    keyExtractor={(item) =>
+                        item.id?.toString() || Math.random().toString()
+                    }
+                    renderItem={({ item }) => (
+                        <Card style={styles.messageCard}>
+                            <Card.Content>
+                                <Text style={styles.sender}>
+                                    ({item.sender_type}) {item.sender_id}
+                                </Text>
+                                <Text>{item.content}</Text>
+                            </Card.Content>
+                        </Card>
+                    )}
                 />
-                <Button
-                    mode="contained"
-                    onPress={sendMessage}
-                    style={styles.sendButton}
-                >
-                    전송
-                </Button>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        mode="outlined"
+                        value={input}
+                        onChangeText={setInput}
+                        style={styles.input}
+                        placeholder="메시지를 입력하세요"
+                    />
+                    <Button
+                        mode="contained"
+                        onPress={sendMessage}
+                        style={styles.sendButton}
+                    >
+                        전송
+                    </Button>
+                </View>
             </View>
-        </View>
-        </>
+        </SafeAreaView>
     );
 }
 

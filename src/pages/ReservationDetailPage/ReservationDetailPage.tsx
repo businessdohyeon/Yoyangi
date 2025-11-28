@@ -65,7 +65,6 @@ export default function ReservationDetailPage({ route }: any) {
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={'예약 상세 내역'} />
-
             <View style={{ flex: 1, backgroundColor: '#f6f6f6', padding: 12 }}>
                 {isLoading ? (
                     <ActivityIndicator animating color={theme.colors.primary} />
