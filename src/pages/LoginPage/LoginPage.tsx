@@ -262,7 +262,7 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
                                             ? '#06C755'
                                             : id === 'kakao'
                                             ? '#FEE500'
-                                            : '#FFFFFF',
+                                            : '#eeeeee',
                                     borderWidth: id === 'google' ? 1 : 0,
                                     borderColor: '#E0E0E0',
                                     marginBottom: 10,
@@ -271,7 +271,7 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
                                 <Image
                                     source={src}
                                     style={{
-                                        height: 28,
+                                        height: 50,
                                         resizeMode: 'contain',
                                     }}
                                 />
