@@ -35,8 +35,6 @@ function StarRow({ rating = 0 }) {
     return <View style={styles.starRow}>{stars}</View>;
 }
 
-type ImageItem = { uri: string };
-
 type Props = {
     reviewData: ReviewData_t;
     isOwner?: boolean;
@@ -117,7 +115,15 @@ export default function ReviewCard({ reviewData, isOwner, facilityId }: Props) {
         setReportVisible(true);
     };
     return (
-        <Card style={styles.card}>
+        <Card
+            style={styles.card}
+            onPress={() =>
+                navigation.navigate('ReviewDetail', {
+                    facilityId,
+                    reviewId: reviewData.id,
+                })
+            }
+        >
             <Card.Title
                 title={reviewData.user?.name ?? '작성자'}
                 subtitle={reviewData.created_at}

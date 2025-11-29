@@ -112,7 +112,7 @@ export default function FacilityDetailPage({
                             userLike={userLike}
                         />
                         {/* 이동버튼 */}
-                        <TabNav tabIndex={tabIndex} setTabIndex={setTabIndex}/>
+                        <TabNav tabIndex={tabIndex} setTabIndex={setTabIndex} />
                         {/* 구체적인 정보들 */}
                         <ScrollView
                             pagingEnabled
@@ -169,7 +169,7 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
     return (
         <View
             style={{
-                ...showBorder,
+                borderTopWidth: 1,
                 flexDirection: 'row',
                 backgroundColor: theme.colors.background,
             }}
@@ -247,90 +247,74 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
     );
 }
 
-
-function TabNav({tabIndex, setTabIndex }) {
+function TabNav({ tabIndex, setTabIndex }) {
     const theme = useTheme();
 
     return (
-         <View
-                            style={{
-                                ...showBorder,
-                                flex: 1,
-                                flexDirection: 'row',
-                                justifyContent: 'space-around',
-                                backgroundColor: theme.colors.background,
-                                overflow: 'visible',
-                            }}
-                        >
-                            <TouchableRipple
-                                style={{
-                                    flex: 1,
-                                    borderBottomWidth: 10,
-                                    borderBottomColor:
-                                        tabIndex === 0
-                                            ? theme.colors.primary
-                                            : '#dddddd',
-                                    backgroundColor: theme.colors.background,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    setTabIndex(0);
-                                }}
-                            >
-                                <Text
-                                    style={{ marginVertical: 5 }}
-                                    variant="titleMedium"
-                                >
-                                    병원정보
-                                </Text>
-                            </TouchableRipple>
-                            <TouchableRipple
-                                style={{
-                                    flex: 1,
-                                    borderBottomWidth: 10,
-                                    borderBottomColor:
-                                        tabIndex === 1
-                                            ? theme.colors.primary
-                                            : '#dddddd',
-                                    backgroundColor: theme.colors.background,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    setTabIndex(1);
-                                }}
-                            >
-                                <Text
-                                    style={{ marginVertical: 5 }}
-                                    variant="titleMedium"
-                                >
-                                    병원소식
-                                </Text>
-                            </TouchableRipple>
-                            <TouchableRipple
-                                style={{
-                                    flex: 1,
-                                    borderBottomWidth: 10,
-                                    borderBottomColor:
-                                        tabIndex === 2
-                                            ? theme.colors.primary
-                                            : '#dddddd',
-                                    backgroundColor: theme.colors.background,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                                onPress={() => {
-                                    setTabIndex(2);
-                                }}
-                            >
-                                <Text
-                                    style={{ marginVertical: 5 }}
-                                    variant="titleMedium"
-                                >
-                                    후기
-                                </Text>
-                            </TouchableRipple>
-                        </View>
+        <View
+            style={{
+                ...showBorder,
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                backgroundColor: theme.colors.background,
+                overflow: 'visible',
+            }}
+        >
+            <TouchableRipple
+                style={{
+                    flex: 1,
+                    borderBottomWidth: 10,
+                    borderBottomColor:
+                        tabIndex === 0 ? theme.colors.primary : '#dddddd',
+                    backgroundColor: theme.colors.background,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+                onPress={() => {
+                    setTabIndex(0);
+                }}
+            >
+                <Text style={{ marginVertical: 5 }} variant="titleMedium">
+                    병원정보
+                </Text>
+            </TouchableRipple>
+            <TouchableRipple
+                style={{
+                    flex: 1,
+                    borderBottomWidth: 10,
+                    borderBottomColor:
+                        tabIndex === 1 ? theme.colors.primary : '#dddddd',
+                    backgroundColor: theme.colors.background,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+                onPress={() => {
+                    setTabIndex(1);
+                }}
+            >
+                <Text style={{ marginVertical: 5 }} variant="titleMedium">
+                    병원소식
+                </Text>
+            </TouchableRipple>
+            <TouchableRipple
+                style={{
+                    flex: 1,
+                    borderBottomWidth: 10,
+                    borderBottomColor:
+                        tabIndex === 2 ? theme.colors.primary : '#dddddd',
+                    backgroundColor: theme.colors.background,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+                onPress={() => {
+                    setTabIndex(2);
+                }}
+            >
+                <Text style={{ marginVertical: 5 }} variant="titleMedium">
+                    후기
+                </Text>
+            </TouchableRipple>
+        </View>
     );
 }
