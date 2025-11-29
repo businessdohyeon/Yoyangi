@@ -1,3 +1,4 @@
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import {
     Button,
@@ -6,25 +7,70 @@ import {
     IconButton,
     Text,
     useTheme,
+    ActivityIndicator,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
+import { LocationInfoContext } from '../../Context';
+import { FacilityData_t } from '../../types/FacilityDataScheme';
+import { useQuery } from '@tanstack/react-query';
+
+const LIMIT = 5;
+const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
 
 export default function SomeFacilityList() {
     const navigation = useNavigation();
     const theme = useTheme();
+    const { locationInfo } = useContext(LocationInfoContext);
+
+    const [kind, setKind] = useState<string[]>(KIND_DEFAULT_VALUE);
+
+    const { data, isLoading, refetch } = useQuery<FacilityData_t[]>({
+        queryKey: [
+            'someFacilities',
+            locationInfo?.latitude,
+            locationInfo?.longitude,
+            kind,
+        ],
+        queryFn: async () => {
+            if (!locationInfo) return [] as FacilityData_t[];
+            const params = {
+                limit: LIMIT,
+                page: 1,
+                latitude: locationInfo.latitude,
+                longitude: locationInfo.longitude,
+                kind: kind.join(','),
+            };
+            const resp = await axiosInstance.get(apis.urls.facilities, {
+                params,
+            });
+            const { Response } = resp.data;
+            return Response ?? [];
+        },
+        enabled: !!locationInfo,
+    });
+
+    const list = useMemo(() => (data ?? []) as FacilityData_t[], [data]);
+
+    useEffect(() => {
+        refetch();
+    }, [kind, refetch]);
+
+    const toggleKind = (label: string) => {
+        setKind((prev) =>
+            prev.includes(label)
+                ? prev.filter((p) => p !== label)
+                : [...prev, label],
+        );
+    };
 
     return (
-        <View
-            style={{
-                padding: 10,
-                backgroundColor: '#ffffff',
-            }}
-        >
-            {/* text */}
+        <View style={{ padding: 10, backgroundColor: '#ffffff' }}>
             <View style={{ marginVertical: 10 }}>
-                <Text variant="titleLarge">지금 걸어갈 수 있는 병원</Text>
+                <Text variant="titleLarge">근처 시설</Text>
             </View>
-            {/* filter */}
+
             <View
                 style={{
                     marginVertical: 10,
@@ -32,56 +78,57 @@ export default function SomeFacilityList() {
                     justifyContent: 'space-around',
                 }}
             >
-                <Chip icon="hospital" onPress={() => console.log('Pressed')}>
-                    요양병원
-                </Chip>
-                <Chip icon="forest" onPress={() => console.log('Pressed')}>
-                    요양원
-                </Chip>
-                <Chip
-                    icon="sun-clock-outline"
-                    onPress={() => console.log('Pressed')}
-                >
-                    주간데이케어센터
-                </Chip>
+                {['요양병원', '요양원', '주간보호케어센터'].map((k) => (
+                    <Chip
+                        key={k}
+                        icon={kind.includes(k) ? 'check' : 'hospital'}
+                        selected={kind.includes(k)}
+                        onPress={() => toggleKind(k)}
+                    >
+                        {k}
+                    </Chip>
+                ))}
             </View>
-            {/* items */}
-            <View style={{ gap: 10, marginVertical: 20 }}>
-                <Card onPress={() => console.log('card pressed')}>
-                    {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
-                    <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
-                    <Card.Content>
-                        <Text variant="titleLarge">병원이름</Text>
-                        {/* TODO: 밑 요소에 별점, 위치, 종류 */}
-                        <Text variant="bodyMedium">Card content</Text>
-                    </Card.Content>
-                    <Card.Actions>
-                        {/* TODO: 옆으로 보내기 */}
-                        <IconButton
-                            icon={'heart-outline'}
-                            onPress={() => console.log('Adsfsa')}
-                        />
-                    </Card.Actions>
-                </Card>
-                <Card onPress={() => console.log('card pressed')}>
-                    {/* <Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} /> */}
-                    <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
-                    <Card.Content>
-                        <Text variant="titleLarge">병원이름</Text>
-                        {/* TODO: 밑 요소에 별점, 위치, 종류 */}
-                        <Text variant="bodyMedium">Card content</Text>
-                    </Card.Content>
-                    <Card.Actions>
-                        {/* TODO: 옆으로 보내기 */}
-                        <Button>like</Button>
-                    </Card.Actions>
-                </Card>
-            </View>
-            {/* moreButton */}
-            <View style={{ marginBottom: 20 }}>
+
+            {isLoading ? (
+                <ActivityIndicator animating color={theme.colors.primary} />
+            ) : (
+                <View style={{ gap: 10 }}>
+                    {list.map((item) => (
+                        <Card
+                            key={item.id}
+                            style={{ marginBottom: 10 }}
+                            onPress={() =>
+                                (navigation as any).navigate(
+                                    'FacilityDetailPage',
+                                    {
+                                        id: item.id,
+                                    },
+                                )
+                            }
+                        >
+                            <Card.Content>
+                                <Text variant="titleMedium">{item.name}</Text>
+                                <Text>{`${item.sido_name} ${item.sggu_name}`}</Text>
+                                <Text>{item.kind}</Text>
+                            </Card.Content>
+                            <Card.Actions>
+                                <IconButton
+                                    icon="heart-outline"
+                                    onPress={() => {}}
+                                />
+                            </Card.Actions>
+                        </Card>
+                    ))}
+                </View>
+            )}
+
+            <View style={{ marginTop: 10, marginBottom: 20 }}>
                 <Button
                     mode="outlined"
-                    onPress={() => (navigation as any).navigate('SearchPage')}
+                    onPress={() =>
+                        (navigation as any).navigate('SearchPage', { kind })
+                    }
                 >
                     <Text variant="labelLarge">더보기</Text>
                 </Button>
