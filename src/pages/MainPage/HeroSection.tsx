@@ -10,7 +10,8 @@ import Carousel, {
 import { useSharedValue } from 'react-native-reanimated';
 
 export default function HeroSection() {
-    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
 
     return (
@@ -25,7 +26,8 @@ const data = [...new Array(6).keys()];
 const width = Dimensions.get('window').width;
 
 function AdBanner() {
-    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
 
     const ref = useRef<ICarouselInstance>(null);
@@ -84,7 +86,8 @@ function AdBanner() {
 }
 
 function BigButtons() {
-    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
 
     // TODO: button 개조하거나 따로 만들어야 할지도..? */

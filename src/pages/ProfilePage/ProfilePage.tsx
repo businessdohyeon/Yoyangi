@@ -22,7 +22,8 @@ const CalendarIcon = (props: any) => <List.Icon {...props} icon="calendar" />;
 const ChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
 
 const ProfilePage = () => {
-    const navigation = useNavigation<TabAndStackCompositeNav<'ProfilePage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'ProfilePage', 'Tabs'>>();
     const nav = navigation;
     const theme = useTheme();
     const ctx: any = useContext(LoginInfoContext as any);

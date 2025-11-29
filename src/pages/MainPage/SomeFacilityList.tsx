@@ -21,7 +21,8 @@ const LIMIT = 5;
 const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
 
 export default function SomeFacilityList() {
-    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
 
@@ -99,7 +100,7 @@ export default function SomeFacilityList() {
                         <Card
                             key={item.id}
                             style={{ marginBottom: 10 }}
-                                onPress={() =>
+                            onPress={() =>
                                 navigation.navigate('FacilityDetailPage', {
                                     id: item.id,
                                 })
@@ -124,9 +125,7 @@ export default function SomeFacilityList() {
             <View style={{ marginTop: 10, marginBottom: 20 }}>
                 <Button
                     mode="outlined"
-                    onPress={() =>
-                        navigation.navigate('SearchPage', { kind })
-                    }
+                    onPress={() => navigation.navigate('SearchPage', { kind })}
                 >
                     <Text variant="labelLarge">더보기</Text>
                 </Button>

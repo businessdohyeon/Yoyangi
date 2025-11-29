@@ -94,7 +94,6 @@ export default function ReservationPage({
     const formatPhone = (text: string) =>
         text.replace(/\D/g, '').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
 
-
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={`${facilityName} 예약`} />

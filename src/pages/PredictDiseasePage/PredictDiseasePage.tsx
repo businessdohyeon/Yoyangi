@@ -4,38 +4,36 @@ import { Button, ActivityIndicator, Text, Card } from 'react-native-paper';
 import * as ImagePicker from 'react-native-image-picker';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import apis from '../../apis';
+import axiosInstance from '../../apis/axios';
+import { useMutation } from '@tanstack/react-query';
 
-// TODO: remove mockdata
-const mockdata = {
-    data: {
-        image_quality: 93.5578,
-        body_part: 'face',
-        results_english: {
-            acne: 0.1106,
-            rosacea: 0.7895,
-            lupus_erythematosus: 0.0521,
-        },
-        image_type: 'skin_lesion',
-        results_korean: {
-            여드름: 0.1106,
-            주사피부염: 0.7895,
-            루푸스: 0.0521,
-        },
-    },
-    error_code: 0,
+type PredictResultMap = Record<string, number>;
+
+type PredictApiData = {
+    image_quality: number;
+    body_part: string;
+    results_english: Record<string, number>;
+    image_type: string;
+    results_korean: PredictResultMap;
+};
+
+type PredictApiResponse = {
+    data: PredictApiData;
+    error_code: number;
     error_detail: {
-        status_code: 200,
-        code: '',
-        code_message: '',
-        message: '',
-    },
-    log_id: '78057412',
-    request_id: '2E4FFE4B-599E-5641-9826-542E560494F5',
+        status_code: number;
+        code: string;
+        code_message: string;
+        message: string;
+    };
+    log_id: string;
+    request_id: string;
 };
 
 const PredictDiseasePage = () => {
     const [image, setImage] = useState<ImagePicker.Asset | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, _setLoading] = useState<boolean>(false);
     const [results, setResults] = useState<Record<string, number> | null>(null);
 
     const pickImage = () => {
@@ -60,51 +58,37 @@ const PredictDiseasePage = () => {
 
     // console.log(image);
 
+    const mutation = useMutation<PredictApiResponse, unknown, FormData>({
+        mutationFn: async (formData: FormData) => {
+            const resp = await axiosInstance.post(
+                apis.urls.skinAnalysis,
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                },
+            );
+            return resp.data as PredictApiResponse;
+        },
+        onSuccess: (data) => {
+            setResults(data.data.results_korean);
+        },
+        onError: (err) => {
+            console.error('uploadImage error', err);
+            Alert.alert('업로드 오류', '이미지 업로드에 실패했습니다.');
+        },
+    });
+
     const uploadImage = async () => {
-        if (!image) {
-            return;
-        }
+        if (!image) return;
 
-        setLoading(true);
-        try {
-            const formData = new FormData();
-            formData.append('image', {
-                uri: image.uri,
-                type: image.type,
-                name: (image.fileName as string) || 'upload.jpg',
-            } as any);
+        const formData = new FormData();
+        formData.append('image', {
+            uri: image.uri,
+            type: image.type,
+            name: (image.fileName as string) || 'upload.jpg',
+        } as any);
 
-            // const response = await fetch(
-            //     `${apis.urls.server}/exam/skin-analysis`,
-            //     {
-            //         method: 'POST',
-            //         body: formData,
-            //         headers: {
-            //             'Content-Type': 'multipart/form-data',
-            //             // TODO: 인증 토큰 필요 시 헤더 추가
-            //         },
-            //     },
-            // );
-
-            // const data = await response.json();
-
-            const data = mockdata;
-
-            // console.group('uploadImage');
-            // console.log(response);
-            console.log(data);
-            // console.groupEnd();
-
-            // if (response.ok) {
-            setResults(data.data.results_korean as Record<string, number>);
-            // } else {
-            //     console.log(err);
-            // }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+        mutation.mutate(formData);
     };
 
     return (

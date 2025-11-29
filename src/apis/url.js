@@ -66,6 +66,7 @@ const urls = {
         `${API_PREFIX}/facilities/${facilityId}/reservation`,
     cancelReservationById: (reservation_id) =>
         `${API_PREFIX}/facilities/reservations/${reservation_id}`,
+    skinAnalysis: `${API_PREFIX}/exam/skin-analysis`,
 
     // search
     searchVoice: `${API_PREFIX}/search/voice`,

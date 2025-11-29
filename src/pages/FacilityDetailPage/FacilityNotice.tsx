@@ -19,22 +19,26 @@ export function FacilityNotice({
     const { width: viewportWidth } = useWindowDimensions();
 
     const fetchMenu = async () => {
-        const res = await axiosInstance.get(apis.urls.getFacilityMenu(facilityData.id));
+        const res = await axiosInstance.get(
+            apis.urls.getFacilityMenu(facilityData.id),
+        );
 
         // TODO
 
         console.log(res);
-    }
+    };
 
     const fetchNotices = async () => {
-        const res = await axiosInstance.get(apis.urls.getFacilityNotices(facilityData.id));
+        const res = await axiosInstance.get(
+            apis.urls.getFacilityNotices(facilityData.id),
+        );
 
         // TODO
 
         console.log(res);
-    }
+    };
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchMenu();
         fetchNotices();
     }, []);

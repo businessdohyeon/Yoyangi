@@ -1,4 +1,7 @@
-import { createNavigationContainerRef, CommonActions } from '@react-navigation/native';
+import {
+    createNavigationContainerRef,
+    CommonActions,
+} from '@react-navigation/native';
 import { RootStackParamList } from '../types/Navigation';
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
@@ -17,7 +20,8 @@ export function navigateToLogin(returnScreen?: string, returnParams?: any) {
             try {
                 const state = navigationRef.getState();
                 if (state && state.routes && state.routes.length > 0) {
-                    const activeRoute = state.routes[state.index || state.routes.length - 1];
+                    const activeRoute =
+                        state.routes[state.index || state.routes.length - 1];
                     if (activeRoute) {
                         currentRoute = activeRoute.name;
                         currentParams = activeRoute.params;
@@ -34,4 +38,3 @@ export function navigateToLogin(returnScreen?: string, returnParams?: any) {
         });
     }
 }
-

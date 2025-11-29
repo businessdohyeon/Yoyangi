@@ -1,6 +1,12 @@
-import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BottomTabScreenProps as RNBTabScreenProps, BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { CompositeScreenProps, CompositeNavigationProp } from '@react-navigation/native';
+import {
+    NativeStackScreenProps,
+    NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
+import {
+    BottomTabScreenProps as RNBTabScreenProps,
+    BottomTabNavigationProp,
+} from '@react-navigation/bottom-tabs';
+import { CompositeNavigationProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
     Tabs: undefined;
@@ -35,7 +41,11 @@ export type RootStackParamList = {
     CommunityFormPage:
         | {
               communityId?: number;
-              initialValues?: { title?: string; content?: string; images?: string[] };
+              initialValues?: {
+                  title?: string;
+                  content?: string;
+                  images?: string[];
+              };
           }
         | undefined;
     ChatPage:
@@ -79,8 +89,10 @@ export type RootStackNavProp<T extends keyof RootStackParamList> =
     NativeStackNavigationProp<RootStackParamList, T>;
 
 // Composite navigation prop (Tab 안에서 Stack 접근 등 복합 상황에 사용)
-export type TabAndStackCompositeNav<TTab extends keyof BottomTabParamList, TStack extends keyof RootStackParamList> =
-    CompositeNavigationProp<
-        BottomTabNavigationProp<BottomTabParamList, TTab>,
-        NativeStackNavigationProp<RootStackParamList, TStack>
-    >;
+export type TabAndStackCompositeNav<
+    TTab extends keyof BottomTabParamList,
+    TStack extends keyof RootStackParamList,
+> = CompositeNavigationProp<
+    BottomTabNavigationProp<BottomTabParamList, TTab>,
+    NativeStackNavigationProp<RootStackParamList, TStack>
+>;

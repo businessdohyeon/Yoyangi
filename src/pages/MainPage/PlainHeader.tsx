@@ -5,7 +5,8 @@ import { useContext } from 'react';
 import { LocationInfoContext, LoginInfoContext } from '../../Context';
 
 export default function PlainHeader() {
-    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
     const { loginInfo } = useContext(LoginInfoContext);

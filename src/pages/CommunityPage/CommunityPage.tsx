@@ -42,7 +42,8 @@ export type CommunityItem = {
 };
 
 export default function CommunityPage() {
-    const navigation = useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
 
     const {
         data,
@@ -145,7 +146,8 @@ function FooterIndicator({ isLoading }: { isLoading: boolean }) {
 }
 
 function PostCard({ item }: { item: CommunityItem }) {
-    const navigation = useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
     const { loginInfo } = useContext(LoginInfoContext);
     const { userId } = loginInfo;
     const queryClient = useQueryClient();

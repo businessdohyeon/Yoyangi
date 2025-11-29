@@ -177,14 +177,14 @@ export default function SearchPage({
                                             longitude={parsed.longitude}
                                             anchor={{ x: 0.5, y: 1 }}
                                             caption={{ text: parsed.name }}
-                                                                    onTap={() => {
-                                                                        navigation.navigate(
-                                                                            'FacilityDetailPage',
-                                                                            {
-                                                                                id: parsed.id,
-                                                                            },
-                                                                        );
-                                                                    }}
+                                            onTap={() => {
+                                                navigation.navigate(
+                                                    'FacilityDetailPage',
+                                                    {
+                                                        id: parsed.id,
+                                                    },
+                                                );
+                                            }}
                                         />
                                     );
                                 } catch (error) {
@@ -260,7 +260,8 @@ export default function SearchPage({
 }
 
 function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
-    const navigation = useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
@@ -526,7 +527,8 @@ export function SearchHeader({
     kind: string[];
     setKind: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-    const navigation = useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
+    const navigation =
+        useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
     const theme = useTheme();
     const { width } = useWindowDimensions();
     const queryClient = useQueryClient();
@@ -597,8 +599,8 @@ export function SearchHeader({
                 {/* TODO: ripple이 안되는데.. 흠... */}
                 <TouchableRipple
                     onPress={() => {
-                            navigation.navigate('EditLocationPage');
-                        }}
+                        navigation.navigate('EditLocationPage');
+                    }}
                     style={{
                         backgroundColor: '#eeeeee',
                         paddingHorizontal: 10,

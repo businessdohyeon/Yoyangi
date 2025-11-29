@@ -161,8 +161,7 @@ export default function ReservationHistory() {
                                         console.log(item);
 
                                         nav.navigate('ReservationDetailPage', {
-                                            reservation_id:
-                                                item.reservation_id,
+                                            reservation_id: item.reservation_id,
                                         });
                                     }}
                                 >

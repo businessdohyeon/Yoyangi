@@ -25,7 +25,8 @@ export default function ExamDimentiaPage() {
     const [orientationWeekday, setOrientationWeekday] = useState<YesNo>(null);
 
     const [placeCorrect, setPlaceCorrect] = useState<YesNo>(null);
-    const [memoryRegisterCorrect, setMemoryRegisterCorrect] = useState<YesNo>(null);
+    const [memoryRegisterCorrect, setMemoryRegisterCorrect] =
+        useState<YesNo>(null);
     const [attentionCorrect, setAttentionCorrect] = useState<YesNo>(null);
     const [execFunctionCorrect, setExecFunctionCorrect] = useState<YesNo>(null);
 
