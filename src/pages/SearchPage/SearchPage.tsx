@@ -147,7 +147,6 @@ export default function SearchPage({
             />
             <VoiceButton setSearchResults={setSearchResults} />
             {/* 지도 */}
-            {/* 지도 */}
             <View
                 style={{
                     display: isMapShown ? 'flex' : 'none',
@@ -558,11 +557,16 @@ export function SearchHeader({
     };
 
     const toggleKind = (value: string) => {
-        setKind((cur: string[]) =>
-            cur.includes(value)
-                ? cur.filter((v) => v !== value)
-                : [...cur, value],
-        );
+        setKind((cur: string[]) => {
+            if (cur.includes(value)) {
+                // Prevent removing last remaining filter
+                if (cur.length === 1) {
+                    return cur;
+                }
+                return cur.filter((v) => v !== value);
+            }
+            return [...cur, value];
+        });
     };
 
     console.group('SearchHeader rerendered');

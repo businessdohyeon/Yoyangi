@@ -1,5 +1,12 @@
-import { useWindowDimensions, View } from 'react-native';
+import {
+    useWindowDimensions,
+    View,
+    Platform,
+    Alert,
+    ToastAndroid,
+} from 'react-native';
 import { Button, Icon, Text, useTheme } from 'react-native-paper';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
@@ -513,8 +520,27 @@ export function FacilityInfo({
                     >
                         <Button
                             onPress={() => {
-                                // TODO: copy
-                                console.log('copied!');
+                                const addr = facilityData.address || '';
+                                try {
+                                    Clipboard.setString(addr);
+                                    if (Platform.OS === 'android') {
+                                        ToastAndroid.show(
+                                            '주소가 클립보드에 복사되었습니다.',
+                                            ToastAndroid.SHORT,
+                                        );
+                                    } else {
+                                        Alert.alert(
+                                            '복사됨',
+                                            '주소가 클립보드에 복사되었습니다.',
+                                        );
+                                    }
+                                } catch (e) {
+                                    console.log('clipboard copy failed', e);
+                                    Alert.alert(
+                                        '오류',
+                                        '주소 복사에 실패했습니다.',
+                                    );
+                                }
                             }}
                             icon={'content-copy'}
                         >
@@ -563,8 +589,18 @@ export function FacilityInfo({
                     >
                         <Button
                             onPress={() => {
-                                // TODO: copy
-                                console.log('copied!');
+                                const tel = facilityData.telno || '';
+                                try {
+                                    Clipboard.setString(tel);
+                                    if (Platform.OS === 'android') {
+                                        ToastAndroid.show('전화번호가 클립보드에 복사되었습니다.', ToastAndroid.SHORT);
+                                    } else {
+                                        Alert.alert('복사됨', '전화번호가 클립보드에 복사되었습니다.');
+                                    }
+                                } catch (e) {
+                                    console.log('clipboard copy failed', e);
+                                    Alert.alert('오류', '전화번호 복사에 실패했습니다.');
+                                }
                             }}
                             icon={'content-copy'}
                         >

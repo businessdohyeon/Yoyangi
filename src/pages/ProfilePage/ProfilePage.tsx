@@ -16,15 +16,13 @@ import { useContext, useState } from 'react';
 import { LoginInfoContext } from '../../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// 아이콘 컴포넌트를 렌더 함수 외부에 선언하여 렌더 시마다 새 컴포넌트가 생성되는 것을 방지
 const HeartIcon = (props: any) => <List.Icon {...props} icon="heart" />;
 const CalendarIcon = (props: any) => <List.Icon {...props} icon="calendar" />;
 const ChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
 
 const ProfilePage = () => {
-    const navigation =
+    const nav =
         useNavigation<TabAndStackCompositeNav<'ProfilePage', 'Tabs'>>();
-    const nav = navigation;
     const theme = useTheme();
     const ctx: any = useContext(LoginInfoContext as any);
     const { loginInfo, clearLoginInfo } = ctx;
@@ -67,7 +65,7 @@ const ProfilePage = () => {
                     try {
                         await clearLoginInfo();
                         // 로그아웃 후 홈(또는 로그인) 화면으로 이동
-                        navigation.navigate('MainPage');
+                        nav.navigate('MainPage');
                     } catch (e) {
                         console.error('clearLoginInfo failed', e);
                     }
@@ -207,19 +205,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-
-// import * as React from 'react';
-// import { View } from 'react-native';
-// import { Avatar, Button, Card, Text, Divider } from 'react-native-paper';
-// import { useNavigation } from '@react-navigation/native';
-
-// const UserProfileScreen = ({ user }) => {
-
-//   return (
-//     <View style={{ flex: 1, padding: 16 }}>
-
-//     </View>
-//   );
-// };
-
-// export default UserProfileScreen;
