@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import {
     ScrollView,
     View,
@@ -65,7 +65,8 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
     });
 
     const review: ReviewApiData | null | undefined = data;
-    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const navigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { loginInfo } = useContext(LoginInfoContext);
 
     return (
@@ -173,26 +174,32 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                                 </View>
 
                                 <View style={styles.actionRow}>
-                                    {loginInfo?.userId && review?.user?.id === loginInfo.userId ? (
+                                    {loginInfo?.userId &&
+                                    review?.user?.id === loginInfo.userId ? (
                                         <Button
                                             onPress={() =>
-                                                navigation.navigate('ReviewForm', {
-                                                    facilityId,
-                                                    reviewId: review.id,
-                                                    initialValues: {
-                                                        content: review.content,
-                                                        rating: String(
-                                                            review.rating ?? '',
-                                                        ),
-                                                        reservationId:
-                                                            (review as any)
-                                                                .reservation_id ??
-                                                            (review as any)
-                                                                .reservationId ??
-                                                            '',
-                                                        images: [],
+                                                navigation.navigate(
+                                                    'ReviewForm',
+                                                    {
+                                                        facilityId,
+                                                        reviewId: review.id,
+                                                        initialValues: {
+                                                            content:
+                                                                review.content,
+                                                            rating: String(
+                                                                review.rating ??
+                                                                    '',
+                                                            ),
+                                                            reservationId:
+                                                                (review as any)
+                                                                    .reservation_id ??
+                                                                (review as any)
+                                                                    .reservationId ??
+                                                                '',
+                                                            images: [],
+                                                        },
                                                     },
-                                                })
+                                                )
                                             }
                                         >
                                             수정하기

@@ -1,7 +1,8 @@
 const PORT = 8080;
 // const IP = '43.201.248.108';
 const IP = 'localhost';
-const SERVER = `http://${IP}:${PORT}`;
+// const SERVER = `http://${IP}:${PORT}`;
+const SERVER = `https://yoyang2.site`;
 const API_PREFIX = '/api';
 
 const urls = {
@@ -30,6 +31,9 @@ const urls = {
     // loginKakao: `${API_PREFIX}/user/sns/login/kakao`,
     // loginGoogle: `${API_PREFIX}/user/sns/login/google`,
     loginRefreshToken: `${API_PREFIX}/user/sns/login/refresh-token`,
+    // 문자
+    sendTelNo: `${API_PREFIX}/user/phone/send`,
+    verifyTel: `${API_PREFIX}/user/phone/verify`,
 
     // community
     communities: `${API_PREFIX}/community`,
@@ -65,6 +69,7 @@ const urls = {
 
     // search
     searchVoice: `${API_PREFIX}/search/voice`,
+
 };
 
 export default urls;
