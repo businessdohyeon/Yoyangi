@@ -10,7 +10,7 @@ const LocationInfoSchema = z.object({
     displayName: z.string().default(''),
 });
 
-const LoginInfoSchema = z.object({
+export const LoginInfoSchema = z.object({
     userId: z.preprocess((val) => Number(val), z.number()).default(0),
     token: z.string().default(''),
     refreshToken: z.string().default(''),

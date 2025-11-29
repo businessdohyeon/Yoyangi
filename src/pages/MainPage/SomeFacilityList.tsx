@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { TabAndStackCompositeNav } from '../../types/Navigation';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { LocationInfoContext } from '../../Context';
@@ -20,7 +21,7 @@ const LIMIT = 5;
 const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센터'];
 
 export default function SomeFacilityList() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
 
@@ -98,13 +99,10 @@ export default function SomeFacilityList() {
                         <Card
                             key={item.id}
                             style={{ marginBottom: 10 }}
-                            onPress={() =>
-                                (navigation as any).navigate(
-                                    'FacilityDetailPage',
-                                    {
-                                        id: item.id,
-                                    },
-                                )
+                                onPress={() =>
+                                navigation.navigate('FacilityDetailPage', {
+                                    id: item.id,
+                                })
                             }
                         >
                             <Card.Content>
@@ -127,7 +125,7 @@ export default function SomeFacilityList() {
                 <Button
                     mode="outlined"
                     onPress={() =>
-                        (navigation as any).navigate('SearchPage', { kind })
+                        navigation.navigate('SearchPage', { kind })
                     }
                 >
                     <Text variant="labelLarge">더보기</Text>

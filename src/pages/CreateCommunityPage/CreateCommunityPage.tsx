@@ -7,6 +7,7 @@ import {
 } from 'react-native-image-picker';
 import { useForm } from '@tanstack/react-form';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { RootStackNavProp } from '../../types/Navigation';
 import { LoginInfoContext } from '../../Context';
 import axiosInstance from '../../apis/axios';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
@@ -16,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
 
 export default function CommunityFormPage() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<RootStackNavProp<'CommunityFormPage'>>();
     const { loginInfo } = React.useContext(LoginInfoContext);
     const route = useRoute();
     const params = (route.params as any) || {};

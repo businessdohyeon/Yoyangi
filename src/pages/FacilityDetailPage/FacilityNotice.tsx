@@ -3,6 +3,7 @@ import { Button, Text, useTheme } from 'react-native-paper';
 
 import { showBorder } from '../../common';
 import { useNavigation } from '@react-navigation/native';
+import { RootStackNavProp } from '../../types/Navigation';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
 import { useEffect } from 'react';
 import axiosInstance from '../../apis/axios';
@@ -13,7 +14,7 @@ export function FacilityNotice({
 }: {
     facilityData: FacilityData_t;
 }) {
-    const navigation = useNavigation();
+    const navigation = useNavigation<RootStackNavProp<'FacilityDetailPage'>>();
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
 

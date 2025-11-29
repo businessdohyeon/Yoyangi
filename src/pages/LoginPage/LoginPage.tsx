@@ -177,10 +177,7 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
                     const returnScreen = (route as any)?.params?.returnScreen;
                     const returnParams = (route as any)?.params?.returnParams;
                     if (returnScreen) {
-                        (navigation as any).navigate(
-                            returnScreen as any,
-                            returnParams || {},
-                        );
+                        navigation.navigate(returnScreen as any, returnParams || {});
                     } else {
                         navigation.goBack();
                     }

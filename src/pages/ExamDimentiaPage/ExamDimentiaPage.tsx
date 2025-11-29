@@ -17,23 +17,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExamDimentiaPage() {
     // 선택지 방식으로 변경 (0점 / 정답점)
-    const [orientationYear, setOrientationYear] = useState(null);
-    const [orientationMonth, setOrientationMonth] = useState(null);
-    const [orientationDay, setOrientationDay] = useState(null);
-    const [orientationWeekday, setOrientationWeekday] = useState(null);
+    type YesNo = 'yes' | 'no' | null;
 
-    const [placeCorrect, setPlaceCorrect] = useState(null);
-    const [memoryRegisterCorrect, setMemoryRegisterCorrect] = useState(null);
-    const [attentionCorrect, setAttentionCorrect] = useState(null);
-    const [execFunctionCorrect, setExecFunctionCorrect] = useState(null);
+    const [orientationYear, setOrientationYear] = useState<YesNo>(null);
+    const [orientationMonth, setOrientationMonth] = useState<YesNo>(null);
+    const [orientationDay, setOrientationDay] = useState<YesNo>(null);
+    const [orientationWeekday, setOrientationWeekday] = useState<YesNo>(null);
 
-    const [recallMinsoo, setRecallMinsoo] = useState(null);
-    const [recallBicycle, setRecallBicycle] = useState(null);
-    const [recallPark, setRecallPark] = useState(null);
-    const [recall11, setRecall11] = useState(null);
-    const [recallBaseball, setRecallBaseball] = useState(null);
+    const [placeCorrect, setPlaceCorrect] = useState<YesNo>(null);
+    const [memoryRegisterCorrect, setMemoryRegisterCorrect] = useState<YesNo>(null);
+    const [attentionCorrect, setAttentionCorrect] = useState<YesNo>(null);
+    const [execFunctionCorrect, setExecFunctionCorrect] = useState<YesNo>(null);
 
-    const [languageCorrect, setLanguageCorrect] = useState(null);
+    const [recallMinsoo, setRecallMinsoo] = useState<YesNo>(null);
+    const [recallBicycle, setRecallBicycle] = useState<YesNo>(null);
+    const [recallPark, setRecallPark] = useState<YesNo>(null);
+    const [recall11, setRecall11] = useState<YesNo>(null);
+    const [recallBaseball, setRecallBaseball] = useState<YesNo>(null);
+
+    const [languageCorrect, setLanguageCorrect] = useState<YesNo>(null);
 
     const [age, setAge] = useState('');
     const [education, setEducation] = useState('비문해');
@@ -63,7 +65,7 @@ export default function ExamDimentiaPage() {
         return s;
     };
 
-    const interpretResult = (v) => {
+    const interpretResult = (v: number) => {
         if (v >= 20) return '정상 범위';
         if (v >= 14) return '경미한 인지저하 가능성';
         return '인지저하 가능성';
@@ -117,7 +119,6 @@ export default function ExamDimentiaPage() {
                             value={memoryRegisterCorrect}
                             onChange={setMemoryRegisterCorrect}
                         />
-                        {/* TODO: 필요한 경우 음성 재생 리소스 추가 */}
                     </Card.Content>
                 </Card>
                 <Card style={styles.card}>
@@ -265,11 +266,22 @@ export default function ExamDimentiaPage() {
     );
 }
 
-function SelectBlock({ label, value, onChange }) {
+function SelectBlock({
+    label,
+    value,
+    onChange,
+}: {
+    label: string;
+    value: 'yes' | 'no' | null | undefined;
+    onChange: React.Dispatch<React.SetStateAction<'yes' | 'no' | null>>;
+}) {
     return (
         <View style={styles.block}>
             <Text style={styles.label}>{label}</Text>
-            <RadioButton.Group onValueChange={onChange} value={value}>
+            <RadioButton.Group
+                onValueChange={(v: string) => onChange(v as 'yes' | 'no')}
+                value={value ?? ''}
+            >
                 <RadioButton.Item label="정답" value="yes" />
                 <RadioButton.Item label="하지 못함" value="no" />
             </RadioButton.Group>

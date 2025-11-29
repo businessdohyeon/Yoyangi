@@ -25,6 +25,7 @@ import {
     type SpeechResult,
 } from '@dbkable/react-native-speech-to-text';
 import { useNavigation } from '@react-navigation/native';
+import { TabAndStackCompositeNav } from '../../types/Navigation';
 import { ScreenProps } from '../../types/Navigation';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
@@ -176,14 +177,14 @@ export default function SearchPage({
                                             longitude={parsed.longitude}
                                             anchor={{ x: 0.5, y: 1 }}
                                             caption={{ text: parsed.name }}
-                                            onTap={() => {
-                                                (navigation as any).navigate(
-                                                    'FacilityDetailPage',
-                                                    {
-                                                        id: parsed.id,
-                                                    },
-                                                );
-                                            }}
+                                                                    onTap={() => {
+                                                                        navigation.navigate(
+                                                                            'FacilityDetailPage',
+                                                                            {
+                                                                                id: parsed.id,
+                                                                            },
+                                                                        );
+                                                                    }}
                                         />
                                     );
                                 } catch (error) {
@@ -259,7 +260,7 @@ export default function SearchPage({
 }
 
 function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
-    const navigation = useNavigation();
+    const navigation = useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
@@ -284,7 +285,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
 
     const userLike = () => {
         if (!loginInfo?.token || loginInfo?.userId === 0) {
-            (navigation as any).navigate('LoginPage', {
+            navigation.navigate('LoginPage', {
                 returnScreen: 'SearchPage',
             });
             return;
@@ -299,7 +300,7 @@ function SearchResult({ facilityData }: { facilityData: FacilityData_t }) {
                 backgroundColor: theme.colors.background,
             }}
             onPress={() => {
-                (navigation as any).navigate('FacilityDetailPage', {
+                navigation.navigate('FacilityDetailPage', {
                     id: facilityData.id,
                 });
             }}
@@ -525,7 +526,7 @@ export function SearchHeader({
     kind: string[];
     setKind: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-    const navigation = useNavigation();
+    const navigation = useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
     const theme = useTheme();
     const { width } = useWindowDimensions();
     const queryClient = useQueryClient();
@@ -596,8 +597,8 @@ export function SearchHeader({
                 {/* TODO: ripple이 안되는데.. 흠... */}
                 <TouchableRipple
                     onPress={() => {
-                        (navigation as any).navigate('EditLocationPage');
-                    }}
+                            navigation.navigate('EditLocationPage');
+                        }}
                     style={{
                         backgroundColor: '#eeeeee',
                         paddingHorizontal: 10,

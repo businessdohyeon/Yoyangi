@@ -34,9 +34,9 @@ const mockdata = {
 };
 
 const PredictDiseasePage = () => {
-    const [image, setImage] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [results, setResults] = useState(null);
+    const [image, setImage] = useState<ImagePicker.Asset | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [results, setResults] = useState<Record<string, number> | null>(null);
 
     const pickImage = () => {
         ImagePicker.launchImageLibrary(
@@ -50,7 +50,8 @@ const PredictDiseasePage = () => {
                     Alert.alert('이미지 선택 오류', response.errorMessage);
                     return;
                 }
-                const selected = response.assets[0];
+                const selected = response.assets?.[0];
+                if (!selected) return;
                 setImage(selected);
                 setResults(null);
             },
@@ -70,8 +71,8 @@ const PredictDiseasePage = () => {
             formData.append('image', {
                 uri: image.uri,
                 type: image.type,
-                name: image.fileName,
-            });
+                name: (image.fileName as string) || 'upload.jpg',
+            } as any);
 
             // const response = await fetch(
             //     `${apis.urls.server}/exam/skin-analysis`,
@@ -95,7 +96,7 @@ const PredictDiseasePage = () => {
             // console.groupEnd();
 
             // if (response.ok) {
-            setResults(data.data.results_korean);
+            setResults(data.data.results_korean as Record<string, number>);
             // } else {
             //     console.log(err);
             // }

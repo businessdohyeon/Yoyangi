@@ -10,6 +10,7 @@ import {
     useTheme,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { TabAndStackCompositeNav } from '../../types/Navigation';
 import PlainHeader from '../MainPage/PlainHeader';
 import { useContext, useState } from 'react';
 import { LoginInfoContext } from '../../Context';
@@ -21,8 +22,8 @@ const CalendarIcon = (props: any) => <List.Icon {...props} icon="calendar" />;
 const ChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
 
 const ProfilePage = () => {
-    const navigation = useNavigation();
-    const nav = navigation as any;
+    const navigation = useNavigation<TabAndStackCompositeNav<'ProfilePage', 'Tabs'>>();
+    const nav = navigation;
     const theme = useTheme();
     const ctx: any = useContext(LoginInfoContext as any);
     const { loginInfo, clearLoginInfo } = ctx;
@@ -65,7 +66,7 @@ const ProfilePage = () => {
                     try {
                         await clearLoginInfo();
                         // 로그아웃 후 홈(또는 로그인) 화면으로 이동
-                        (navigation as any).navigate('MainPage');
+                        navigation.navigate('MainPage');
                     } catch (e) {
                         console.error('clearLoginInfo failed', e);
                     }

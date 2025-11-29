@@ -8,14 +8,15 @@ import axiosInstance from '../../apis/axios';
 import { useQuery } from '@tanstack/react-query';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
+import { RootStackNavProp } from '../../types/Navigation';
 import apis from '../../apis';
 
 export default function LikedOrganizations() {
     const theme = useTheme();
     const ctx: any = useContext(LoginInfoContext as any);
     const { loginInfo } = ctx;
-    const navigation = useNavigation();
-    const nav = navigation as any;
+    const navigation = useNavigation<RootStackNavProp<'LikedOrganizations'>>();
+    const nav = navigation;
 
     useEffect(() => {
         if (!loginInfo || !loginInfo.userId) {

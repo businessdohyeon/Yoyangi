@@ -12,6 +12,7 @@ import {
     TextInput,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { TabAndStackCompositeNav } from '../../types/Navigation';
 // import { showBorder } from "./common.js"
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
@@ -41,7 +42,7 @@ export type CommunityItem = {
 };
 
 export default function CommunityPage() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
 
     const {
         data,
@@ -122,7 +123,7 @@ export default function CommunityPage() {
                         bottom: 0,
                     }}
                     onPress={() => {
-                        (navigation as any).navigate('CommunityFormPage');
+                        navigation.navigate('CommunityFormPage');
                     }}
                 />
             </View>
@@ -144,7 +145,7 @@ function FooterIndicator({ isLoading }: { isLoading: boolean }) {
 }
 
 function PostCard({ item }: { item: CommunityItem }) {
-    const navigation = useNavigation();
+    const navigation = useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
     const { loginInfo } = useContext(LoginInfoContext);
     const { userId } = loginInfo;
     const queryClient = useQueryClient();
@@ -156,13 +157,13 @@ function PostCard({ item }: { item: CommunityItem }) {
     console.log(item);
 
     const onPress = () => {
-        (navigation as any).navigate('CommunityDetail', {
+        navigation.navigate('CommunityDetail', {
             communityId: item.id,
         });
     };
 
     const editBtn = () => {
-        (navigation as any).navigate('CommunityFormPage', {
+        navigation.navigate('CommunityFormPage', {
             communityId: item.id,
             initialValues: { title: item.title, content: item.content ?? '' },
         });

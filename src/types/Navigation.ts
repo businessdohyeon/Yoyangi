@@ -1,4 +1,6 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabScreenProps as RNBTabScreenProps, BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { CompositeScreenProps, CompositeNavigationProp } from '@react-navigation/native';
 
 export type RootStackParamList = {
     Tabs: undefined;
@@ -6,12 +8,14 @@ export type RootStackParamList = {
     SearchPage: { kind?: string[]; page?: number } | undefined;
     CommunityPage: undefined;
     ProfilePage: undefined;
-    FacilityDetailPage: { facilityId: number } | undefined;
+    // accept both `facilityId` and `id` because code uses `{ id: ... }` in many places
+    FacilityDetailPage: { facilityId?: number; id?: number } | undefined;
     NotificationPage: undefined;
     LoginPage:
         | { returnScreen?: keyof RootStackParamList; returnParams?: any }
         | undefined;
     EditLocationPage: undefined;
+    EditProfile: undefined;
     CommunityDetailPage: { id?: number } | undefined;
     ReservationPage: { facilityId: number; facilityName?: string } | undefined;
     ReviewForm:
@@ -27,8 +31,13 @@ export type RootStackParamList = {
               };
           }
         | undefined;
-    CommunityDetail: undefined;
-    CommunityFormPage: undefined;
+    CommunityDetail: { communityId?: number } | undefined;
+    CommunityFormPage:
+        | {
+              communityId?: number;
+              initialValues?: { title?: string; content?: string; images?: string[] };
+          }
+        | undefined;
     ChatPage:
         | {
               facility_id: number;
@@ -49,3 +58,29 @@ export type RootStackParamList = {
 
 export type ScreenProps<T extends keyof RootStackParamList> =
     NativeStackScreenProps<RootStackParamList, T>;
+
+// Bottom Tab 네비게이션에 사용되는 파라미터 리스트
+export type BottomTabParamList = {
+    MainPage: undefined;
+    SearchPage: { kind?: string[]; page?: number } | undefined;
+    CommunityPage: undefined;
+    ProfilePage: undefined;
+};
+
+// Bottom Tab screen props helper
+export type BottomTabScreenProps<T extends keyof BottomTabParamList> =
+    RNBTabScreenProps<BottomTabParamList, T>;
+
+// 네비게이션 prop 타입별 alias
+export type BottomTabNavProp<T extends keyof BottomTabParamList> =
+    BottomTabNavigationProp<BottomTabParamList, T>;
+
+export type RootStackNavProp<T extends keyof RootStackParamList> =
+    NativeStackNavigationProp<RootStackParamList, T>;
+
+// Composite navigation prop (Tab 안에서 Stack 접근 등 복합 상황에 사용)
+export type TabAndStackCompositeNav<TTab extends keyof BottomTabParamList, TStack extends keyof RootStackParamList> =
+    CompositeNavigationProp<
+        BottomTabNavigationProp<BottomTabParamList, TTab>,
+        NativeStackNavigationProp<RootStackParamList, TStack>
+    >;

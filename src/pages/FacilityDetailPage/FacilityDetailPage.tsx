@@ -247,7 +247,7 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
     );
 }
 
-function TabNav({ tabIndex, setTabIndex }) {
+function TabNav({ tabIndex, setTabIndex }: { tabIndex: number; setTabIndex: (n: number) => void }) {
     const theme = useTheme();
 
     return (

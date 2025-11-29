@@ -15,10 +15,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoginInfoContext } from '../../Context';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
+import { RootStackNavProp } from '../../types/Navigation';
 import apis from '../../apis';
 
 export default function ReservationHistory() {
-    const nav = useNavigation();
+    const nav = useNavigation<RootStackNavProp<'ReservationHistory'>>();
     const theme = useTheme();
     const ctx = useContext(LoginInfoContext);
     const { loginInfo } = ctx;
@@ -159,13 +160,10 @@ export default function ReservationHistory() {
                                     onPress={() => {
                                         console.log(item);
 
-                                        (nav as any).navigate(
-                                            'ReservationDetailPage',
-                                            {
-                                                reservation_id:
-                                                    item.reservation_id,
-                                            },
-                                        );
+                                        nav.navigate('ReservationDetailPage', {
+                                            reservation_id:
+                                                item.reservation_id,
+                                        });
                                     }}
                                 >
                                     <Card.Content>

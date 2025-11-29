@@ -91,8 +91,9 @@ export default function ReservationPage({
         },
     });
 
-    const formatPhone = (text) =>
+    const formatPhone = (text: string) =>
         text.replace(/\D/g, '').replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+
 
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
@@ -130,9 +131,9 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!field.state.error}
+                                visible={!!(field.state.meta as any).error}
                             >
-                                {field.state.error}
+                                {(field.state.meta as any).error}
                             </HelperText>
                         </>
                     )}
@@ -168,9 +169,9 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!field.state.error}
+                                visible={!!(field.state.meta as any).error}
                             >
-                                {field.state.error}
+                                {(field.state.meta as any).error}
                             </HelperText>
                         </>
                     )}
@@ -196,9 +197,9 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!field.state.error}
+                                visible={!!(field.state.meta as any).error}
                             >
-                                {field.state.error}
+                                {(field.state.meta as any).error}
                             </HelperText>
                         </>
                     )}
@@ -226,9 +227,9 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!field.state.error}
+                                visible={!!(field.state.meta as any).error}
                             >
-                                {field.state.error}
+                                {(field.state.meta as any).error}
                             </HelperText>
                         </>
                     )}
@@ -274,9 +275,9 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!field.state.error}
+                                visible={!!(field.state.meta as any).error}
                             >
-                                {field.state.error}
+                                {(field.state.meta as any).error}
                             </HelperText>
                         </>
                     )}
@@ -320,9 +321,9 @@ export default function ReservationPage({
                             </Menu>
                             <HelperText
                                 type="error"
-                                visible={!!field.state.error}
+                                visible={!!(field.state.meta as any).error}
                             >
-                                {field.state.error}
+                                {(field.state.meta as any).error}
                             </HelperText>
                         </>
                     )}

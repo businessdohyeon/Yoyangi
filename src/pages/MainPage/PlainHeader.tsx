@@ -1,10 +1,11 @@
 import { Appbar, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { TabAndStackCompositeNav } from '../../types/Navigation';
 import { useContext } from 'react';
 import { LocationInfoContext, LoginInfoContext } from '../../Context';
 
 export default function PlainHeader() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
     const { loginInfo } = useContext(LoginInfoContext);
@@ -18,7 +19,7 @@ export default function PlainHeader() {
                 icon="map-marker"
                 iconColor={theme.colors.primary}
                 onPress={() => {
-                    (navigation as any).navigate('EditLocationPage');
+                    navigation.navigate('EditLocationPage');
                 }}
             />
             <Appbar.Content title={locationInfo?.displayName} />
@@ -26,12 +27,12 @@ export default function PlainHeader() {
                 icon="magnify"
                 onPress={() => {
                     // TODO: searchPage로 리다이렉션 할 때 seachbox에 focus된 채로?
-                    (navigation as any).navigate('SearchPage');
+                    navigation.navigate('SearchPage');
                 }}
             />
             <Appbar.Action
                 icon="bell"
-                onPress={() => (navigation as any).navigate('NotificationPage')}
+                onPress={() => navigation.navigate('NotificationPage')}
             />
         </Appbar.Header>
     );

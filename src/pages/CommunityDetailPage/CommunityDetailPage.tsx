@@ -27,13 +27,6 @@ import { LoginInfoContext } from '../../Context';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
 
-// TODO: {로그인 상태에서 Authorization 헤더를 넣어야 하는 경우 아래 getAuthHeaders를 수정하세요}
-function getAuthHeaders() {
-    // TODO: {토큰을 가져와서 `Bearer <token>` 형식으로 반환}
-    // 예: return { Authorization: `Bearer ${token}` };
-    return {};
-}
-
 function formatDate(iso: any) {
     try {
         return new Date(iso).toLocaleString();
@@ -73,7 +66,6 @@ export default function CommunityDetailScreen({ route }: any) {
             const response = await axiosInstance.get<CommunityApiResponse>(
                 apis.urls.getCommunityById(communityId),
                 {
-                    headers: { ...getAuthHeaders() },
                 },
             );
             console.log(response);

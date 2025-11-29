@@ -1,6 +1,7 @@
 import { createNavigationContainerRef, CommonActions } from '@react-navigation/native';
+import { RootStackParamList } from '../types/Navigation';
 
-export const navigationRef = createNavigationContainerRef();
+export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 /**
  * 전역 navigation 참조를 사용하여 LoginPage로 리다이렉션
@@ -28,7 +29,7 @@ export function navigateToLogin(returnScreen?: string, returnParams?: any) {
         }
 
         navigationRef.navigate('LoginPage', {
-            returnScreen: currentRoute,
+            returnScreen: currentRoute as keyof RootStackParamList | undefined,
             returnParams: currentParams,
         });
     }
