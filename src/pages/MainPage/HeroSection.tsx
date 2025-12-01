@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import { Dimensions, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Dimensions, View, Pressable, StyleSheet } from 'react-native';
+import { Text, useTheme, IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { TabAndStackCompositeNav } from '../../types/Navigation';
 import Carousel, {
@@ -90,8 +90,6 @@ function BigButtons() {
         useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
 
-    // TODO: button 개조하거나 따로 만들어야 할지도..? */
-
     return (
         <View
             style={{
@@ -101,97 +99,133 @@ function BigButtons() {
                 marginVertical: 20,
             }}
         >
-            <View
-                style={{
-                    flex: 2,
-                    flexDirection: 'row',
-                }}
-            >
-                <View style={{ flex: 1, margin: 5 }}>
-                    <Button
-                        style={{}}
-                        textColor={theme.dark ? 'white' : 'black'}
-                        contentStyle={{ height: '100%' }}
-                        icon="camera"
-                        mode="elevated"
-                        onPress={() => {
+            <View style={styles.row}>
+                <View style={styles.cell}>
+                    <FeatureButton
+                        icon="hospital-building"
+                        label="주변 요양병원 검색"
+                        onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['요양병원'],
-                            });
-                        }}
-                    >
-                        주변 요양병원 검색
-                    </Button>
+                            })
+                        }
+                        theme={theme}
+                    />
                 </View>
-                <View style={{ flex: 1, margin: 5 }}>
-                    <Button
-                        style={{}}
-                        textColor={theme.dark ? 'white' : 'black'}
-                        contentStyle={{ height: '100%' }}
-                        icon="camera"
-                        mode="elevated"
-                        onPress={() => {
+                <View style={styles.cell}>
+                    <FeatureButton
+                        icon="home-group"
+                        label="주변 요양원 검색"
+                        onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['요양원'],
-                            });
-                        }}
-                    >
-                        주변 요양원 검색
-                    </Button>
+                            })
+                        }
+                        theme={theme}
+                    />
                 </View>
-                <View style={{ flex: 1, margin: 5 }}>
-                    <Button
-                        style={{}}
-                        textColor={theme.dark ? 'white' : 'black'}
-                        contentStyle={{ height: '100%' }}
-                        icon="camera"
-                        mode="elevated"
-                        onPress={() => {
+                <View style={styles.cell}>
+                    <FeatureButton
+                        icon="calendar-check"
+                        label="주변 주간보호케어센터 검색"
+                        onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['주간보호케어센터'],
-                            });
-                        }}
-                    >
-                        주변 주간보호케어센터 검색
-                    </Button>
+                            })
+                        }
+                        theme={theme}
+                    />
                 </View>
             </View>
-            <View
-                style={{
-                    flex: 1,
 
-                    flexDirection: 'row',
-                }}
-            >
-                <View style={{ flex: 1, margin: 5 }}>
-                    <Button
-                        style={{}}
-                        textColor={theme.dark ? 'white' : 'black'}
-                        contentStyle={{ height: '100%' }}
-                        icon="camera"
-                        mode="elevated"
-                        onPress={() => {
-                            navigation.navigate('ExamDimentiaPage');
-                        }}
-                    >
-                        치매 자가 진단
-                    </Button>
+            <View style={styles.row}>
+                <View style={styles.cell}>
+                    <FeatureButton
+                        icon="brain"
+                        label="치매 자가 진단"
+                        onPress={() => navigation.navigate('ExamDimentiaPage')}
+                        theme={theme}
+                    />
                 </View>
-                <View style={{ flex: 1, margin: 5 }}>
-                    <Button
-                        style={{}}
-                        textColor={theme.dark ? 'white' : 'black'}
-                        contentStyle={{ height: '100%' }}
-                        icon="camera"
-                        mode="elevated"
-                        onPress={() => {
-                            navigation.navigate('PredictDiseasePage');
-                        }}
-                    >
-                        질병 예측
-                    </Button>
+                <View style={styles.cell}>
+                    <FeatureButton
+                        icon="pill"
+                        label="질병 예측"
+                        onPress={() =>
+                            navigation.navigate('PredictDiseasePage')
+                        }
+                        theme={theme}
+                    />
                 </View>
+                <View style={styles.cell} />
             </View>
         </View>
     );
 }
+
+function FeatureButton({
+    icon,
+    label,
+    onPress,
+    theme,
+}: {
+    icon: string;
+    label: string;
+    onPress: () => void;
+    theme: any;
+}) {
+    return (
+        <Pressable
+            onPress={onPress}
+            style={({ pressed }) => [
+                styles.featureButton,
+                {
+                    backgroundColor: pressed
+                        ? theme.dark
+                            ? '#222'
+                            : '#eee'
+                        : 'transparent',
+                },
+            ]}
+        >
+            <IconButton
+                icon={icon}
+                size={36}
+                style={styles.iconButton}
+                iconColor={theme.dark ? 'white' : 'black'}
+            />
+            <Text
+                style={[
+                    styles.featureLabel,
+                    { color: theme.dark ? 'white' : 'black' },
+                ]}
+            >
+                {label}
+            </Text>
+        </Pressable>
+    );
+}
+
+const styles = StyleSheet.create({
+    row: {
+        flex: 1,
+        flexDirection: 'row',
+    },
+    cell: { flex: 1, margin: 5 },
+    featureButton: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 8,
+        borderRadius: 8,
+    },
+    iconButton: {
+        margin: 0,
+        backgroundColor: 'transparent',
+    },
+    featureLabel: {
+        textAlign: 'center',
+        fontSize: 14,
+        flexWrap: 'wrap',
+    },
+});

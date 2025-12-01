@@ -78,5 +78,3 @@ const urls = {
 };
 
 export default urls;
-
-// adb reverse tcp:8080 tcp:8080
