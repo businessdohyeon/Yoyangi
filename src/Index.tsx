@@ -1,5 +1,3 @@
-import { Provider } from 'react-native-paper';
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Routes from './routes/Routes.tsx';
 
@@ -15,15 +13,13 @@ const Index = () => {
     }, []);
 
     return (
-        <Provider>
-            <TotalContextProvider>
-                <QueryClientProvider client={queryClient}>
-                    <SafeAreaProvider>
-                        <Routes />
-                    </SafeAreaProvider>
-                </QueryClientProvider>
-            </TotalContextProvider>
-        </Provider>
+        <TotalContextProvider>
+            <QueryClientProvider client={queryClient}>
+                <SafeAreaProvider>
+                    <Routes />
+                </SafeAreaProvider>
+            </QueryClientProvider>
+        </TotalContextProvider>
     );
 };
 

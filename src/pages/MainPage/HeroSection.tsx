@@ -103,7 +103,7 @@ function BigButtons() {
                 <View style={styles.cell}>
                     <FeatureButton
                         icon="hospital-building"
-                        label="주변 요양병원 검색"
+                        label="주변 요양병원검색"
                         onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['요양병원'],
