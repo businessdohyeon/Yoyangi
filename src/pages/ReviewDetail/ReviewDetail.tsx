@@ -176,6 +176,10 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                                 <View style={styles.actionRow}>
                                     {loginInfo?.userId &&
                                     review?.user?.id === loginInfo.userId ? (
+                                        // TODO: `as any` 캐스트 제거 및 정형화된 타입 사용
+                                        // - API 응답 타입에 `reservation_id` 또는 `reservationId`
+                                        //   를 일관되게 반영하세요.
+                                        // - 필요하면 변환 유틸을 만들어 타입 안전하게 매핑합니다.
                                         <Button
                                             onPress={() =>
                                                 navigation.navigate(

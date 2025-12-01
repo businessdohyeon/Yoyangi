@@ -125,62 +125,93 @@ export default function Routes() {
         <NavigationContainer ref={navigationRef}>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Tabs" component={BottomTabs} />
+                {/* TODO: `as any` 제거 — 각 페이지의 props를 `RootStackParamList`에 맞게 정의하세요.
+                    예: component={FacilityDetailPage} 이 되도록 `RootStackParamList`에
+                    'FacilityDetailPage' 항목의 params 타입을 정확히 추가합니다. */}
                 <Stack.Screen
                     name="FacilityDetailPage"
-                    component={FacilityDetailPage as any}
+                    component={FacilityDetailPage as React.ComponentType<any>}
                 />
+                {/* TODO: NotificationPage 타입 명시 필요 (현재 any 사용) */}
                 <Stack.Screen
                     name="NotificationPage"
-                    component={NotificationPage as any}
+                    component={NotificationPage as React.ComponentType<any>}
                 />
-                <Stack.Screen name="LoginPage" component={LoginPage as any} />
+                {/* TODO: LoginPage는 전달되는 params에 따라 타입 지정 필요 */}
+                <Stack.Screen
+                    name="LoginPage"
+                    component={LoginPage as React.ComponentType<any>}
+                />
+                {/* TODO: EditLocationPage 타입 개선 */}
                 <Stack.Screen
                     name="EditLocationPage"
-                    component={EditLocationPage as any}
+                    component={EditLocationPage as React.ComponentType<any>}
                 />
+                {/* TODO: CommunityDetailPage params를 `RootStackParamList`에 추가 */}
                 <Stack.Screen
                     name="CommunityDetailPage"
-                    component={CommunityDetailPage as any}
+                    component={CommunityDetailPage as React.ComponentType<any>}
                 />
                 <Stack.Screen
                     name="ReservationPage"
-                    component={ReservationPage}
+                    component={ReservationPage as React.ComponentType<any>}
                 />
-                <Stack.Screen name="ReviewForm" component={ReviewForm} />
+                <Stack.Screen
+                    name="ReviewForm"
+                    component={ReviewForm as React.ComponentType<any>}
+                />
+                {/* TODO: CommunityDetail (중복 네이밍 확인) 및 타입 정리 */}
                 <Stack.Screen
                     name="CommunityDetail"
-                    component={CommunityDetailScreen as any}
+                    component={
+                        CommunityDetailScreen as React.ComponentType<any>
+                    }
                 />
+                {/* TODO: CommunityFormPage 타입 개선 */}
                 <Stack.Screen
                     name="CommunityFormPage"
-                    component={CommunityFormPage as any}
+                    component={CommunityFormPage as React.ComponentType<any>}
                 />
-                <Stack.Screen name="ChatPage" component={ChatPage as any} />
+                {/* TODO: ChatPage props 타입을 정의하여 `as any` 제거 */}
+                <Stack.Screen
+                    name="ChatPage"
+                    component={ChatPage as React.ComponentType<any>}
+                />
+                {/* TODO: PredictDiseasePage 타입 명시 */}
                 <Stack.Screen
                     name="PredictDiseasePage"
-                    component={PredictDiseasePage as any}
+                    component={PredictDiseasePage as React.ComponentType<any>}
                 />
+                {/* TODO: ExamDimentiaPage 타입 명시 */}
                 <Stack.Screen
                     name="ExamDimentiaPage"
-                    component={ExamDimentiaPage as any}
+                    component={ExamDimentiaPage as React.ComponentType<any>}
                 />
+                {/* TODO: LikedOrganizations 타입 개선 */}
                 <Stack.Screen
                     name="LikedOrganizations"
-                    component={LikedOrganizations as any}
+                    component={LikedOrganizations as React.ComponentType<any>}
                 />
+                {/* TODO: ReservationHistory의 params/props 타입 정의 필요 */}
                 <Stack.Screen
                     name="ReservationHistory"
-                    component={ReservationHistory as any}
+                    component={ReservationHistory as React.ComponentType<any>}
                 />
+                {/* TODO: ConsultationHistory 타입을 RootStackParamList에 반영 */}
                 <Stack.Screen
                     name="ConsultationHistory"
-                    component={ConsultationHistory as any}
+                    component={ConsultationHistory as React.ComponentType<any>}
                 />
                 <Stack.Screen
                     name="ReservationDetailPage"
-                    component={ReservationDetailPage}
+                    component={
+                        ReservationDetailPage as React.ComponentType<any>
+                    }
                 />
-                <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
+                <Stack.Screen
+                    name="ReviewDetail"
+                    component={ReviewDetail as React.ComponentType<any>}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

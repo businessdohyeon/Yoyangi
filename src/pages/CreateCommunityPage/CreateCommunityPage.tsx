@@ -110,6 +110,10 @@ export default function CommunityFormPage() {
 
     // 로그인하지 않았으면 리다이렉션 처리됨 (useRequireAuth에서)
     if (!isAuthenticated) {
+        // TODO: 현재 리다이렉션은 훅에서 처리되어 바로 `null`을 반환합니다.
+        //       권장 개선사항:
+        //       - 작성 중이던 내용 임시 저장(로컬) 후 로그인 후 복원
+        //       - 리다이렉션 대신 명확한 안내 UI 또는 로그인 모달 제공
         return null; // 로그인 페이지로 리다이렉션 중
     }
 

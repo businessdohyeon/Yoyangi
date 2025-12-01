@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { ScreenProps } from '../../types/Navigation';
 import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import {
     TextInput,
@@ -10,11 +11,18 @@ import {
 import io from 'socket.io-client';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import apis from '../../apis';
 // import apis from '../../apis'; (not used — using direct URL for socket)
 
-export default function ChatPage({ route }: any) {
+// TODO: Define a proper Props type for ChatPage instead of using `any`.
+// - Define the expected route params interface (facility_id, guardian_id, sender, sender_type)
+// - Replace `{ route }: any` with `props: ChatPageProps` and use typed `route.params`
+// TODO: Move hard-coded socket URL to configuration or environment variables.
+// Define the expected route params for ChatPage
+export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     console.log(route.params);
-    const { facility_id, guardian_id, sender, sender_type } = route.params;
+    const { facility_id, guardian_id, sender, sender_type } =
+        route.params as any;
 
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
@@ -25,7 +33,8 @@ export default function ChatPage({ route }: any) {
     const [snackbarVisible, setSnackbarVisible] = useState(false);
 
     useEffect(() => {
-        const url = `http://43.201.248.108:8080`;
+        // Use centralized socket URL from config
+        const url = apis.urls.chatSocketUrl;
         console.log('init socket url', url);
 
         try {

@@ -30,6 +30,7 @@ type GetRoomsResponse = {
 };
 
 // simple left icon component moved out of render to satisfy lint rules
+// TODO: Define proper props type instead of `any` (e.g., React.ComponentProps<typeof List.Icon>)
 const LeftChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
 const ItemSeparator = () => (
     <View style={{ height: 1, backgroundColor: '#eee' }} />
@@ -58,7 +59,7 @@ export default function ConsultationHistory() {
 
         const disabled = !item.facility_id || !item.guardian_id;
 
-        console.log(item)
+        console.log(item);
 
         return (
             <List.Item

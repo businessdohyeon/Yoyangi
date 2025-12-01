@@ -13,7 +13,6 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
-import { useNavigation } from '@react-navigation/native';
 import { ScreenProps } from '../../types/Navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequireAuth } from '../../hooks/useRequireAuth';
@@ -33,6 +32,11 @@ export default function ReservationPage({
 
     // 로그인하지 않았으면 리다이렉션 처리됨 (useRequireAuth에서)
     if (!isAuthenticated) {
+        // TODO: 현재는 `useRequireAuth` 훅에서 리다이렉션을 처리하고 있어
+        //       이 컴포넌트는 `null`을 반환합니다. UX 개선 권장:
+        //       - 로딩/스켈레톤 화면 표시
+        //       - 리다이렉션 중 명확한 메시지 또는 fallback UI 제공
+        //       - 테스트 시 useRequireAuth 동작을 목(mock) 처리하여 컴포넌트 렌더링 검증
         return null; // 로그인 페이지로 리다이렉션 중
     }
 
