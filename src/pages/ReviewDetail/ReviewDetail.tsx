@@ -89,7 +89,12 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                     <Text>리뷰 정보가 없습니다.</Text>
                 ) : (
                     <>
-                        <Card style={styles.cardMain}>
+                        <Card
+                            style={[
+                                styles.cardMain,
+                                { backgroundColor: theme.colors.surface },
+                            ]}
+                        >
                             <Card.Content>
                                 <View style={styles.headerRow}>
                                     <View
@@ -216,7 +221,12 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                         </Card>
 
                         {review.reply ? (
-                            <Card style={styles.replyCard}>
+                            <Card
+                                style={[
+                                    styles.replyCard,
+                                    { backgroundColor: theme.colors.surface },
+                                ]}
+                            >
                                 <Card.Content>
                                     <Title>답글</Title>
                                     <Text>{review.reply}</Text>

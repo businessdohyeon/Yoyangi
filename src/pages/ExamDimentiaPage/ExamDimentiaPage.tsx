@@ -9,6 +9,7 @@ import {
     TextInput,
     DataTable,
     Divider,
+    useTheme,
 } from 'react-native-paper';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import patternImg from './patternImg.png';
@@ -16,6 +17,7 @@ import paintingImg from './painting.png';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ExamDimentiaPage() {
+    const theme = useTheme();
     // 선택지 방식으로 변경 (0점 / 정답점)
     type YesNo = 'yes' | 'no' | null;
 
@@ -76,7 +78,12 @@ export default function ExamDimentiaPage() {
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={'치매 간단 검사'} />
             <ScrollView contentContainerStyle={styles.scroll}>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>지남력</Text>
                         <SelectBlock
@@ -101,7 +108,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>장소</Text>
                         <SelectBlock
@@ -111,7 +123,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>기억 등록</Text>
                         <Text>문장 따라하기</Text>
@@ -122,7 +139,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>주의력</Text>
                         <Text>숫자 6-9-7-3 따라하기</Text>
@@ -133,7 +155,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>집행기능</Text>
                         <Text>패턴 문제 보기</Text>
@@ -149,7 +176,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>기억 회상</Text>
 
@@ -180,7 +212,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>언어 기능</Text>
                         <Text>그림 이름 맞히기</Text>
@@ -196,7 +233,12 @@ export default function ExamDimentiaPage() {
                         />
                     </Card.Content>
                 </Card>
-                <Card style={styles.card}>
+                <Card
+                    style={[
+                        styles.card,
+                        { backgroundColor: theme.colors.surface },
+                    ]}
+                >
                     <Card.Content>
                         <Text style={styles.section}>검사자 정보</Text>
                         <TextInput
@@ -243,7 +285,12 @@ export default function ExamDimentiaPage() {
                     결과 확인
                 </Button>
                 {showResult && (
-                    <Card style={styles.card}>
+                    <Card
+                        style={[
+                            styles.card,
+                            { backgroundColor: theme.colors.surface },
+                        ]}
+                    >
                         <Card.Content>
                             <Text style={styles.section}>결과</Text>
                             <Divider style={{ marginVertical: 8 }} />

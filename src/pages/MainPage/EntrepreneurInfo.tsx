@@ -1,7 +1,8 @@
 import { View } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { Button, Text, useTheme } from 'react-native-paper';
 
 export default function EntrepreneurInfo() {
+    const theme = useTheme();
     const entrepreneurInfo = `(주)굿닥 사업자정보
 대표: 이민석
 사업자등록번호
@@ -11,9 +12,16 @@ export default function EntrepreneurInfo() {
 이메일`;
 
     return (
-        <View style={{  }}>
+        <View
+            style={{
+                backgroundColor: theme.colors.surface,
+                paddingVertical: 8,
+            }}
+        >
             <View style={{ padding: 10 }}>
-                <Text>{entrepreneurInfo}</Text>
+                <Text style={{ color: theme.colors.onBackground }}>
+                    {entrepreneurInfo}
+                </Text>
             </View>
             <View
                 style={{
@@ -28,24 +36,29 @@ export default function EntrepreneurInfo() {
                 <Button
                     mode="outlined"
                     onPress={() => console.log('Pressed')}
-                    style={{ flex: 1 }}
-                    contentStyle={{}}
+                    style={{ flex: 1, borderColor: theme.colors.primary }}
+                    textColor={theme.colors.primary}
+                    contentStyle={{ paddingVertical: 6 }}
                 >
-                    <Text variant="bodySmall">서비스이용약관</Text>
+                    서비스이용약관
                 </Button>
                 <Button
                     mode="outlined"
                     onPress={() => console.log('Pressed')}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, borderColor: theme.colors.primary }}
+                    textColor={theme.colors.primary}
+                    contentStyle={{ paddingVertical: 6 }}
                 >
-                    <Text variant="bodySmall">개인정보처리방침</Text>
+                    개인정보처리방침
                 </Button>
                 <Button
                     mode="outlined"
                     onPress={() => console.log('Pressed')}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, borderColor: theme.colors.primary }}
+                    textColor={theme.colors.primary}
+                    contentStyle={{ paddingVertical: 6 }}
                 >
-                    <Text variant="bodySmall">위치기반서비스이용약관</Text>
+                    위치기반서비스이용약관
                 </Button>
             </View>
         </View>

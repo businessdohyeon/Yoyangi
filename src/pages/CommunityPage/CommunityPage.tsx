@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View, Image, Alert } from 'react-native';
+import { FlatList, StyleSheet, View, Alert, Image } from 'react-native';
 import {
     ActivityIndicator,
     Avatar,
@@ -10,6 +10,7 @@ import {
     Dialog,
     Chip,
     TextInput,
+    useTheme,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { TabAndStackCompositeNav } from '../../types/Navigation';
@@ -42,6 +43,7 @@ export type CommunityItem = {
 };
 
 export default function CommunityPage() {
+    const theme = useTheme();
     const navigation =
         useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
 
@@ -146,6 +148,7 @@ function FooterIndicator({ isLoading }: { isLoading: boolean }) {
 }
 
 function PostCard({ item }: { item: CommunityItem }) {
+    const theme = useTheme();
     const navigation =
         useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
     const { loginInfo } = useContext(LoginInfoContext);
@@ -239,146 +242,171 @@ function PostCard({ item }: { item: CommunityItem }) {
     const images = Array.isArray(item.images) ? item.images.slice(0, 4) : [];
 
     return (
-        <Card style={{ margin: 10, paddingVertical: 8 }} onPress={onPress}>
+        <Card style={styles.postCard} onPress={onPress}>
+            {images.length > 0 && (
+                <View style={styles.imageGrid}>
+                    {images.map((uri, idx) => (
+                        <Image
+                            key={idx}
+                            source={{ uri }}
+                            style={styles.gridImage}
+                        />
+                    ))}
+                </View>
+            )}
+
             <Card.Content>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={styles.postHeader}>
                     <Avatar.Text
-                        size={40}
+                        size={44}
                         label={(item.user?.name || 'U').slice(0, 2)}
                     />
-                    <View style={{ marginLeft: 12, flex: 1 }}>
+
+                    <View style={styles.postTitleWrap}>
                         <Text variant="titleMedium" numberOfLines={1}>
                             {item.title}
                         </Text>
-                        <Text style={styles.meta}>
+                        <Text style={styles.meta} numberOfLines={1}>
                             {item.user?.name || '익명'} ·{' '}
                             {formatDate(item.createdAt)}
                         </Text>
                     </View>
-                    <View style={{ justifyContent: 'center' }}>
+
+                    <View style={styles.postCountWrap}>
                         <Text style={styles.commentCount}>
                             {Number(item.totalComments) || 0}
                         </Text>
-                        <Text style={styles.meta}>답글</Text>
+                        <Text style={styles.meta}>댓글</Text>
                     </View>
                 </View>
-                {images.length > 0 && (
-                    <View style={styles.imageGrid}>
-                        {images.map((uri, idx) => (
-                            <Image
-                                key={`${item.id}-img-${idx}`}
-                                source={{ uri }}
-                                style={styles.gridImage}
-                                resizeMode="cover"
-                            />
-                        ))}
-                    </View>
-                )}
+
                 <Text numberOfLines={3} style={styles.paragraph}>
                     {snippet}
                 </Text>
-                {userId === item.user?.id && (
-                    <View>
-                        <Button onPress={editBtn}>수정</Button>
-                        <Button
-                            onPress={handleDelete}
-                            loading={deleteMutation.status === 'pending'}
-                            disabled={deleteMutation.status === 'pending'}
-                        >
-                            삭제
-                        </Button>
-                    </View>
-                )}
-                <Button onPress={() => setReportVisible(true)}>신고</Button>
-                <Portal>
-                    <Dialog
-                        visible={reportVisible}
-                        onDismiss={() => setReportVisible(false)}
-                    >
-                        <Dialog.Title>게시물 신고</Dialog.Title>
-                        <Dialog.Content>
-                            <form.Field
-                                name="category"
-                                children={(field) => (
-                                    <View
-                                        style={{
-                                            flexDirection: 'row',
-                                            flexWrap: 'wrap',
-                                            gap: 8,
-                                        }}
-                                    >
-                                        {[
-                                            'DUPLICATE_SPAM',
-                                            'AD_PROMOTION',
-                                            'ABUSE_HATE',
-                                            'PRIVACY_LEAK',
-                                            'SEXUAL_CONTENT',
-                                            'ETC',
-                                        ].map((c) => (
-                                            <Chip
-                                                key={c}
-                                                mode="outlined"
-                                                selected={
-                                                    field.state.value === c
-                                                }
-                                                onPress={() =>
-                                                    field.handleChange(c)
-                                                }
-                                                style={{
-                                                    marginRight: 6,
-                                                    marginBottom: 6,
-                                                }}
-                                            >
-                                                {c}
-                                            </Chip>
-                                        ))}
-                                    </View>
-                                )}
-                            />
-
-                            <form.Field
-                                name="reason"
-                                children={(field) => (
-                                    <TextInput
-                                        label="신고 사유 (선택적)"
-                                        value={field.state.value}
-                                        onChangeText={field.handleChange}
-                                        multiline
-                                        style={{ marginTop: 12 }}
-                                    />
-                                )}
-                            />
-                        </Dialog.Content>
-                        <Dialog.Actions>
-                            <Button onPress={() => setReportVisible(false)}>
-                                취소
-                            </Button>
-                            <form.Subscribe
-                                selector={(s) => ({
-                                    canSubmit: s.canSubmit,
-                                    isSubmitting: s.isSubmitting,
-                                })}
-                                children={({ canSubmit, isSubmitting }) => (
-                                    <Button
-                                        mode="contained"
-                                        loading={
-                                            isSubmitting ||
-                                            reportMutation.status === 'pending'
-                                        }
-                                        disabled={
-                                            !canSubmit ||
-                                            reportMutation.status === 'pending'
-                                        }
-                                        onPress={() => form.handleSubmit()}
-                                    >
-                                        신고 제출
-                                    </Button>
-                                )}
-                            />
-                        </Dialog.Actions>
-                    </Dialog>
-                </Portal>
             </Card.Content>
+
+            <Card.Actions style={styles.postActions}>
+                <View style={styles.actionLeft}>
+                    {userId === item.user?.id && (
+                        <>
+                            <Button
+                                compact
+                                onPress={editBtn}
+                                textColor={theme.colors.primary}
+                            >
+                                수정
+                            </Button>
+                            <Button
+                                compact
+                                mode="outlined"
+                                onPress={handleDelete}
+                                loading={deleteMutation.status === 'pending'}
+                                disabled={deleteMutation.status === 'pending'}
+                                textColor={theme.colors.error}
+                            >
+                                삭제
+                            </Button>
+                        </>
+                    )}
+                </View>
+
+                <View style={styles.actionRight}>
+                    <Button
+                        compact
+                        onPress={() => setReportVisible(true)}
+                        textColor={theme.colors.primary}
+                    >
+                        신고
+                    </Button>
+                </View>
+            </Card.Actions>
+
+            <Portal>
+                <Dialog
+                    visible={reportVisible}
+                    onDismiss={() => setReportVisible(false)}
+                >
+                    <Dialog.Title>게시물 신고</Dialog.Title>
+                    <Dialog.Content>
+                        <form.Field
+                            name="category"
+                            children={(field) => (
+                                <View
+                                    style={{
+                                        flexDirection: 'row',
+                                        flexWrap: 'wrap',
+                                        gap: 8,
+                                    }}
+                                >
+                                    {[
+                                        'DUPLICATE_SPAM',
+                                        'AD_PROMOTION',
+                                        'ABUSE_HATE',
+                                        'PRIVACY_LEAK',
+                                        'SEXUAL_CONTENT',
+                                        'ETC',
+                                    ].map((c) => (
+                                        <Chip
+                                            key={c}
+                                            mode="outlined"
+                                            selected={field.state.value === c}
+                                            onPress={() =>
+                                                field.handleChange(c)
+                                            }
+                                            style={{
+                                                marginRight: 6,
+                                                marginBottom: 6,
+                                            }}
+                                        >
+                                            {c}
+                                        </Chip>
+                                    ))}
+                                </View>
+                            )}
+                        />
+
+                        <form.Field
+                            name="reason"
+                            children={(field) => (
+                                <TextInput
+                                    label="신고 사유 (선택적)"
+                                    value={field.state.value}
+                                    onChangeText={field.handleChange}
+                                    multiline
+                                    style={{ marginTop: 12 }}
+                                />
+                            )}
+                        />
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={() => setReportVisible(false)}>
+                            취소
+                        </Button>
+                        <form.Subscribe
+                            selector={(s) => ({
+                                canSubmit: s.canSubmit,
+                                isSubmitting: s.isSubmitting,
+                            })}
+                            children={({ canSubmit, isSubmitting }) => (
+                                <Button
+                                    mode="contained"
+                                    loading={
+                                        isSubmitting ||
+                                        reportMutation.status === 'pending'
+                                    }
+                                    disabled={
+                                        !canSubmit ||
+                                        reportMutation.status === 'pending'
+                                    }
+                                    onPress={() => form.handleSubmit()}
+                                >
+                                    신고 제출
+                                </Button>
+                            )}
+                        />
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
         </Card>
     );
 }
@@ -400,5 +428,41 @@ const styles = StyleSheet.create({
         width: '50%',
         height: 140,
         backgroundColor: '#eee',
+    },
+
+    /* PostCard specific styles */
+    postCard: {
+        margin: 10,
+        borderRadius: 12,
+        overflow: 'hidden',
+        elevation: 2,
+        // backgroundColor set via theme
+    },
+    // postCover removed: using thumbnail grid instead
+    postHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    postTitleWrap: {
+        marginLeft: 12,
+        flex: 1,
+    },
+    postCountWrap: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
+    postActions: {
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
+    },
+    actionLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    actionRight: {
+        alignItems: 'flex-end',
     },
 });

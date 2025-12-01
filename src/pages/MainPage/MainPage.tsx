@@ -11,7 +11,6 @@ const styles = StyleSheet.create({
 
 export default function MainPage() {
     // const { t } = useTranslation();
-    // const {height: vh, width: vw} = useWindowㅅDimensions();
 
     return (
         <>

@@ -24,6 +24,9 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     const { facility_id, guardian_id, sender, sender_type } =
         route.params as any;
 
+
+    // TODO: auth guard
+
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
     const socketRef = useRef<any | null>(null);
@@ -42,6 +45,7 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
 
             socketRef.current.on('connect', () => {
                 console.log('socket connected', socketRef.current?.id);
+
                 setSocketConnected(true);
                 setSocketError(null);
                 setSnackbarVisible(false);
@@ -76,6 +80,7 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
             setTimeout(() => {
                 setSocketError('소켓 초기화 중 오류가 발생했습니다.');
                 setSnackbarVisible(true);
+                // TODO: auth guard
             }, 0);
         }
 

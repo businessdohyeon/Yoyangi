@@ -74,7 +74,7 @@ const urls = {
     searchVoice: `${API_PREFIX}/search/voice`,
     getRooms: `${API_PREFIX}/chats/rooms/guardian`,
 
-    chatSocketUrl: `http://43.201.248.108:8080`,
+    chatSocketUrl: `ws://43.201.248.108:8080`,
 };
 
 export default urls;

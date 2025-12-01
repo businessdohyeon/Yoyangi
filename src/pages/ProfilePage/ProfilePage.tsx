@@ -92,7 +92,7 @@ const ProfilePage = () => {
                         padding: 20,
                     }}
                 >
-                    <Card style={{}}>
+                    <Card style={{ backgroundColor: theme.colors.surface }}>
                         <Card.Content style={{ alignItems: 'center' }}>
                             <Avatar.Image
                                 size={80}

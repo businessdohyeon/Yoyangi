@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Dimensions, View, Pressable, StyleSheet } from 'react-native';
+import { Dimensions, View, Pressable, StyleSheet, Image } from 'react-native';
 import { Text, useTheme, IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { TabAndStackCompositeNav } from '../../types/Navigation';
@@ -8,10 +8,11 @@ import Carousel, {
     Pagination,
 } from 'react-native-reanimated-carousel';
 import { useSharedValue } from 'react-native-reanimated';
+import ad1 from './ad1.jpg';
+import ad2 from './ad2.png';
+import ad3 from './ad3.jpg';
 
 export default function HeroSection() {
-    const navigation =
-        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
     const theme = useTheme();
 
     return (
@@ -22,13 +23,19 @@ export default function HeroSection() {
     );
 }
 
-const data = [...new Array(6).keys()];
+const tmp = {
+    daycare: `주변 주간보호
+케어센터 검색`,
+    hospital: `주변 요양병원
+검색`,
+    one: `주변 요양원
+검색`,
+};
+const ads = [ad1, ad2, ad3];
 const width = Dimensions.get('window').width;
 
 function AdBanner() {
-    const navigation =
-        useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
-    const theme = useTheme();
+    // navigation and theme not required inside AdBanner
 
     const ref = useRef<ICarouselInstance>(null);
     const progress = useSharedValue<number>(0);
@@ -49,36 +56,28 @@ function AdBanner() {
             <Carousel
                 ref={ref}
                 width={width}
-                height={width / 2}
-                data={data}
+                height={300}
+                data={ads}
                 onProgressChange={progress}
-                renderItem={({ index }) => (
-                    <View
+                renderItem={({ item }) => (
+                    <Image
+                        source={item}
                         style={{
-                            flex: 1,
-                            borderWidth: 1,
-                            justifyContent: 'center',
+                            width: '100%',
+                            height: "100%",
+                            resizeMode: 'cover',
                         }}
-                    >
-                        <Text
-                            style={{
-                                textAlign: 'center',
-                                fontSize: 30,
-                            }}
-                        >
-                            {index}
-                        </Text>
-                    </View>
+                    />
                 )}
             />
             <Pagination.Basic
                 progress={progress}
-                data={data}
+                data={ads}
                 dotStyle={{
                     backgroundColor: 'rgba(0,0,0,0.2)',
                     borderRadius: 50,
                 }}
-                containerStyle={{ gap: 5, marginTop: 10 }}
+                containerStyle={{ gap: 5, marginTop: -20 }}
                 onPress={onPressPagination}
             />
         </View>
@@ -93,17 +92,17 @@ function BigButtons() {
     return (
         <View
             style={{
-                height: 300,
+                height: 280,
                 flex: 1,
                 paddingHorizontal: 10,
                 marginVertical: 20,
             }}
         >
-            <View style={styles.row}>
+            <View style={{ ...styles.row, flex: 2 }}>
                 <View style={styles.cell}>
                     <FeatureButton
                         icon="hospital-building"
-                        label="주변 요양병원검색"
+                        label={tmp.one}
                         onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['요양병원'],
@@ -115,7 +114,7 @@ function BigButtons() {
                 <View style={styles.cell}>
                     <FeatureButton
                         icon="home-group"
-                        label="주변 요양원 검색"
+                        label={tmp.one}
                         onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['요양원'],
@@ -127,7 +126,7 @@ function BigButtons() {
                 <View style={styles.cell}>
                     <FeatureButton
                         icon="calendar-check"
-                        label="주변 주간보호케어센터 검색"
+                        label={tmp.daycare}
                         onPress={() =>
                             navigation.navigate('SearchPage', {
                                 kind: ['주간보호케어센터'],
@@ -139,7 +138,7 @@ function BigButtons() {
             </View>
 
             <View style={styles.row}>
-                <View style={styles.cell}>
+                <View style={[styles.cell, { flex: 1 }]}>
                     <FeatureButton
                         icon="brain"
                         label="치매 자가 진단"
@@ -147,7 +146,7 @@ function BigButtons() {
                         theme={theme}
                     />
                 </View>
-                <View style={styles.cell}>
+                <View style={[styles.cell, { flex: 1 }]}>
                     <FeatureButton
                         icon="pill"
                         label="질병 예측"
@@ -157,7 +156,6 @@ function BigButtons() {
                         theme={theme}
                     />
                 </View>
-                <View style={styles.cell} />
             </View>
         </View>
     );
@@ -179,12 +177,11 @@ function FeatureButton({
             onPress={onPress}
             style={({ pressed }) => [
                 styles.featureButton,
+                styles.featureShadow,
                 {
                     backgroundColor: pressed
-                        ? theme.dark
-                            ? '#222'
-                            : '#eee'
-                        : 'transparent',
+                        ? theme.colors.primary + '12'
+                        : theme.colors.surface,
                 },
             ]}
         >
@@ -192,13 +189,10 @@ function FeatureButton({
                 icon={icon}
                 size={36}
                 style={styles.iconButton}
-                iconColor={theme.dark ? 'white' : 'black'}
+                iconColor={theme.colors.primary}
             />
             <Text
-                style={[
-                    styles.featureLabel,
-                    { color: theme.dark ? 'white' : 'black' },
-                ]}
+                style={[styles.featureLabel, { color: theme.colors.gray900 }]}
             >
                 {label}
             </Text>
@@ -218,6 +212,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 8,
         borderRadius: 8,
+    },
+    featureShadow: {
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
     },
     iconButton: {
         margin: 0,

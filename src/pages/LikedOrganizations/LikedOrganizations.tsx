@@ -80,7 +80,12 @@ export default function LikedOrganizations() {
                         data={favorites}
                         keyExtractor={(item, idx) => String(item.id ?? idx)}
                         renderItem={({ item }) => (
-                            <Card style={{ marginBottom: 10 }}>
+                            <Card
+                                style={{
+                                    marginBottom: 10,
+                                    backgroundColor: theme.colors.surface,
+                                }}
+                            >
                                 <Card.Content>
                                     <Text variant="titleMedium">
                                         {item.name ||

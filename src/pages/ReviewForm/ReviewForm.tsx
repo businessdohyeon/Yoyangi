@@ -1,6 +1,12 @@
 import React, { useContext } from 'react';
 import { Alert, Text, View, Image } from 'react-native';
-import { TextInput, Button, Card, IconButton } from 'react-native-paper';
+import {
+    TextInput,
+    Button,
+    Card,
+    IconButton,
+    useTheme,
+} from 'react-native-paper';
 import {
     launchImageLibrary,
     ImageLibraryOptions,
@@ -121,6 +127,8 @@ export default function ReviewForm({
         },
     });
 
+    const theme = useTheme();
+
     // 인증 상태가 준비되지 않았으면 아무 것도 렌더링하지 않음
     if (!isAuthenticated) return null;
 
@@ -128,7 +136,12 @@ export default function ReviewForm({
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={`${facilityName} 후기 쓰기`} />
             <ScrollView style={{ flex: 1, padding: 16 }}>
-                <Card style={{ padding: 16 }}>
+                <Card
+                    style={{
+                        padding: 16,
+                        backgroundColor: theme.colors.surface,
+                    }}
+                >
                     <form.Field
                         name="content"
                         validators={{

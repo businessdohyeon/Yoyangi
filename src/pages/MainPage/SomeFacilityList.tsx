@@ -80,16 +80,27 @@ export default function SomeFacilityList() {
                     justifyContent: 'space-around',
                 }}
             >
-                {['요양병원', '요양원', '주간보호케어센터'].map((k) => (
-                    <Chip
-                        key={k}
-                        icon={kind.includes(k) ? 'check' : 'hospital'}
-                        selected={kind.includes(k)}
-                        onPress={() => toggleKind(k)}
-                    >
-                        {k}
-                    </Chip>
-                ))}
+                {['요양병원', '요양원', '주간보호케어센터'].map((k) => {
+                    const selected = kind.includes(k);
+                    return (
+                        <Chip
+                            key={k}
+                            icon={selected ? 'check' : 'hospital'}
+                            selected={selected}
+                            onPress={() => toggleKind(k)}
+                            style={{
+                                borderRadius: 16,
+                            }}
+                            selectedColor={
+                                selected
+                                    ? theme.colors.primary
+                                    : theme.colors.secondary
+                            }
+                        >
+                            {k}
+                        </Chip>
+                    );
+                })}
             </View>
 
             {isLoading ? (
@@ -99,7 +110,12 @@ export default function SomeFacilityList() {
                     {list.map((item) => (
                         <Card
                             key={item.id}
-                            style={{ marginBottom: 10 }}
+                            style={{
+                                margin: 10,
+                                backgroundColor: theme.colors.background,
+                                borderWidth: 1,
+                                borderColor: theme.colors.secondaryContainer,
+                            }}
                             onPress={() =>
                                 navigation.navigate('FacilityDetailPage', {
                                     id: item.id,

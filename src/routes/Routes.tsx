@@ -40,7 +40,11 @@ const BottomTabs = () => {
                 <BottomNavigation.Bar
                     navigationState={state}
                     safeAreaInsets={insets}
-                    style={{ backgroundColor: theme.colors.background }}
+                    style={{
+                        backgroundColor: theme.colors.background,
+                        borderTopWidth: 1,
+                        borderTopColor: theme.colors.secondaryContainer,
+                    }}
                     onTabPress={({ route, preventDefault }) => {
                         const event = navigation.emit({
                             type: 'tabPress',

@@ -15,11 +15,12 @@ import React, { useState, useCallback, useContext, useEffect } from 'react';
 import { ScreenProps } from '../../types/Navigation';
 import apis from '../../apis';
 import { LoginInfoContext } from '../../Context';
-import naverLoginBtnImg from './btnG_완성형.png';
-import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
-import googleLoginBtnImg from './web_light_sq_SI.png';
 import { useMutation } from '@tanstack/react-query';
 import axiosInstance from '../../apis/axios';
+
+import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
+import naverLoginBtnImg from './btnG_완성형.png';
+import googleLoginBtnImg from './web_light_sq_SI.png';
 
 function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
     const theme = useTheme();

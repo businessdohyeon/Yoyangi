@@ -81,7 +81,12 @@ export default function ReservationDetailPage({
                     <Text>예약 정보를 찾을 수 없습니다.</Text>
                 ) : (
                     <View>
-                        <Card style={{ marginBottom: 12 }}>
+                        <Card
+                            style={{
+                                marginBottom: 12,
+                                backgroundColor: theme.colors.surface,
+                            }}
+                        >
                             <Card.Content>
                                 <Title>기관</Title>
                                 <Text>
@@ -90,7 +95,12 @@ export default function ReservationDetailPage({
                             </Card.Content>
                         </Card>
 
-                        <Card style={{ marginBottom: 12 }}>
+                        <Card
+                            style={{
+                                marginBottom: 12,
+                                backgroundColor: theme.colors.surface,
+                            }}
+                        >
                             <Card.Content>
                                 <Title>예약 정보</Title>
                                 <Text>
@@ -125,7 +135,12 @@ export default function ReservationDetailPage({
                             </Card.Content>
                         </Card>
 
-                        <Card style={{ marginBottom: 12 }}>
+                        <Card
+                            style={{
+                                marginBottom: 12,
+                                backgroundColor: theme.colors.surface,
+                            }}
+                        >
                             <Card.Content>
                                 <Title>진료 대상자</Title>
                                 <Text>이름: {data.patient?.name ?? '-'}</Text>
@@ -150,7 +165,7 @@ export default function ReservationDetailPage({
                             </Card.Content>
                         </Card>
 
-                        <Card>
+                        <Card style={{ backgroundColor: theme.colors.surface }}>
                             <Card.Content>
                                 <Title>예약자</Title>
                                 <Text>

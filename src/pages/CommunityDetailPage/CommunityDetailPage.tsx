@@ -18,6 +18,7 @@ import {
     Portal,
     Dialog,
     Chip,
+    useTheme,
 } from 'react-native-paper';
 import axiosInstance from '../../apis/axios';
 import { CommunityDetail, CommunityApiResponse } from '../../types/Community';
@@ -36,13 +37,14 @@ function formatDate(iso: any) {
 }
 
 export default function CommunityDetailScreen({ route }: any) {
+    const theme = useTheme();
     const { communityId } = route.params;
 
     const { loginInfo } = useContext(LoginInfoContext);
     const [newComment, setNewComment] = useState('');
     const queryClient = useQueryClient();
 
-     const categories = [
+    const categories = [
         'DUPLICATE_SPAM',
         'AD_PROMOTION',
         'ABUSE_HATE',
@@ -65,8 +67,7 @@ export default function CommunityDetailScreen({ route }: any) {
         queryFn: async (): Promise<CommunityDetail | null> => {
             const response = await axiosInstance.get<CommunityApiResponse>(
                 apis.urls.getCommunityById(communityId),
-                {
-                },
+                {},
             );
             console.log(response);
 
@@ -204,7 +205,12 @@ export default function CommunityDetailScreen({ route }: any) {
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={community.title} />
             <ScrollView style={styles.container}>
-                <Card style={{ margin: 12 }}>
+                <Card
+                    style={{
+                        margin: 12,
+                        backgroundColor: theme.colors.surface,
+                    }}
+                >
                     <Card.Title
                         title={community.title}
                         subtitle={`${
@@ -287,7 +293,10 @@ export default function CommunityDetailScreen({ route }: any) {
                             return (
                                 <Card
                                     key={c.commentId}
-                                    style={{ marginVertical: 6 }}
+                                    style={{
+                                        marginVertical: 6,
+                                        backgroundColor: theme.colors.surface,
+                                    }}
                                 >
                                     <Card.Title
                                         title={c.userName || '익명'}
