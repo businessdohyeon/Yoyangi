@@ -39,6 +39,8 @@ export default function SearchPage({
     const [searchResults, setSearchResults] = useState<FacilityData_t[] | null>(
         null,
     );
+    const [refreshing, setRefreshing] = useState(false);
+    const [resetCounter, setResetCounter] = useState(0);
 
     const {
         data,
@@ -107,6 +109,20 @@ export default function SearchPage({
         refetch();
     };
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        // reset filters and search results
+        setSearchResults(null);
+        setKindAndReset(KIND_DEFAULT_VALUE);
+        setResetCounter((c) => c + 1);
+        try {
+            await refetch();
+        } catch (e) {
+            console.warn('refresh refetch failed', e);
+        }
+        setRefreshing(false);
+    };
+
     return (
         <>
             <SearchHeader
@@ -143,6 +159,8 @@ export default function SearchPage({
                             backgroundColor: '#eeeeee',
                             gap: 20,
                         }}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
                         // onEndReached={getMore}
                         // onEndReachedThreshold={0.5}
                         ListFooterComponent={

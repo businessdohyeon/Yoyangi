@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import {
     ActivityIndicator,
     Appbar,
+    Button,
     Chip,
     Icon,
     IconButton,
@@ -34,10 +35,12 @@ export default function SearchHeader({
     setSearchResults,
     kind,
     setKind,
+    resetSignal,
 }: {
     setSearchResults: (data: any) => void;
     kind: string[];
     setKind: React.Dispatch<React.SetStateAction<string[]>>;
+    resetSignal?: number;
 }) {
     const navigation =
         useNavigation<TabAndStackCompositeNav<'SearchPage', 'Tabs'>>();
@@ -46,6 +49,11 @@ export default function SearchHeader({
     const queryClient = useQueryClient();
 
     const [searchQuery, setSearchQuery] = useState('');
+
+    useEffect(() => {
+        // reset external signal: clear the search box
+        setSearchQuery('');
+    }, [resetSignal]);
 
     const searchMutation = useMutation({
         mutationFn: async (keyword: string) => {
@@ -227,15 +235,13 @@ function VoiceButton({
     // then perform the search. This prevents immediate search and gives user feedback.
     const [showModal, setShowModal] = useState(false);
     const [listeningStarted, setListeningStarted] = useState(false);
+    const timerRef = useRef<number | null>(null);
 
     useEffect(() => {
-        let timer: number | null = null;
-
-        if (!isListening && (transcript || listeningStarted)) {
+            if (!isListening && (transcript || listeningStarted)) {
             // show transcript preview
             setShowModal(true);
-
-            timer = setTimeout(async () => {
+                timerRef.current = setTimeout(async () => {
                 try {
                     const searchQuery = transcript;
                     const url = `${
@@ -247,24 +253,47 @@ function VoiceButton({
                     setSearchResults(result);
                 } catch (e) {
                     console.error('voice search failed', e);
-                } finally {
-                    setShowModal(false);
-                    setListeningStarted(false);
-                }
-            }, 1200);
+                    } finally {
+                        setShowModal(false);
+                        setListeningStarted(false);
+                        timerRef.current = null;
+                    }
+                }, 1200);
         } else if (!isListening && transcript === '' && listeningStarted) {
             // nothing heard — briefly show modal then hide
             setShowModal(true);
-            timer = setTimeout(() => {
-                setShowModal(false);
-                setListeningStarted(false);
-            }, 800);
+                timerRef.current = setTimeout(() => {
+                    setShowModal(false);
+                    setListeningStarted(false);
+                    timerRef.current = null;
+                }, 800);
         }
 
         return () => {
-            if (timer) clearTimeout(timer as any);
+            if (timerRef.current) {
+                clearTimeout(timerRef.current as any);
+                timerRef.current = null;
+            }
         };
     }, [isListening, transcript, setSearchResults]);
+
+    const cancelVoice = async () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current as any);
+            timerRef.current = null;
+        }
+
+        try {
+            if (isListening) await stop();
+        } catch (e) {
+            console.error('stop failed', e);
+        }
+
+        setIsListening(false);
+        setListeningStarted(false);
+        setShowModal(false);
+        setTranscript('');
+    };
 
     const handleStart = async () => {
         try {
@@ -340,6 +369,9 @@ function VoiceButton({
                             </View>
                         )}
                     </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button onPress={cancelVoice}>취소</Button>
+                    </Dialog.Actions>
                 </Dialog>
             </Portal>
         </>
