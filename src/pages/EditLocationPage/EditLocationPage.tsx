@@ -5,10 +5,14 @@ import { useContext, useState } from 'react';
 import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 import { LocationInfoContext } from '../../Context';
+import {
+    GeoApiResponse,
+    GeoApiResponseWrapper,
+    GeoLocationResult,
+} from '../../types/GeoLocation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// import { showBorder } from "./common.js"
 
 const EditLocationPage = () => {
     const nav = useNavigation();
@@ -17,44 +21,7 @@ const EditLocationPage = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    // --- Geolocation API 타입들 (샘플 응답 기반) ---
-    type AddressElement = {
-        types: string[];
-        longName: string;
-        shortName: string;
-        code: string;
-    };
-
-    type AddressItem = {
-        roadAddress: string;
-        jibunAddress: string;
-        englishAddress: string;
-        addressElements: AddressElement[];
-        x: string; // longitude (샘플에서는 문자열)
-        y: string; // latitude (샘플에서는 문자열)
-        distance: number;
-    };
-
-    type GeoApiResponse = {
-        status: string;
-        meta: {
-            totalCount: number;
-            page: number;
-            count: number;
-        };
-        addresses: AddressItem[];
-        errorMessage: string;
-    };
-
-    // 일부 응답은 { Response: GeoApiResponse } 형태로 래핑되는 경우도 있어 이를 허용
-    type GeoApiResponseWrapper = GeoApiResponse | { Response: GeoApiResponse };
-
-    type GeoLocationResult = {
-        roadAddress: string;
-        latitude: number;
-        longitude: number;
-        displayName: string;
-    } | null;
+    // Geolocation API 타입들은 `src/types/GeoLocation.ts`에 정의되어 있습니다.
 
     const [searchResult, setSearchResult] = useState<GeoLocationResult>(null);
 

@@ -4,175 +4,171 @@ import { z } from 'zod';
 import { setLogoutCallback, setTokenRefreshCallback } from './utils/auth';
 
 const LocationInfoSchema = z.object({
-    latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
-    longitude: z.preprocess((val) => Number(val), z.number()).default(126.978),
-    roadAddress: z.string().default('위치를 설정해주세요'),
-    displayName: z.string().default('위치를 설정해주세요'),
+  latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
+  longitude: z.preprocess((val) => Number(val), z.number()).default(126.978),
+  roadAddress: z.string().default('위치를 설정해주세요'),
+  displayName: z.string().default('위치를 설정해주세요'),
 });
 
 export const LoginInfoSchema = z.object({
-    userId: z.preprocess((val) => Number(val), z.number()).default(0),
-    token: z.string().default(''),
-    refreshToken: z.string().default(''),
-    provider: z.enum(['naver', 'kakao', 'google', 'phone']).default('naver'),
+  userId: z.preprocess((val) => Number(val), z.number()).default(0),
+  token: z.string().default(''),
+  refreshToken: z.string().default(''),
+  provider: z.enum(['naver', 'kakao', 'google', 'phone']).default('naver'),
 });
 
 export type LocationInfo = z.infer<typeof LocationInfoSchema>;
 export type LoginInfo = z.infer<typeof LoginInfoSchema>;
 
 export const LocationInfoContext = createContext<{
-    locationInfo: LocationInfo;
-    storeLocationInfo: (value: LocationInfo) => Promise<void>;
+  locationInfo: LocationInfo;
+  storeLocationInfo: (value: LocationInfo) => Promise<void>;
 }>({
-    locationInfo: LocationInfoSchema.parse({}),
-    storeLocationInfo: async (value) => {
-        console.log(value);
-    },
+  locationInfo: LocationInfoSchema.parse({}),
+  storeLocationInfo: async (value) => {
+    console.log(value);
+  },
 });
 
 export const LoginInfoContext = createContext<{
-    loginInfo: LoginInfo | null;
-    storeLoginInfo: (value: LoginInfo) => void;
-    clearLoginInfo: () => Promise<void>;
-    reloadLoginInfo: () => Promise<void>;
+  loginInfo: LoginInfo | null;
+  storeLoginInfo: (value: LoginInfo) => void;
+  clearLoginInfo: () => Promise<void>;
+  reloadLoginInfo: () => Promise<void>;
 }>({
-    loginInfo: null,
-    storeLoginInfo: async (value) => {
-        console.log(value);
-    },
-    clearLoginInfo: async () => {
-        console.log('clearLoginInfo');
-    },
-    reloadLoginInfo: async () => {
-        console.log('reloadLoginInfo');
-    },
+  loginInfo: null,
+  storeLoginInfo: async (value) => {
+    console.log(value);
+  },
+  clearLoginInfo: async () => {
+    console.log('clearLoginInfo');
+  },
+  reloadLoginInfo: async () => {
+    console.log('reloadLoginInfo');
+  },
 });
 
 export function TotalContextProvider({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    const [locationInfo, setLocationInfo] = useState<LocationInfo>(
-        LocationInfoSchema.parse({}),
-    );
-    const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null);
+  const [locationInfo, setLocationInfo] = useState<LocationInfo>(
+    LocationInfoSchema.parse({}),
+  );
+  const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null);
 
-    const loadLoginInfo = async () => {
-        const data = await AsyncStorage.getItem('loginInfo');
+  const loadLoginInfo = async () => {
+    const data = await AsyncStorage.getItem('loginInfo');
 
-        console.group('loadLoginInfo');
+    console.group('loadLoginInfo');
 
-        if (data) {
-            try {
-                const parsed = LoginInfoSchema.parse(JSON.parse(data));
-                setLoginInfo(parsed);
+    if (data) {
+      try {
+        const parsed = LoginInfoSchema.parse(JSON.parse(data));
+        setLoginInfo(parsed);
 
-                console.log(parsed);
-            } catch (e) {
-                console.error('Invalid loginInfo schema', e);
-                setLoginInfo(null);
-            }
-        } else {
-            setLoginInfo(null);
-        }
-
-        console.groupEnd();
-    };
-
-    const storeLoginInfo = useCallback((value: LoginInfo) => {
-        setLoginInfo(value);
-        AsyncStorage.setItem('loginInfo', JSON.stringify(value)).catch(
-            (error) => {
-                console.error('Failed to store loginInfo:', error);
-            },
-        );
-    }, []);
-
-    const clearLoginInfo = useCallback(async () => {
-        await AsyncStorage.removeItem('loginInfo');
+        console.log(parsed);
+      } catch (e) {
+        console.error('Invalid loginInfo schema', e);
         setLoginInfo(null);
-    }, []);
+      }
+    } else {
+      setLoginInfo(null);
+    }
 
-    const reloadLoginInfo = useCallback(async () => {
-        const data = await AsyncStorage.getItem('loginInfo');
+    console.groupEnd();
+  };
 
-        if (data) {
-            try {
-                const parsed = LoginInfoSchema.parse(JSON.parse(data));
-                setLoginInfo(parsed);
-            } catch (e) {
-                console.error('Invalid loginInfo schema', e);
-                setLoginInfo(null);
-            }
-        } else {
-            setLoginInfo(null);
-        }
-    }, []);
+  const storeLoginInfo = useCallback((value: LoginInfo) => {
+    setLoginInfo(value);
+    AsyncStorage.setItem('loginInfo', JSON.stringify(value)).catch((error) => {
+      console.error('Failed to store loginInfo:', error);
+    });
+  }, []);
 
-    const loadLocationInfo = async () => {
-        const data = await AsyncStorage.getItem('locationInfo');
+  const clearLoginInfo = useCallback(async () => {
+    await AsyncStorage.removeItem('loginInfo');
+    setLoginInfo(null);
+  }, []);
 
-        console.group('getLocationInfo');
+  const reloadLoginInfo = useCallback(async () => {
+    const data = await AsyncStorage.getItem('loginInfo');
 
-        if (data) {
-            try {
-                const parsed = LocationInfoSchema.parse(JSON.parse(data));
-                setLocationInfo(parsed);
-                console.log(parsed);
-            } catch (e) {
-                console.error('Invalid locationInfo schema', e);
-                setLocationInfo(LocationInfoSchema.parse({}));
-            }
-        } else {
-            setLocationInfo(LocationInfoSchema.parse({}));
-        }
+    if (data) {
+      try {
+        const parsed = LoginInfoSchema.parse(JSON.parse(data));
+        setLoginInfo(parsed);
+      } catch (e) {
+        console.error('Invalid loginInfo schema', e);
+        setLoginInfo(null);
+      }
+    } else {
+      setLoginInfo(null);
+    }
+  }, []);
 
-        console.groupEnd();
-    };
+  const loadLocationInfo = async () => {
+    const data = await AsyncStorage.getItem('locationInfo');
 
-    const storeLocationInfo = async (value: LocationInfo) => {
-        try {
-            const parsed = LocationInfoSchema.parse(value);
-            setLocationInfo(parsed);
+    console.group('getLocationInfo');
 
-            console.group('storeLocationInfo');
-            console.log(parsed);
-            console.groupEnd();
+    if (data) {
+      try {
+        const parsed = LocationInfoSchema.parse(JSON.parse(data));
+        setLocationInfo(parsed);
+        console.log(parsed);
+      } catch (e) {
+        console.error('Invalid locationInfo schema', e);
+        setLocationInfo(LocationInfoSchema.parse({}));
+      }
+    } else {
+      setLocationInfo(LocationInfoSchema.parse({}));
+    }
 
-            setLocationInfo(value);
-            await AsyncStorage.setItem('locationInfo', JSON.stringify(value));
-        } catch (e) {
-            console.error('Invalid locationInfo schema', e);
-            setLocationInfo(LocationInfoSchema.parse({}));
-        }
-    };
+    console.groupEnd();
+  };
 
-    useEffect(() => {
-        (async () => {
-            await loadLoginInfo();
-            await loadLocationInfo();
-        })();
+  const storeLocationInfo = async (value: LocationInfo) => {
+    try {
+      const parsed = LocationInfoSchema.parse(value);
+      setLocationInfo(parsed);
 
-        // 로그아웃 및 토큰 갱신 콜백 설정 (auth.ts에서 사용)
-        setLogoutCallback(clearLoginInfo);
-        setTokenRefreshCallback(reloadLoginInfo);
-    }, [clearLoginInfo, reloadLoginInfo]);
+      console.group('storeLocationInfo');
+      console.log(parsed);
+      console.groupEnd();
 
-    return (
-        <LocationInfoContext.Provider
-            value={{ locationInfo, storeLocationInfo }}
-        >
-            <LoginInfoContext.Provider
-                value={{
-                    loginInfo,
-                    storeLoginInfo,
-                    clearLoginInfo,
-                    reloadLoginInfo,
-                }}
-            >
-                {children}
-            </LoginInfoContext.Provider>
-        </LocationInfoContext.Provider>
-    );
+      setLocationInfo(value);
+      await AsyncStorage.setItem('locationInfo', JSON.stringify(value));
+    } catch (e) {
+      console.error('Invalid locationInfo schema', e);
+      setLocationInfo(LocationInfoSchema.parse({}));
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      await loadLoginInfo();
+      await loadLocationInfo();
+    })();
+
+    // 로그아웃 및 토큰 갱신 콜백 설정 (auth.ts에서 사용)
+    setLogoutCallback(clearLoginInfo);
+    setTokenRefreshCallback(reloadLoginInfo);
+  }, [clearLoginInfo, reloadLoginInfo]);
+
+  return (
+    <LocationInfoContext.Provider value={{ locationInfo, storeLocationInfo }}>
+      <LoginInfoContext.Provider
+        value={{
+          loginInfo,
+          storeLoginInfo,
+          clearLoginInfo,
+          reloadLoginInfo,
+        }}
+      >
+        {children}
+      </LoginInfoContext.Provider>
+    </LocationInfoContext.Provider>
+  );
 }

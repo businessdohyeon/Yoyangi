@@ -85,7 +85,7 @@ export default function CommunityDetailScreen({
 
             // 응답의 Community 필드를 우선 사용하고, 없으면 소문자 키를 시도
             const raw = response.data as unknown as Record<string, unknown>;
-            const maybe = (raw['Community'] ?? raw['community']) as
+            const maybe = (raw.Community ?? raw.community) as
                 | CommunityDetail
                 | undefined;
             return maybe ?? null;
@@ -296,8 +296,8 @@ export default function CommunityDetailScreen({
                         community.comments.map((c: CommunityComment) => {
                             const isOwner =
                                 !!loginInfo?.userId &&
-                                ((c.userId && c.userId === loginInfo.userId) ||
-                                    (c.user && c.user.id === loginInfo.userId));
+                                c.userId &&
+                                c.userId === loginInfo.userId;
 
                             return (
                                 <Card

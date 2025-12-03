@@ -4,39 +4,37 @@ import { RootStackNavProp } from '../types/Navigation';
 import { LoginInfoContext } from '../Context';
 
 export function useRequireAuth(redirectIfNotLoggedIn: boolean = true) {
-    const { loginInfo } = useContext(LoginInfoContext);
-    const navigation = useNavigation<RootStackNavProp<'Tabs'>>();
-    const route = useRoute();
-    const hasRedirected = useRef(false);
+  const { loginInfo } = useContext(LoginInfoContext);
+  const navigation = useNavigation<RootStackNavProp<'Tabs'>>();
+  const route = useRoute();
+  const hasRedirected = useRef(false);
 
-    const isAuthenticated =
-        loginInfo?.token &&
-        loginInfo?.token.length > 0 &&
-        loginInfo?.userId > 0;
+  const isAuthenticated =
+    loginInfo?.token && loginInfo?.token.length > 0 && loginInfo?.userId > 0;
 
-    useEffect(() => {
-        if (!redirectIfNotLoggedIn) {
-            return;
-        }
+  useEffect(() => {
+    if (!redirectIfNotLoggedIn) {
+      return;
+    }
 
-        if (!isAuthenticated && !hasRedirected.current) {
-            hasRedirected.current = true;
-            // 현재 route params를 저장하여 로그인 후 돌아올 수 있도록 함
-            // TODO: `route.name`과 `route.params`의 구체적 타입을 정의하세요.
-            // 현재는 임시 캐스트를 사용하고 있어 안전하지 않으므로, 앱의 네비게이션
-            // 타입을 `RootStackParamList`에 맞춰 업데이트하면 타입 안정성이 높아집니다.
-            navigation.navigate('LoginPage', {
-                returnScreen: route.name as
-                    | keyof import('../types/Navigation').RootStackParamList
-                    | undefined,
-                returnParams: route.params as
-                    | import('../types/Navigation').RootStackParamList[keyof import('../types/Navigation').RootStackParamList]
-                    | undefined,
-            });
-        } else if (isAuthenticated) {
-            hasRedirected.current = false;
-        }
-    }, [isAuthenticated, redirectIfNotLoggedIn, navigation, route]);
+    if (!isAuthenticated && !hasRedirected.current) {
+      hasRedirected.current = true;
+      // 현재 route params를 저장하여 로그인 후 돌아올 수 있도록 함
+      // TODO: `route.name`과 `route.params`의 구체적 타입을 정의하세요.
+      // 현재는 임시 캐스트를 사용하고 있어 안전하지 않으므로, 앱의 네비게이션
+      // 타입을 `RootStackParamList`에 맞춰 업데이트하면 타입 안정성이 높아집니다.
+      navigation.navigate('LoginPage', {
+        returnScreen: route.name as
+          | keyof import('../types/Navigation').RootStackParamList
+          | undefined,
+        returnParams: route.params as
+          | import('../types/Navigation').RootStackParamList[keyof import('../types/Navigation').RootStackParamList]
+          | undefined,
+      });
+    } else if (isAuthenticated) {
+      hasRedirected.current = false;
+    }
+  }, [isAuthenticated, redirectIfNotLoggedIn, navigation, route]);
 
-    return { isAuthenticated };
+  return { isAuthenticated };
 }

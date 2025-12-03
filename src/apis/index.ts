@@ -1,7 +1,7 @@
 import urls from './url';
 
 const apis = {
-    urls,
+  urls,
 };
 
 export default apis;
