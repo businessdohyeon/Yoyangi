@@ -20,8 +20,7 @@ export default function ReservationDetailPage({
     route,
 }: ScreenProps<'ReservationDetailPage'>) {
     const theme = useTheme();
-    const ctx: any = useContext(LoginInfoContext as any);
-    const { loginInfo } = ctx;
+    const { loginInfo } = useContext(LoginInfoContext);
     const { isAuthenticated } = useRequireAuth();
 
     if (!isAuthenticated) return null;

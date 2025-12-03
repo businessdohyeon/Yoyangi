@@ -16,18 +16,20 @@ import { useContext, useState } from 'react';
 import { LoginInfoContext } from '../../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HeartIcon = (props: any) => <List.Icon {...props} icon="heart" />;
-const CalendarIcon = (props: any) => <List.Icon {...props} icon="calendar" />;
-const ChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
+const HeartIcon = (props: React.ComponentProps<typeof List.Icon>) => (
+    <List.Icon {...props} icon="heart" />
+);
+const CalendarIcon = (props: React.ComponentProps<typeof List.Icon>) => (
+    <List.Icon {...props} icon="calendar" />
+);
+const ChatIcon = (props: React.ComponentProps<typeof List.Icon>) => (
+    <List.Icon {...props} icon="chat" />
+);
 
 const ProfilePage = () => {
     const nav = useNavigation<TabAndStackCompositeNav<'ProfilePage', 'Tabs'>>();
     const theme = useTheme();
-    // TODO: LoginInfoContext의 타입을 명확히 선언하여 `any` 제거
-    // - Context의 value 타입(LoginInfo, clearLoginInfo 등)을 `Context` 정의에 반영
-    // - useContext 호출부에서 제네릭을 사용해 안전하게 타입을 가져오세요
-    const ctx: any = useContext(LoginInfoContext as any);
-    const { loginInfo, clearLoginInfo } = ctx;
+    const { loginInfo, clearLoginInfo } = useContext(LoginInfoContext);
 
     console.log(loginInfo);
 

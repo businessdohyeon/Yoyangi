@@ -14,7 +14,7 @@ export default function Map({
     facilityArray,
 }: {
     isMapShown: boolean;
-    facilityArray: any;
+    facilityArray: unknown[];
 }) {
     const { locationInfo } = useContext(LocationInfoContext);
     const navigation =
@@ -37,7 +37,7 @@ export default function Map({
                     }}
                 >
                     {isMapShown &&
-                        facilityArray.map((facilityData: any) => {
+                        (facilityArray || []).map((facilityData: unknown) => {
                             try {
                                 const parsed =
                                     FacilityDataSchema.parse(facilityData);

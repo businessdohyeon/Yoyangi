@@ -31,8 +31,10 @@ type GetRoomsResponse = {
 };
 
 // simple left icon component moved out of render to satisfy lint rules
-// TODO: Define proper props type instead of `any` (e.g., React.ComponentProps<typeof List.Icon>)
-const LeftChatIcon = (props: any) => <List.Icon {...props} icon="chat" />;
+// Left icon props typed using List.Icon props
+const LeftChatIcon = (props: React.ComponentProps<typeof List.Icon>) => (
+    <List.Icon {...props} icon="chat" />
+);
 const ItemSeparator = () => (
     <View style={{ height: 1, backgroundColor: '#eee' }} />
 );
@@ -75,7 +77,7 @@ export default function ConsultationHistory() {
                     if (disabled) return;
                     navigation.navigate('ChatPage', {
                         facility_id: item.facility_id!,
-                        facility_name: item.facility?.name!
+                        facility_name: item.facility?.name!,
                     });
                 }}
                 left={LeftChatIcon}

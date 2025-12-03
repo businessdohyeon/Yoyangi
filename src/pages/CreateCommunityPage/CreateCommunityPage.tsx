@@ -20,19 +20,22 @@ export default function CommunityFormPage() {
     const navigation = useNavigation<RootStackNavProp<'CommunityFormPage'>>();
     const { loginInfo } = React.useContext(LoginInfoContext);
     const route = useRoute();
-    const params = (route.params as any) || {};
+    const params = (route.params ?? {}) as Partial<{
+        communityId?: number;
+        initialValues?: { title?: string; content?: string; images?: string[] };
+    }>;
     const communityId: number | undefined = params.communityId;
-    const initialValuesFromRoute:
-        | { title?: string; content?: string }
-        | undefined = params.initialValues;
+    const initialValuesFromRoute = params.initialValues;
     const queryClient = useQueryClient();
     const { isAuthenticated } = useRequireAuth();
 
     const token = loginInfo?.token ?? '';
 
     const communityMutation = useMutation({
-        mutationFn: async (data: any) => {
-            const isForm = data && typeof data.append === 'function';
+        mutationFn: async (data: FormData | Record<string, unknown>) => {
+            const isForm =
+                typeof (data as FormData & { append?: unknown }).append ===
+                'function';
             if (communityId) {
                 // edit existing community post
                 const response = await axiosInstance.patch(
@@ -80,9 +83,9 @@ export default function CommunityFormPage() {
             title: initialValuesFromRoute?.title ?? '',
             content: initialValuesFromRoute?.content ?? '',
             images:
-                ((initialValuesFromRoute as any)?.images || []).map(
-                    (u: string) => ({ uri: u }),
-                ) || [],
+                (initialValuesFromRoute?.images || []).map((u: string) => ({
+                    uri: u,
+                })) || [],
         },
         onSubmit: async ({ value }) => {
             try {
@@ -92,18 +95,20 @@ export default function CommunityFormPage() {
                 formData.append('content', value.content);
 
                 if (Array.isArray(value.images) && value.images.length > 0) {
-                    value.images.forEach((img: any, idx: number) => {
-                        if (img?.uri) {
-                            formData.append('images', {
-                                uri: img.uri,
-                                name: `community_${idx}.jpg`,
-                                type: 'image/jpeg',
-                            } as any);
-                        }
-                    });
+                    value.images.forEach(
+                        (img: { uri?: string }, idx: number) => {
+                            if (img?.uri) {
+                                formData.append('images', {
+                                    uri: img.uri,
+                                    name: `community_${idx}.jpg`,
+                                    type: 'image/jpeg',
+                                } as unknown as Blob);
+                            }
+                        },
+                    );
                 }
 
-                communityMutation.mutate(formData as any);
+                communityMutation.mutate(formData);
             } catch (err) {
                 console.error(err);
             }
@@ -143,11 +148,17 @@ export default function CommunityFormPage() {
                                 value={field.state.value}
                                 onChangeText={(v) => field.handleChange(v)}
                                 onBlur={field.handleBlur}
-                                error={!!(field.state.meta as any).error}
+                                error={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             />
-                            {(field.state.meta as any).error && (
+                            {(field.state.meta as { error?: string }).error && (
                                 <Text style={{ color: 'red', marginTop: 4 }}>
-                                    {(field.state.meta as any).error}
+                                    {
+                                        (field.state.meta as { error?: string })
+                                            .error
+                                    }
                                 </Text>
                             )}
                         </>
@@ -178,12 +189,18 @@ export default function CommunityFormPage() {
                                 value={field.state.value}
                                 onChangeText={(v) => field.handleChange(v)}
                                 onBlur={field.handleBlur}
-                                error={!!(field.state.meta as any).error}
+                                error={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                                 style={{ minHeight: 150 }}
                             />
-                            {(field.state.meta as any).error && (
+                            {(field.state.meta as { error?: string }).error && (
                                 <Text style={{ color: 'red', marginTop: 4 }}>
-                                    {(field.state.meta as any).error}
+                                    {
+                                        (field.state.meta as { error?: string })
+                                            .error
+                                    }
                                 </Text>
                             )}
                         </>
@@ -207,7 +224,7 @@ export default function CommunityFormPage() {
                                 const newImgs = assets
                                     .map((a) => a?.uri)
                                     .filter(Boolean)
-                                    .map((uri) => ({ uri } as any));
+                                    .map((uri) => ({ uri }));
                                 const cur = Array.isArray(field.state.value)
                                     ? field.state.value
                                     : [];
@@ -236,27 +253,27 @@ export default function CommunityFormPage() {
                                 </Button>
 
                                 <View style={styles.imagePreviewRow}>
-                                    {(field.state.value || []).map(
-                                        (img: any, idx: number) => (
-                                            <View
-                                                key={idx}
-                                                style={styles.previewItem}
-                                            >
-                                                <Image
-                                                    source={{ uri: img.uri }}
-                                                    style={styles.previewImg}
-                                                />
-                                                <IconButton
-                                                    icon="close"
-                                                    size={16}
-                                                    onPress={() =>
-                                                        removeImage(idx)
-                                                    }
-                                                    style={styles.removeBtn}
-                                                />
-                                            </View>
-                                        ),
-                                    )}
+                                    {(
+                                        (field.state.value || []) as Array<{
+                                            uri?: string;
+                                        }>
+                                    ).map((img, idx: number) => (
+                                        <View
+                                            key={idx}
+                                            style={styles.previewItem}
+                                        >
+                                            <Image
+                                                source={{ uri: img.uri }}
+                                                style={styles.previewImg}
+                                            />
+                                            <IconButton
+                                                icon="close"
+                                                size={16}
+                                                onPress={() => removeImage(idx)}
+                                                style={styles.removeBtn}
+                                            />
+                                        </View>
+                                    ))}
                                 </View>
                             </View>
                         );
@@ -269,13 +286,9 @@ export default function CommunityFormPage() {
                     {([canSubmit, isSubmitting]) => (
                         <Button
                             mode="contained"
-                            disabled={
-                                !canSubmit ||
-                                (communityMutation as any).isPending
-                            }
+                            disabled={!canSubmit || communityMutation.isLoading}
                             loading={
-                                isSubmitting ||
-                                (communityMutation as any).isPending
+                                isSubmitting || communityMutation.isLoading
                             }
                             onPress={() => form.handleSubmit()}
                         >
@@ -288,26 +301,28 @@ export default function CommunityFormPage() {
     );
 }
 
-const styles = {
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
     imagePreviewRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
-    } as any,
+        marginVertical: 8,
+    },
     previewItem: {
         position: 'relative',
         marginRight: 8,
-    } as any,
+    },
     previewImg: {
         width: 80,
         height: 80,
         borderRadius: 6,
         backgroundColor: '#eee',
-    } as any,
+    },
     removeBtn: {
         position: 'absolute',
         top: -6,
         right: -6,
         backgroundColor: 'rgba(0,0,0,0.6)',
-    } as any,
-};
+    },
+});

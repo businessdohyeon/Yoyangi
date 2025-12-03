@@ -7,7 +7,6 @@ import {
     useTheme,
 } from 'react-native-paper';
 
-import { showBorder } from '../../common';
 import axiosInstance from '../../apis/axios';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -32,7 +31,10 @@ export default function FacilityDetailPage({
 }: ScreenProps<'FacilityDetailPage'>) {
     const theme = useTheme();
     const { loginInfo } = useContext(LoginInfoContext);
-    const id = route.params?.facilityId ?? (route.params as any)?.id;
+    const _params = route.params as
+        | { facilityId?: number; id?: number }
+        | undefined;
+    const id = _params?.facilityId ?? _params?.id;
     const scrollRef = useRef<ScrollView | null>(null);
     const navigation =
         useNavigation<
@@ -95,7 +97,6 @@ export default function FacilityDetailPage({
         });
     };
 
-
     console.group('[rerender]: FacilityDetailPage');
     console.log({ id });
     console.log(loginInfo);
@@ -140,7 +141,12 @@ export default function FacilityDetailPage({
                         </ScrollView>
                         {/* 버그신고등등등 */}
                         <View
-                            style={{ paddingBottom: 50, paddingHorizontal: 10, paddingVertical: 30,  gap: 30, }}
+                            style={{
+                                paddingBottom: 50,
+                                paddingHorizontal: 10,
+                                paddingVertical: 30,
+                                gap: 30,
+                            }}
                         >
                             <TouchableRipple
                                 onPress={() => {
@@ -234,7 +240,6 @@ function TabNav({
                     justifyContent: 'center',
                     alignItems: 'center',
                     paddingVertical: 5,
-
                 }}
                 onPress={() => {
                     setTabIndex(1);
@@ -254,7 +259,6 @@ function TabNav({
                     justifyContent: 'center',
                     alignItems: 'center',
                     paddingVertical: 5,
-
                 }}
                 onPress={() => {
                     setTabIndex(2);

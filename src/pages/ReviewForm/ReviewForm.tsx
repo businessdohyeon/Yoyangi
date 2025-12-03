@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Alert, Text, View, Image } from 'react-native';
+import { Alert, Text, View, Image, StyleSheet } from 'react-native';
 import {
     TextInput,
     Button,
@@ -28,10 +28,18 @@ export default function ReviewForm({
     route,
     navigation,
 }: ScreenProps<'ReviewForm'>) {
-    const { facilityId } = route.params || {};
-    const { facilityName } = route.params || {};
-    const reviewId = (route.params as any)?.reviewId;
-    const initialValues = (route.params as any)?.initialValues;
+    const { facilityId, facilityName, reviewId, initialValues } =
+        (route.params ?? {}) as Partial<{
+            facilityId?: number;
+            facilityName?: string;
+            reviewId?: number;
+            initialValues?: {
+                content?: string;
+                rating?: string | number;
+                reservationId?: string | number;
+                images?: Array<{ uri: string }>;
+            };
+        }>;
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
     const { isAuthenticated } = useRequireAuth();
@@ -109,15 +117,17 @@ export default function ReviewForm({
                     Array.isArray(values.value.images) &&
                     values.value.images.length > 0
                 ) {
-                    values.value.images.forEach((img: any, idx: number) => {
-                        if (img?.uri) {
-                            formData.append('images', {
-                                uri: img.uri,
-                                name: `review_${idx}.jpg`,
-                                type: 'image/jpeg',
-                            } as any);
-                        }
-                    });
+                    values.value.images.forEach(
+                        (img: { uri?: string }, idx: number) => {
+                            if (img?.uri) {
+                                formData.append('images', {
+                                    uri: img.uri,
+                                    name: `review_${idx}.jpg`,
+                                    type: 'image/jpeg',
+                                } as unknown as Blob);
+                            }
+                        },
+                    );
                 }
 
                 reviewMutation.mutate(formData);
@@ -161,9 +171,16 @@ export default function ReviewForm({
                                     onBlur={field.handleBlur}
                                     multiline
                                 />
-                                {(field.state as any).meta?.error ? (
+                                {(field.state as { meta?: { error?: string } })
+                                    .meta?.error ? (
                                     <Text style={{ color: 'red' }}>
-                                        {(field.state as any).meta?.error}
+                                        {
+                                            (
+                                                field.state as {
+                                                    meta?: { error?: string };
+                                                }
+                                            ).meta?.error
+                                        }
                                     </Text>
                                 ) : null}
                             </>
@@ -190,9 +207,16 @@ export default function ReviewForm({
                                     onChangeText={field.handleChange}
                                     onBlur={field.handleBlur}
                                 />
-                                {(field.state as any).meta?.error ? (
+                                {(field.state as { meta?: { error?: string } })
+                                    .meta?.error ? (
                                     <Text style={{ color: 'red' }}>
-                                        {(field.state as any).meta?.error}
+                                        {
+                                            (
+                                                field.state as {
+                                                    meta?: { error?: string };
+                                                }
+                                            ).meta?.error
+                                        }
                                     </Text>
                                 ) : null}
                             </>
@@ -240,7 +264,7 @@ export default function ReviewForm({
                                     const newImgs = assets
                                         .map((a) => a?.uri)
                                         .filter(Boolean)
-                                        .map((uri) => ({ uri } as any));
+                                        .map((uri) => ({ uri }));
                                     const cur = Array.isArray(field.state.value)
                                         ? field.state.value
                                         : [];
@@ -269,31 +293,31 @@ export default function ReviewForm({
                                     </Button>
 
                                     <View style={styles.imagePreviewRow}>
-                                        {(field.state.value || []).map(
-                                            (img: any, idx: number) => (
-                                                <View
-                                                    key={idx}
-                                                    style={styles.previewItem}
-                                                >
-                                                    <Image
-                                                        source={{
-                                                            uri: img.uri,
-                                                        }}
-                                                        style={
-                                                            styles.previewImg
-                                                        }
-                                                    />
-                                                    <IconButton
-                                                        icon="close"
-                                                        size={16}
-                                                        onPress={() =>
-                                                            removeImage(idx)
-                                                        }
-                                                        style={styles.removeBtn}
-                                                    />
-                                                </View>
-                                            ),
-                                        )}
+                                        {(
+                                            (field.state.value || []) as Array<{
+                                                uri?: string;
+                                            }>
+                                        ).map((img, idx: number) => (
+                                            <View
+                                                key={idx}
+                                                style={styles.previewItem}
+                                            >
+                                                <Image
+                                                    source={{
+                                                        uri: img.uri,
+                                                    }}
+                                                    style={styles.previewImg}
+                                                />
+                                                <IconButton
+                                                    icon="close"
+                                                    size={16}
+                                                    onPress={() =>
+                                                        removeImage(idx)
+                                                    }
+                                                    style={styles.removeBtn}
+                                                />
+                                            </View>
+                                        ))}
                                     </View>
                                 </View>
                             );
@@ -326,26 +350,26 @@ export default function ReviewForm({
     );
 }
 
-const styles = {
+const styles = StyleSheet.create({
     imagePreviewRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
-    } as any,
+        marginVertical: 8,
+    },
     previewItem: {
         position: 'relative',
         marginRight: 8,
-    } as any,
+    },
     previewImg: {
         width: 80,
         height: 80,
         borderRadius: 6,
         backgroundColor: '#eee',
-    } as any,
+    },
     removeBtn: {
         position: 'absolute',
         top: -6,
         right: -6,
         backgroundColor: 'rgba(0,0,0,0.6)',
-    } as any,
-};
+    },
+});

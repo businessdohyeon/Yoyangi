@@ -12,6 +12,7 @@ import {
     Button,
 } from 'react-native-paper';
 import React, { useState, useCallback, useContext, useEffect } from 'react';
+import { RootStackParamList } from '../../types/Navigation';
 import { ScreenProps } from '../../types/Navigation';
 import apis from '../../apis';
 import { LoginInfoContext } from '../../Context';
@@ -107,11 +108,11 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
             Alert.alert('인증 완료', '전화번호 인증이 완료되었습니다.');
             try {
                 storeLoginInfo({
-                    provider: 'phone' as any,
+                    provider: 'phone',
                     token: data.token,
                     refreshToken: data.refreshToken,
                     userId: Number(data.user.id),
-                } as any);
+                });
             } catch (e) {
                 console.warn('storeLoginInfo failed', e);
             }
@@ -154,8 +155,8 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
     };
 
     const handleUrl = useCallback(
-        (event: any) => {
-            const url = event?.url ?? event;
+        (event: { url?: string } | string) => {
+            const url = typeof event === 'string' ? event : event?.url ?? '';
             try {
                 const getQueryParam = (u: string, name: string) => {
                     const m = u.match(new RegExp('[?&]' + name + '=([^&]+)'));
@@ -169,19 +170,27 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
 
                 if (provider && token && refreshToken && userId) {
                     storeLoginInfo({
-                        provider: provider as any,
+                        provider: provider ?? 'phone',
                         token,
                         refreshToken,
                         userId: Number(userId),
-                    } as any);
+                    });
 
-                    const returnScreen = (route as any)?.params?.returnScreen;
-                    const returnParams = (route as any)?.params?.returnParams;
+                    const returnScreen = (
+                        route.params as
+                            | { returnScreen?: keyof RootStackParamList }
+                            | undefined
+                    )?.returnScreen;
+                    const returnParams = (
+                        route.params as
+                            | {
+                                  returnParams?: RootStackParamList[keyof RootStackParamList];
+                              }
+                            | undefined
+                    )?.returnParams;
+
                     if (returnScreen) {
-                        navigation.navigate(
-                            returnScreen as any,
-                            returnParams || {},
-                        );
+                        navigation.navigate(returnScreen, returnParams || {});
                     } else {
                         navigation.goBack();
                     }
@@ -198,7 +207,10 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
             if (initialUrl) handleUrl(initialUrl);
         });
 
-        const sub = Linking.addEventListener('url', handleUrl as any);
+        const sub = Linking.addEventListener(
+            'url',
+            handleUrl as (event: { url: string }) => void,
+        );
         return () => {
             // @ts-ignore
             sub.remove();

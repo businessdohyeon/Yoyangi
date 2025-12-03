@@ -86,7 +86,7 @@ const PredictDiseasePage = () => {
             uri: image.uri,
             type: image.type,
             name: (image.fileName as string) || 'upload.jpg',
-        } as any);
+        } as unknown as Blob);
 
         mutation.mutate(formData);
     };

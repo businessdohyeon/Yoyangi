@@ -161,25 +161,30 @@ export default function ReviewCard({ reviewData, isOwner, facilityId }: Props) {
                     <View style={styles.imageRow}>
                         {reviewData.images
                             .slice(0, 3)
-                            .map((img: any, idx: number) => {
-                                const uri =
-                                    typeof img === 'string'
-                                        ? img
-                                        : (img && img.uri) || String(idx);
-                                const source = { uri };
-                                return (
-                                    <TouchableOpacity
-                                        key={`${idx}-${uri}`}
-                                        activeOpacity={0.8}
-                                        onPress={() => {}}
-                                    >
-                                        <Image
-                                            source={source}
-                                            style={styles.imageThumb}
-                                        />
-                                    </TouchableOpacity>
-                                );
-                            })}
+                            .map(
+                                (
+                                    img: string | { uri?: string },
+                                    idx: number,
+                                ) => {
+                                    const uri =
+                                        typeof img === 'string'
+                                            ? img
+                                            : img?.uri ?? String(idx);
+                                    const source = { uri };
+                                    return (
+                                        <TouchableOpacity
+                                            key={`${idx}-${uri}`}
+                                            activeOpacity={0.8}
+                                            onPress={() => {}}
+                                        >
+                                            <Image
+                                                source={source}
+                                                style={styles.imageThumb}
+                                            />
+                                        </TouchableOpacity>
+                                    );
+                                },
+                            )}
                         {reviewData.images.length > 3 ? (
                             <View style={styles.moreOverlay}>
                                 <Text style={styles.moreText}>
@@ -213,10 +218,27 @@ export default function ReviewCard({ reviewData, isOwner, facilityId }: Props) {
                                 initialValues: {
                                     content: reviewData.content,
                                     rating: String(reviewData.rating ?? ''),
-                                    reservationId:
-                                        (reviewData as any).reservation_id ??
-                                        (reviewData as any).reservationId ??
-                                        '',
+                                    reservationId: String(
+                                        (
+                                            reviewData as Partial<
+                                                Record<
+                                                    | 'reservation_id'
+                                                    | 'reservationId',
+                                                    number
+                                                >
+                                            >
+                                        ).reservation_id ??
+                                            (
+                                                reviewData as Partial<
+                                                    Record<
+                                                        | 'reservation_id'
+                                                        | 'reservationId',
+                                                        number
+                                                    >
+                                                >
+                                            ).reservationId ??
+                                            '',
+                                    ),
                                     images: [],
                                 },
                             })

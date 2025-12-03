@@ -18,7 +18,10 @@ export type RootStackParamList = {
     FacilityDetailPage: { facilityId?: number; id?: number } | undefined;
     NotificationPage: undefined;
     LoginPage:
-        | { returnScreen?: keyof RootStackParamList; returnParams?: any }
+        | {
+              returnScreen?: keyof RootStackParamList;
+              returnParams?: RootStackParamList[keyof RootStackParamList];
+          }
         | undefined;
     EditLocationPage: undefined;
     EditProfile: undefined;

@@ -34,7 +34,7 @@ export const lightTheme = {
     dark: false,
     colors: {
         // start from react-native-paper defaults then override
-        ...(PaperDefaultTheme.colors as any),
+        ...(PaperDefaultTheme.colors as Record<string, string>),
         primary: custom.primary,
         onPrimary: '#ffffff',
         primaryContainer: custom.primaryLight,
@@ -77,7 +77,7 @@ export const darkTheme = {
     ...PaperDefaultTheme,
     dark: true,
     colors: {
-        ...(PaperDefaultTheme.colors as any),
+        ...(PaperDefaultTheme.colors as Record<string, string>),
         primary: custom.primaryDark,
         onPrimary: '#000000',
         primaryContainer: custom.primary,

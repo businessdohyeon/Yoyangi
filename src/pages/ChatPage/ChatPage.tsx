@@ -16,7 +16,7 @@ import {
     useTheme,
     Snackbar,
 } from 'react-native-paper';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
@@ -26,16 +26,27 @@ import { LoginInfoContext } from '../../Context';
 
 export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     console.log(route.params);
-    const { facility_id, facility_name } =
-        route.params as any;
-    const sender_type = "guardian";
-    const {loginInfo} = useContext(LoginInfoContext);
+    const params = route.params ?? {};
+    const { facility_id, facility_name } = params as {
+        facility_id?: number;
+        facility_name?: string;
+    };
+    const sender_type = 'guardian';
+    const { loginInfo } = useContext(LoginInfoContext);
     const guardian_id = loginInfo?.userId;
     const sender = loginInfo?.userId;
 
-    const [messages, setMessages] = useState<any[]>([]);
+    type ChatMessage = {
+        id?: number | string;
+        sender?: number | string;
+        sender_id?: number | string;
+        content?: string;
+        [key: string]: unknown;
+    };
+
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
-    const socketRef = useRef<any | null>(null);
+    const socketRef = useRef<Socket | null>(null);
     const theme = useTheme();
     const [socketConnected, setSocketConnected] = useState(false);
     const [socketError, setSocketError] = useState<string | null>(null);
@@ -60,14 +71,13 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
                 setSnackbarVisible(false);
             });
 
-            socketRef.current.on('connect_error', (err: any) => {
+            socketRef.current.on('connect_error', (err: unknown) => {
                 console.warn('socket connect_error', err);
                 setSocketConnected(false);
                 setSocketError('서버 연결에 실패했습니다.');
                 setSnackbarVisible(true);
             });
-
-            socketRef.current.on('disconnect', (reason: any) => {
+            socketRef.current.on('disconnect', (reason: unknown) => {
                 console.warn('socket disconnected', reason);
                 setSocketConnected(false);
                 setSocketError('서버와의 연결이 끊겼습니다.');
@@ -76,14 +86,22 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
 
             socketRef.current.emit?.('joinRoom', { facility_id, guardian_id });
 
-            socketRef.current.on('chatHistory', (data: any) => {
-                console.log('chatHistory', data);
-                setMessages(data ?? []);
-            });
+            socketRef.current.on(
+                'chatHistory',
+                (data: ChatMessage[] | unknown) => {
+                    console.log('chatHistory', data);
+                    if (Array.isArray(data)) setMessages(data as ChatMessage[]);
+                    else setMessages([]);
+                },
+            );
 
-            socketRef.current.on('receiveMessage', (data: any) => {
-                setMessages((prev) => [...prev, data]);
-            });
+            socketRef.current.on(
+                'receiveMessage',
+                (data: ChatMessage | unknown) => {
+                    if (data && typeof data === 'object')
+                        setMessages((prev) => [...prev, data as ChatMessage]);
+                },
+            );
         } catch (e) {
             console.warn('socket init failed', e);
             setTimeout(() => {

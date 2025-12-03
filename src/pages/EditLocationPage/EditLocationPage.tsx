@@ -69,9 +69,7 @@ const EditLocationPage = () => {
 
             // 응답이 { Response: { ... } } 형태인지, 아니면 바로 { ... } 형태인지 모두 처리
             const payload: GeoApiResponse =
-                'Response' in res.data
-                    ? (res.data as any).Response
-                    : (res.data as GeoApiResponse);
+                'Response' in res.data ? res.data.Response : res.data;
 
             console.log('geolocation payload:', payload);
 

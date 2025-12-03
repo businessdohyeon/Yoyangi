@@ -14,8 +14,7 @@ import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export default function LikedOrganizations() {
     const theme = useTheme();
-    const ctx: any = useContext(LoginInfoContext as any);
-    const { loginInfo } = ctx;
+    const { loginInfo } = useContext(LoginInfoContext);
     const navigation = useNavigation<RootStackNavProp<'LikedOrganizations'>>();
     const nav = navigation;
     const { isAuthenticated } = useRequireAuth();
@@ -47,7 +46,19 @@ export default function LikedOrganizations() {
         staleTime: 30 * 1000,
     });
 
-    const favorites: any[] = Array.isArray(data) ? data : [];
+    type Favorite = {
+        id?: number | string;
+        name?: string;
+        facility_name?: string;
+        address?: string;
+        sido_name?: string;
+        sggu_name?: string;
+        phone?: string;
+    };
+
+    const favorites: Favorite[] = Array.isArray(data)
+        ? (data as Favorite[])
+        : [];
 
     if (!loginInfo || !loginInfo.userId) {
         return (

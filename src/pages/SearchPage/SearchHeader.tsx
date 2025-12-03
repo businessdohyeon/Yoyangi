@@ -38,7 +38,7 @@ export default function SearchHeader({
     setKind,
     resetSignal,
 }: {
-    setSearchResults: (data: any) => void;
+    setSearchResults: (data: unknown) => void;
     kind: string[];
     setKind: React.Dispatch<React.SetStateAction<string[]>>;
     resetSignal?: number;
@@ -48,7 +48,7 @@ export default function SearchHeader({
     const theme = useTheme();
     const { width } = useWindowDimensions();
     const queryClient = useQueryClient();
-    const {locationInfo} = useContext(LocationInfoContext);
+    const { locationInfo } = useContext(LocationInfoContext);
 
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -201,18 +201,23 @@ export default function SearchHeader({
 function VoiceButton({
     setSearchResults,
 }: {
-    setSearchResults: (data: any) => void;
+    setSearchResults: (data: unknown) => void;
 }) {
     const [transcript, setTranscript] = useState('');
     const [isListening, setIsListening] = useState(false);
     const theme = useTheme();
+
+    // When listening stops and we have a transcript, show a preview modal briefly
+    // then perform the search. This prevents immediate search and gives user feedback.
+    const [showModal, setShowModal] = useState(false);
+    const [listeningStarted, setListeningStarted] = useState(false);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Listen for STT events
     useEffect(() => {
         const resultListener = addSpeechResultListener(
             (result: SpeechResult) => {
                 setTranscript(result.transcript);
-                console.log('Confidence:', result.confidence);
             },
         );
 
@@ -222,7 +227,6 @@ function VoiceButton({
         });
 
         const endListener = addSpeechEndListener(() => {
-            console.log('ended');
             setIsListening(false);
         });
 
@@ -233,27 +237,19 @@ function VoiceButton({
         };
     }, []);
 
-    // When listening stops and we have a transcript, show a preview modal briefly
-    // then perform the search. This prevents immediate search and gives user feedback.
-    const [showModal, setShowModal] = useState(false);
-    const [listeningStarted, setListeningStarted] = useState(false);
-    const timerRef = useRef<number | null>(null);
-
     useEffect(() => {
+        // If listening just stopped and we have a transcript (or listening was started),
+        // show modal and perform delayed search.
         if (!isListening && (transcript || listeningStarted)) {
-            // show transcript preview
             setShowModal(true);
             timerRef.current = setTimeout(async () => {
                 try {
                     const usersentence = transcript;
                     const response = await axiosInstance.post(
                         apis.urls.searchVoice,
-                        {
-                            usersentence,
-                        },
+                        { usersentence },
                     );
                     const result = response.data?.Response ?? response.data;
-
                     setSearchResults(result);
                 } catch (e) {
                     console.error('voice search failed', e);
@@ -275,15 +271,15 @@ function VoiceButton({
 
         return () => {
             if (timerRef.current) {
-                clearTimeout(timerRef.current as any);
+                clearTimeout(timerRef.current);
                 timerRef.current = null;
             }
         };
-    }, [isListening, transcript, setSearchResults]);
+    }, [isListening, transcript, listeningStarted, setSearchResults]);
 
     const cancelVoice = async () => {
         if (timerRef.current) {
-            clearTimeout(timerRef.current as any);
+            clearTimeout(timerRef.current);
             timerRef.current = null;
         }
 
@@ -304,13 +300,17 @@ function VoiceButton({
             const available = await isAvailable();
             if (!available) {
                 console.log('Speech recognition not available');
-                return;
             }
 
             const hasPermission = await requestPermissions();
             if (!hasPermission) {
                 console.log('Permission denied');
                 return;
+            }
+
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
             }
 
             await start({ language: 'ko-KR' });

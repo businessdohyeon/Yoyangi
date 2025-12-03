@@ -51,7 +51,17 @@ export default function ReservationHistory() {
         staleTime: 30 * 1000,
     });
 
-    const reservations: any[] = Array.isArray(data) ? data : [];
+    type Reservation = {
+        reservation_id?: number | string;
+        status?: string;
+        facility_name?: string;
+        user_name?: string;
+        reserved_date?: string;
+    };
+
+    const reservations: Reservation[] = Array.isArray(data)
+        ? (data as Reservation[])
+        : [];
 
     // 로그인 여부는 useRequireAuth 훅에서 처리함
 

@@ -23,9 +23,14 @@ export default function SearchResult({
     const { loginInfo } = useContext(LoginInfoContext);
     const queryClient = useQueryClient();
 
+    type ExtendedFacility = FacilityData_t & {
+        user_like?: boolean;
+        is_liked?: boolean;
+    };
+
     const initialLiked =
-        (facilityData as any)?.user_like ??
-        (facilityData as any)?.is_liked ??
+        (facilityData as ExtendedFacility)?.user_like ??
+        (facilityData as ExtendedFacility)?.is_liked ??
         false;
     const [liked, setLiked] = useState<boolean>(initialLiked);
 
@@ -137,7 +142,11 @@ export default function SearchResult({
                     >
                         <IconButton
                             icon={liked ? 'heart' : 'heart-outline'}
-                            iconColor={liked ? theme.colors.primary : theme.colors.onPrimaryContainer}
+                            iconColor={
+                                liked
+                                    ? theme.colors.primary
+                                    : theme.colors.onPrimaryContainer
+                            }
                             onPress={() => {
                                 setLiked((v) => !v);
                                 userLike();

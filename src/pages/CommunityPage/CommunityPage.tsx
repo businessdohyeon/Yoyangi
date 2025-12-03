@@ -58,7 +58,7 @@ export default function CommunityPage() {
     } = useInfiniteQuery<CommunityItem[]>({
         queryKey: ['community'],
         queryFn: async ({ pageParam }) => {
-            const params: Record<string, any> = { limit: 10 };
+            const params: Record<string, unknown> = { limit: 10 };
             if (pageParam) {
                 params.lastId = pageParam;
             }

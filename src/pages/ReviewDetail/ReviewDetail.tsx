@@ -44,7 +44,9 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
         createdAt?: string; // some APIs return camelCase createdAt
         updatedAt?: string;
         reply?: string | null;
-        tags?: any;
+        reservation_id?: number | string;
+        reservationId?: number | string;
+        tags?: string[] | Record<string, unknown> | null;
     };
 
     const fetchReview = async (): Promise<ReviewApiData | null> => {
@@ -142,7 +144,10 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                                         style={styles.imagesRow}
                                     >
                                         {review.images.map(
-                                            (img: any, idx: number) => (
+                                            (
+                                                img: string | { uri?: string },
+                                                idx: number,
+                                            ) => (
                                                 <TouchableOpacity
                                                     key={`${idx}-${String(
                                                         img,
@@ -155,7 +160,7 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                                                                 typeof img ===
                                                                 'string'
                                                                     ? img
-                                                                    : img.uri,
+                                                                    : img?.uri,
                                                         }}
                                                         style={styles.thumb}
                                                     />
@@ -181,10 +186,8 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                                 <View style={styles.actionRow}>
                                     {loginInfo?.userId &&
                                     review?.user?.id === loginInfo.userId ? (
-                                        // TODO: `as any` 캐스트 제거 및 정형화된 타입 사용
-                                        // - API 응답 타입에 `reservation_id` 또는 `reservationId`
-                                        //   를 일관되게 반영하세요.
-                                        // - 필요하면 변환 유틸을 만들어 타입 안전하게 매핑합니다.
+                                        // TODO: API 응답의 예약 ID 필드 이름을 통일하여
+                                        // 타입 안전하게 매핑하세요.
                                         <Button
                                             onPress={() =>
                                                 navigation.navigate(
@@ -200,11 +203,29 @@ export default function ReviewDetail({ route }: ScreenProps<'ReviewDetail'>) {
                                                                     '',
                                                             ),
                                                             reservationId:
-                                                                (review as any)
-                                                                    .reservation_id ??
-                                                                (review as any)
-                                                                    .reservationId ??
-                                                                '',
+                                                                String(
+                                                                    (
+                                                                        review as Partial<
+                                                                            Record<
+                                                                                | 'reservation_id'
+                                                                                | 'reservationId',
+                                                                                number
+                                                                            >
+                                                                        >
+                                                                    )
+                                                                        .reservation_id ??
+                                                                        (
+                                                                            review as Partial<
+                                                                                Record<
+                                                                                    | 'reservation_id'
+                                                                                    | 'reservationId',
+                                                                                    number
+                                                                                >
+                                                                            >
+                                                                        )
+                                                                            .reservationId ??
+                                                                        '',
+                                                                ),
                                                             images: [],
                                                         },
                                                     },

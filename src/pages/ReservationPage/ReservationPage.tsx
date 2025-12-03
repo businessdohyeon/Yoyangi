@@ -55,7 +55,7 @@ export default function ReservationPage({
     ];
 
     const reservationMutation = useMutation({
-        mutationFn: async (data: any) => {
+        mutationFn: async (data: Record<string, unknown>) => {
             const response = await axiosInstance.post(
                 apis.urls.crateReservation(facilityId),
                 data,
@@ -75,7 +75,7 @@ export default function ReservationPage({
             navigation.goBack();
         },
         onError: (err) => {
-            console.error('예약 실패:', err.message);
+            console.error('예약 실패:', err);
         },
     });
 
@@ -134,9 +134,12 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!(field.state.meta as any).error}
+                                visible={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             >
-                                {(field.state.meta as any).error}
+                                {(field.state.meta as { error?: string }).error}
                             </HelperText>
                         </>
                     )}
@@ -172,9 +175,12 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!(field.state.meta as any).error}
+                                visible={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             >
-                                {(field.state.meta as any).error}
+                                {(field.state.meta as { error?: string }).error}
                             </HelperText>
                         </>
                     )}
@@ -200,9 +206,12 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!(field.state.meta as any).error}
+                                visible={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             >
-                                {(field.state.meta as any).error}
+                                {(field.state.meta as { error?: string }).error}
                             </HelperText>
                         </>
                     )}
@@ -230,9 +239,12 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!(field.state.meta as any).error}
+                                visible={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             >
-                                {(field.state.meta as any).error}
+                                {(field.state.meta as { error?: string }).error}
                             </HelperText>
                         </>
                     )}
@@ -278,9 +290,12 @@ export default function ReservationPage({
                             />
                             <HelperText
                                 type="error"
-                                visible={!!(field.state.meta as any).error}
+                                visible={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             >
-                                {(field.state.meta as any).error}
+                                {(field.state.meta as { error?: string }).error}
                             </HelperText>
                         </>
                     )}
@@ -324,9 +339,12 @@ export default function ReservationPage({
                             </Menu>
                             <HelperText
                                 type="error"
-                                visible={!!(field.state.meta as any).error}
+                                visible={
+                                    !!(field.state.meta as { error?: string })
+                                        .error
+                                }
                             >
-                                {(field.state.meta as any).error}
+                                {(field.state.meta as { error?: string }).error}
                             </HelperText>
                         </>
                     )}
@@ -349,8 +367,8 @@ export default function ReservationPage({
 
                 <Button
                     mode="contained"
-                    loading={reservationMutation.isPending}
-                    disabled={reservationMutation.isPending}
+                    loading={reservationMutation.isLoading}
+                    disabled={reservationMutation.isLoading}
                     onPress={() => form.handleSubmit()}
                     style={{ marginTop: 20 }}
                 >

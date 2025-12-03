@@ -25,8 +25,11 @@ export function FacilityNotice({
         todayDesc: TodayMealDesc | null;
     };
 
-    const { data: mealsData, isLoading: mealsLoading, error: mealsError } =
-        useQuery<ParsedMeals>({
+    const {
+        data: mealsData,
+        isLoading: mealsLoading,
+        error: mealsError,
+    } = useQuery<ParsedMeals>({
         queryKey: ['facilityMeals', facilityData.id],
         queryFn: async () => {
             const res = await axiosInstance.get<MealsApiResponse>(
@@ -36,7 +39,7 @@ export function FacilityNotice({
             console.log(res);
 
             const payload = res.data;
-                if (payload && payload.Response) {
+            if (payload && payload.Response) {
                 const menu: MealData = payload.Response;
                 let todayDesc: TodayMealDesc | null = null;
                 try {
@@ -81,11 +84,15 @@ export function FacilityNotice({
                             animating={true}
                             color={theme.colors.primary}
                         />
-                        <Text style={{ marginTop: 8 }}>메뉴를 불러오는 중입니다...</Text>
+                        <Text style={{ marginTop: 8 }}>
+                            메뉴를 불러오는 중입니다...
+                        </Text>
                     </View>
                 ) : mealsError ? (
                     <View style={{ alignItems: 'center', padding: 20 }}>
-                        <Text style={{ color: theme.colors.error }}>메뉴를 불러오지 못했습니다.</Text>
+                        <Text style={{ color: theme.colors.error }}>
+                            메뉴를 불러오지 못했습니다.
+                        </Text>
                     </View>
                 ) : (
                     <View
@@ -101,9 +108,9 @@ export function FacilityNotice({
                                 { key: 'dinner', label: '저녁' },
                             ] as const
                         ).map((m) => {
-                            const items = (todayMenu as any)?.[m.key] as
-                                | string[]
-                                | undefined;
+                            const items = (todayMenu as TodayMealDesc | null)?.[
+                                m.key as keyof TodayMealDesc
+                            ] as string[] | undefined;
                             return (
                                 <View
                                     key={m.key}

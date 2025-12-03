@@ -21,24 +21,36 @@ import {
     useTheme,
 } from 'react-native-paper';
 import axiosInstance from '../../apis/axios';
-import { CommunityDetail, CommunityApiResponse } from '../../types/Community';
+import {
+    CommunityDetail,
+    CommunityApiResponse,
+    CommunityComment,
+    CommunityCommentReply,
+} from '../../types/Community';
+import { ScreenProps } from '../../types/Navigation';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { LoginInfoContext } from '../../Context';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
 
-function formatDate(iso: any) {
+function formatDate(iso: unknown) {
     try {
-        return new Date(iso).toLocaleString();
+        if (!iso) return '';
+        if (typeof iso === 'number' || typeof iso === 'string')
+            return new Date(iso).toLocaleString();
+        if (iso instanceof Date) return iso.toLocaleString();
+        return String(iso);
     } catch {
-        return iso;
+        return String(iso);
     }
 }
 
-export default function CommunityDetailScreen({ route }: any) {
+export default function CommunityDetailScreen({
+    route,
+}: ScreenProps<'CommunityDetail'>) {
     const theme = useTheme();
-    const { communityId } = route.params;
+    const { communityId } = route.params ?? {};
 
     const { loginInfo } = useContext(LoginInfoContext);
     const [newComment, setNewComment] = useState('');
@@ -72,12 +84,11 @@ export default function CommunityDetailScreen({ route }: any) {
             console.log(response);
 
             // 응답의 Community 필드를 우선 사용하고, 없으면 소문자 키를 시도
-            return (
-                (response.data && response.data.Community) ||
-                // some responses may use `community` key
-                (response.data as any).community ||
-                null
-            );
+            const raw = response.data as unknown as Record<string, unknown>;
+            const maybe = (raw['Community'] ?? raw['community']) as
+                | CommunityDetail
+                | undefined;
+            return maybe ?? null;
         },
         staleTime: 2 * 60 * 1000, // 2분 캐싱
     });
@@ -282,13 +293,11 @@ export default function CommunityDetailScreen({ route }: any) {
                     </View>
                     {Array.isArray(community.comments) &&
                     community.comments.length > 0 ? (
-                        community.comments.map((c) => {
+                        community.comments.map((c: CommunityComment) => {
                             const isOwner =
                                 !!loginInfo?.userId &&
-                                (((c as any).userId &&
-                                    (c as any).userId === loginInfo.userId) ||
-                                    ((c as any).user && (c as any).user.id) ===
-                                        loginInfo.userId);
+                                ((c.userId && c.userId === loginInfo.userId) ||
+                                    (c.user && c.user.id === loginInfo.userId));
 
                             return (
                                 <Card
@@ -464,28 +473,34 @@ export default function CommunityDetailScreen({ route }: any) {
                                                 )}
                                                 {Array.isArray(c.replies) &&
                                                     c.replies.length > 0 &&
-                                                    c.replies.map((r) => (
-                                                        <View
-                                                            key={r.commentId}
-                                                            style={{
-                                                                marginTop: 8,
-                                                                paddingLeft: 12,
-                                                            }}
-                                                        >
-                                                            <Text
+                                                    c.replies.map(
+                                                        (
+                                                            r: CommunityCommentReply,
+                                                        ) => (
+                                                            <View
+                                                                key={
+                                                                    r.commentId
+                                                                }
                                                                 style={{
-                                                                    fontWeight:
-                                                                        '600',
+                                                                    marginTop: 8,
+                                                                    paddingLeft: 12,
                                                                 }}
                                                             >
-                                                                {r.userName ||
-                                                                    '익명'}
-                                                            </Text>
-                                                            <Text>
-                                                                {r.content}
-                                                            </Text>
-                                                        </View>
-                                                    ))}
+                                                                <Text
+                                                                    style={{
+                                                                        fontWeight:
+                                                                            '600',
+                                                                    }}
+                                                                >
+                                                                    {r.userName ||
+                                                                        '익명'}
+                                                                </Text>
+                                                                <Text>
+                                                                    {r.content}
+                                                                </Text>
+                                                            </View>
+                                                        ),
+                                                    )}
                                             </>
                                         )}
                                     </Card.Content>
