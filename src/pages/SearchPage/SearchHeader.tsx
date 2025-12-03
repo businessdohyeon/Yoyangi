@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import {
     ActivityIndicator,
@@ -30,6 +30,7 @@ import apis from '../../apis';
 import axiosInstance from '../../apis/axios';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { LocationInfoContext } from '../../Context';
 
 export default function SearchHeader({
     setSearchResults,
@@ -47,6 +48,7 @@ export default function SearchHeader({
     const theme = useTheme();
     const { width } = useWindowDimensions();
     const queryClient = useQueryClient();
+    const {locationInfo} = useContext(LocationInfoContext);
 
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -107,7 +109,7 @@ export default function SearchHeader({
             <View style={{ flexDirection: 'row', alignItems: 'center', width }}>
                 <View style={{ flex: 1 }}>
                     <Searchbar
-                        placeholder="증상, 진료과, 병원을 검색해보세요"
+                        placeholder="시설을 검색해보세요"
                         onChangeText={setSearchQuery}
                         value={searchQuery}
                         mode="view"
@@ -152,7 +154,7 @@ export default function SearchHeader({
                             <Icon source={'map-marker'} size={20} />
                         </View>
                         <View style={{ flex: 6, justifyContent: 'center' }}>
-                            <Text>현재위치</Text>
+                            <Text>{`기준 위치: ${locationInfo.displayName}`}</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: 'center' }}>
                             <Text>변경</Text>

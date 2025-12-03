@@ -1,7 +1,7 @@
 import { StatusBar, useColorScheme } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import Index from './src/Index';
-import { lightTheme, darkTheme } from './src/design/tossTheme';
+import { lightTheme, darkTheme } from './src/design/theme';
 
 // load translation infos
 import './src/locales/index';

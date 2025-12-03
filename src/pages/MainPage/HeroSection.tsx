@@ -31,7 +31,7 @@ const tmp = {
     one: `주변 요양원
 검색`,
 };
-const ads = [ad1, ad2, ad3];
+const ads = [ad2, ad1, ad3];
 const width = Dimensions.get('window').width;
 
 function AdBanner() {

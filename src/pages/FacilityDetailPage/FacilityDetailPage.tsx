@@ -1,9 +1,7 @@
 import { useContext, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, Platform, ScrollView, ToastAndroid, View } from 'react-native';
 import {
     ActivityIndicator,
-    Button,
-    IconButton,
     Text,
     TouchableRipple,
     useTheme,
@@ -27,6 +25,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apis from '../../apis';
 import { FacilityInfo } from './FacilityInfo';
 import HeroSection from './HeroSection';
+import Footer from './Footer';
 
 export default function FacilityDetailPage({
     route,
@@ -137,18 +136,38 @@ export default function FacilityDetailPage({
                         </ScrollView>
                         {/* 버그신고등등등 */}
                         <View
-                            style={{ paddingBottom: 50, paddingHorizontal: 10 }}
+                            style={{ paddingBottom: 50, paddingHorizontal: 10, paddingVertical: 30,  gap: 30, }}
                         >
                             <TouchableRipple
                                 onPress={() => {
-                                    console.log('bla');
+                                    if (Platform.OS === 'android') {
+                                        ToastAndroid.show(
+                                            '아직 준비 중인 기능입니다.',
+                                            ToastAndroid.SHORT,
+                                        );
+                                    } else {
+                                        Alert.alert(
+                                            '개발중이에ㅕ요',
+                                            '아직 준비 중인 기능입니다.',
+                                        );
+                                    }
                                 }}
                             >
                                 <Text>알고계신 병원 정보와 다른가요?</Text>
                             </TouchableRipple>
                             <TouchableRipple
                                 onPress={() => {
-                                    console.log('bla');
+                                    if (Platform.OS === 'android') {
+                                        ToastAndroid.show(
+                                            '아직 준비 중인 기능입니다.',
+                                            ToastAndroid.SHORT,
+                                        );
+                                    } else {
+                                        Alert.alert(
+                                            '개발중이에ㅕ요',
+                                            '아직 준비 중인 기능입니다.',
+                                        );
+                                    }
                                 }}
                             >
                                 <Text>이 병원의 관계자이신가요?</Text>
@@ -160,93 +179,6 @@ export default function FacilityDetailPage({
             {/* footer */}
             <Footer facilityData={facilityData} />
         </SafeAreaView>
-    );
-}
-
-function Footer({ facilityData }: { facilityData: FacilityData_t }) {
-    const { loginInfo } = useContext(LoginInfoContext);
-    const navigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const theme = useTheme();
-
-    return (
-        <View
-            style={{
-                borderTopWidth: 1,
-                flexDirection: 'row',
-                backgroundColor: theme.colors.background,
-            }}
-        >
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <IconButton icon={'heart'} size={30} onPress={() => {}} />
-            </View>
-            <View
-                style={{
-                    flex: 3,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <Button
-                    icon={'heart'}
-                    onPress={() => {
-                        navigation.navigate('ReservationPage', {
-                            facilityId: facilityData.id,
-                            facilityName: facilityData.name,
-                        });
-                    }}
-                    style={{}}
-                >
-                    예약
-                </Button>
-            </View>
-            <View
-                style={{
-                    flex: 3,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <Button
-                    icon={'phone'}
-                    onPress={() => {
-                        navigation.navigate('ChatPage', {
-                            facility_id: facilityData.id,
-                            guardian_id: loginInfo?.userId ?? 0,
-                            sender: loginInfo?.userId ?? 0,
-                            sender_type: 'guardian',
-                        });
-                    }}
-                >
-                    상담
-                </Button>
-            </View>
-            <View
-                style={{
-                    flex: 3,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <Button
-                    icon={'phone'}
-                    onPress={() => {
-                        navigation.navigate('ReviewForm', {
-                            facilityId: facilityData.id,
-                            facilityName: facilityData.name,
-                        });
-                    }}
-                >
-                    후기작성
-                </Button>
-            </View>
-        </View>
     );
 }
 
@@ -262,7 +194,6 @@ function TabNav({
     return (
         <View
             style={{
-                ...showBorder,
                 flex: 1,
                 flexDirection: 'row',
                 justifyContent: 'space-around',
@@ -279,6 +210,7 @@ function TabNav({
                     backgroundColor: theme.colors.background,
                     justifyContent: 'center',
                     alignItems: 'center',
+                    paddingVertical: 5,
                 }}
                 onPress={() => {
                     setTabIndex(0);
@@ -297,6 +229,8 @@ function TabNav({
                     backgroundColor: theme.colors.background,
                     justifyContent: 'center',
                     alignItems: 'center',
+                    paddingVertical: 5,
+
                 }}
                 onPress={() => {
                     setTabIndex(1);
@@ -315,6 +249,8 @@ function TabNav({
                     backgroundColor: theme.colors.background,
                     justifyContent: 'center',
                     alignItems: 'center',
+                    paddingVertical: 5,
+
                 }}
                 onPress={() => {
                     setTabIndex(2);

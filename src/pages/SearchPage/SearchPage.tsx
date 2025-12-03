@@ -20,11 +20,9 @@ const KIND_DEFAULT_VALUE = ['요양병원', '요양원', '주간보호케어센�
 
 export default function SearchPage({
     route,
-    navigation,
 }: ScreenProps<'SearchPage'>) {
     const theme = useTheme();
     const { locationInfo } = useContext(LocationInfoContext);
-    // queryClient not used in this component
 
     console.group('SearchPage rendered');
     console.log(route.params);
@@ -40,7 +38,6 @@ export default function SearchPage({
         null,
     );
     const [refreshing, setRefreshing] = useState(false);
-    const [resetCounter, setResetCounter] = useState(0);
 
     const {
         data,
@@ -95,8 +92,6 @@ export default function SearchPage({
             fetchNextPage();
         }
     };
-
-    // route.params-based 초기값을 state 초기화에 반영했으므로 추가적인 effect는 제거
 
     // kind 변경시 검색 결과를 리셋하고 쿼리 재요청하는 helper
     const setKindAndReset = (updater: React.SetStateAction<string[]>) => {
