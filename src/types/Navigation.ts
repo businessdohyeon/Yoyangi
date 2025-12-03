@@ -51,9 +51,7 @@ export type RootStackParamList = {
     ChatPage:
         | {
               facility_id: number;
-              guardian_id: number;
-              sender: number;
-              sender_type: string;
+              facility_name: string;
           }
         | undefined;
     PredictDiseasePage: undefined;

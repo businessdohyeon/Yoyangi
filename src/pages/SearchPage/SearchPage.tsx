@@ -38,6 +38,7 @@ export default function SearchPage({
         null,
     );
     const [refreshing, setRefreshing] = useState(false);
+    const [resetCounter, setResetCounter] = useState(0);
 
     const {
         data,

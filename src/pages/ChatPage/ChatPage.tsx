@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { ScreenProps } from '../../types/Navigation';
 import {
     View,
@@ -22,11 +22,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
 
 import { useRequireAuth } from '../../hooks/useRequireAuth';
+import { LoginInfoContext } from '../../Context';
 
 export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     console.log(route.params);
-    const { facility_id, guardian_id, sender, sender_type } =
+    const { facility_id, facility_name } =
         route.params as any;
+    const sender_type = "guardian";
+    const {loginInfo} = useContext(LoginInfoContext);
+    const guardian_id = loginInfo?.userId;
+    const sender = loginInfo?.userId;
 
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
@@ -187,8 +192,7 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
                                             String(sender)
                                     ) && (
                                         <Text style={styles.sender}>
-                                            ({item.sender_type}){' '}
-                                            {item.sender_id}
+                                            {`${facility_name} (#${item.sender_id})`}
                                         </Text>
                                     )}
                                     <Text

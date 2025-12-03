@@ -42,11 +42,6 @@ export default function FacilityDetailPage({
 
     const [tabIndex, setTabIndex] = useState(0);
 
-    console.group('[rerender]: FacilityDetailPage');
-    console.log({ id });
-    console.log(loginInfo);
-    console.groupEnd();
-
     const { data: facilityData = {} as FacilityData_t, isLoading } = useQuery({
         queryKey: ['facility', id],
         queryFn: async () => {
@@ -54,6 +49,9 @@ export default function FacilityDetailPage({
                 apis.urls.getFacilityById(id),
             );
             const { Response } = response.data;
+
+            console.log(Response);
+
             const tmp = FacilityDataSchema.parse(Response);
 
             console.group('fetchFacilityData');
@@ -97,6 +95,13 @@ export default function FacilityDetailPage({
         });
     };
 
+
+    console.group('[rerender]: FacilityDetailPage');
+    console.log({ id });
+    console.log(loginInfo);
+    console.log(facilityData);
+    console.groupEnd();
+
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={facilityData.name} />
@@ -125,7 +130,6 @@ export default function FacilityDetailPage({
                             }}
                             ref={scrollRef}
                         >
-                            {/* 병원정보 */}
                             {tabIndex === 0 ? (
                                 <FacilityInfo facilityData={facilityData} />
                             ) : tabIndex === 1 ? (

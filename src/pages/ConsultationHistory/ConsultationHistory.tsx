@@ -75,9 +75,7 @@ export default function ConsultationHistory() {
                     if (disabled) return;
                     navigation.navigate('ChatPage', {
                         facility_id: item.facility_id!,
-                        guardian_id: item.guardian_id!,
-                        sender: loginInfo?.userId ?? 0,
-                        sender_type: 'guardian',
+                        facility_name: item.facility?.name!
                     });
                 }}
                 left={LeftChatIcon}

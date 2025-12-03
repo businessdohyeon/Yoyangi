@@ -7,9 +7,11 @@ import {
 } from 'react-native';
 import { Button, Icon, Text, useTheme } from 'react-native-paper';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { showBorder } from '../../common';
 import { FacilityData_t } from '../../types/FacilityDataScheme';
-import { NaverMapMarkerOverlay, NaverMapView } from '@mj-studio/react-native-naver-map';
+import {
+    NaverMapMarkerOverlay,
+    NaverMapView,
+} from '@mj-studio/react-native-naver-map';
 
 type prop = { facilityData: FacilityData_t };
 
@@ -184,23 +186,25 @@ export function FacilityInfo({ facilityData }: prop) {
                 <View style={{}}>
                     <Text variant="titleMedium">병원 위치</Text>
                 </View>
-                <View style={{ height: 300 }}>
-                    <NaverMapView
-                        style={{ flex: 1 }}
-                        initialCamera={{
-                            latitude: facilityData.latitude,
-                            longitude: facilityData.longitude,
-                            zoom: 14,
-                        }}
-                    >
-                        <NaverMapMarkerOverlay
-                            latitude={facilityData.latitude}
-                            longitude={facilityData.longitude}
-                            anchor={{ x: 0.5, y: 1 }}
-                            caption={{ text: facilityData.name }}
-                        />
-                    </NaverMapView>
-                </View>
+                {facilityData.latitude && facilityData.longitude && (
+                    <View style={{ height: 300 }}>
+                        <NaverMapView
+                            style={{ flex: 1 }}
+                            initialCamera={{
+                                latitude: facilityData.latitude,
+                                longitude: facilityData.longitude,
+                                zoom: 14,
+                            }}
+                        >
+                            <NaverMapMarkerOverlay
+                                latitude={facilityData.latitude}
+                                longitude={facilityData.longitude}
+                                anchor={{ x: 0.5, y: 1 }}
+                                caption={{ text: facilityData.name }}
+                            />
+                        </NaverMapView>
+                    </View>
+                )}
                 <View
                     style={{
                         flexDirection: 'row',
@@ -213,14 +217,14 @@ export function FacilityInfo({ facilityData }: prop) {
                             flexDirection: 'row',
                             gap: 5,
                             alignItems: 'center',
-                            overflow: "hidden"
+                            overflow: 'hidden',
                         }}
                     >
-                        <View style={{flex: 1}}>
+                        <View style={{ flex: 1 }}>
                             <Icon source={'map-marker'} size={20} />
                         </View>
-                        <View style={{flex: 5}}>
-                            <Text>{facilityData.address}</Text>
+                        <View style={{ flex: 5 }}>
+                            <Text>{facilityData.address || "주소 정보가 없어요"}</Text>
                         </View>
                     </View>
                     <View
@@ -285,7 +289,7 @@ export function FacilityInfo({ facilityData }: prop) {
                         }}
                     >
                         <Icon source={'phone'} size={20} />
-                        <Text>{facilityData.telno}</Text>
+                        <Text>{facilityData.telno || "연락처 정보가 없어요"}</Text>
                     </View>
                     <View
                         style={{
@@ -365,7 +369,9 @@ function StaffInfo({ facilityData }: prop) {
                             style={{
                                 marginRight: 10,
                             }}
-                        >{`${facilityData.facility_status.doctor_count}명`}</Text>
+                        >{`${
+                            facilityData.facility_status?.doctor_count || 0
+                        }명`}</Text>
                     </View>
                     <View
                         style={{
@@ -375,7 +381,9 @@ function StaffInfo({ facilityData }: prop) {
                         }}
                     >
                         <Text variant="bodyMedium">전공의</Text>
-                        <Text variant="bodyMedium">{`${facilityData.facility_status.medc_doctor_count}명`}</Text>
+                        <Text variant="bodyMedium">{`${
+                            facilityData.facility_status?.medc_doctor_count || 0
+                        }명`}</Text>
                     </View>
                 </View>
                 <View
@@ -404,7 +412,9 @@ function StaffInfo({ facilityData }: prop) {
                                 marginRight: 10,
                             }}
                         >
-                            {`${facilityData.facility_status.manager_count}명`}
+                            {`${
+                                facilityData.facility_status?.manager_count || 0
+                            }명`}
                         </Text>
                     </View>
                     <View

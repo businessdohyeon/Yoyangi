@@ -1,47 +1,61 @@
 import { Image, useWindowDimensions, View } from 'react-native';
-import { Button, Text, useTheme } from 'react-native-paper';
+import { Button, Text, useTheme, ActivityIndicator } from 'react-native-paper';
 
 import { showBorder } from '../../common';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackNavProp } from '../../types/Navigation';
+// navigation not used in this component
 import { FacilityData_t } from '../../types/FacilityDataScheme';
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '../../apis/axios';
 import apis from '../../apis';
+import type {
+    MealsApiResponse,
+    MealData,
+    TodayMealDesc,
+} from '../../types/Meal';
 
 export function FacilityNotice({
     facilityData,
 }: {
     facilityData: FacilityData_t;
 }) {
-    const navigation = useNavigation<RootStackNavProp<'FacilityDetailPage'>>();
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
-
-    const fetchMenu = async () => {
-        const res = await axiosInstance.get(
-            apis.urls.getFacilityMenu(facilityData.id),
-        );
-
-        // TODO
-
-        console.log(res);
+    type ParsedMeals = {
+        menu: MealData | null;
+        todayDesc: TodayMealDesc | null;
     };
 
-    const fetchNotices = async () => {
-        const res = await axiosInstance.get(
-            apis.urls.getFacilityNotices(facilityData.id),
-        );
+    const { data: mealsData, isLoading: mealsLoading, error: mealsError } =
+        useQuery<ParsedMeals>({
+        queryKey: ['facilityMeals', facilityData.id],
+        queryFn: async () => {
+            const res = await axiosInstance.get<MealsApiResponse>(
+                apis.urls.getFacilityMenu(facilityData.id),
+            );
 
-        // TODO
+            console.log(res);
 
-        console.log(res);
-    };
+            const payload = res.data;
+                if (payload && payload.Response) {
+                const menu: MealData = payload.Response;
+                let todayDesc: TodayMealDesc | null = null;
+                try {
+                    todayDesc = JSON.parse(
+                        menu.today_meal_desc,
+                    ) as TodayMealDesc;
+                } catch (e) {
+                    console.warn('failed to parse today_meal_desc', e);
+                }
 
-    useEffect(() => {
-        fetchMenu();
-        fetchNotices();
-    }, []);
+                return { menu, todayDesc } as ParsedMeals;
+            }
+            return { menu: null, todayDesc: null } as ParsedMeals;
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // derive todayMenu directly from query data to avoid extra state/effect
+    const todayMenu: TodayMealDesc | null = mealsData?.todayDesc ?? null;
 
     return (
         <View
@@ -61,69 +75,124 @@ export function FacilityNotice({
                 <View style={{ marginVertical: 10 }}>
                     <Text variant="titleMedium">오늘의 메뉴</Text>
                 </View>
-                <View
-                    style={{
-                        gap: 10,
-                        marginVertical: 10,
-                    }}
-                >
-                    {['아침', '점식', '저녁'].map((when) => {
-                        return (
-                            <View
-                                key={when}
-                                style={{
-                                    flexDirection: 'row',
-                                    gap: 10,
-                                }}
-                            >
+                {mealsLoading ? (
+                    <View style={{ alignItems: 'center', padding: 20 }}>
+                        <ActivityIndicator
+                            animating={true}
+                            color={theme.colors.primary}
+                        />
+                        <Text style={{ marginTop: 8 }}>메뉴를 불러오는 중입니다...</Text>
+                    </View>
+                ) : mealsError ? (
+                    <View style={{ alignItems: 'center', padding: 20 }}>
+                        <Text style={{ color: theme.colors.error }}>메뉴를 불러오지 못했습니다.</Text>
+                    </View>
+                ) : (
+                    <View
+                        style={{
+                            gap: 10,
+                            marginVertical: 10,
+                        }}
+                    >
+                        {(
+                            [
+                                { key: 'breakfast', label: '아침' },
+                                { key: 'lunch', label: '점심' },
+                                { key: 'dinner', label: '저녁' },
+                            ] as const
+                        ).map((m) => {
+                            const items = (todayMenu as any)?.[m.key] as
+                                | string[]
+                                | undefined;
+                            return (
                                 <View
+                                    key={m.key}
                                     style={{
-                                        flex: 3,
+                                        flexDirection: 'row',
+                                        gap: 10,
                                     }}
                                 >
-                                    <Image
-                                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
+                                    <View
                                         style={{
-                                            flex: 1,
-                                            borderRadius: 10,
+                                            flex: 3,
                                         }}
-                                    />
+                                    >
+                                        <Image
+                                            src={
+                                                (mealsData?.menu &&
+                                                    mealsData?.menu[
+                                                        `${m.key}_meal_picture_url`
+                                                    ]) ||
+                                                'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC'
+                                            }
+                                            style={{
+                                                flex: 1,
+                                                borderRadius: 10,
+                                            }}
+                                        />
+                                    </View>
+                                    <View
+                                        style={{
+                                            flex: 5,
+                                        }}
+                                    >
+                                        <View style={{}}>
+                                            <Text variant="bodyLarge">
+                                                {`${m.label}: ${
+                                                    items && items.length
+                                                        ? items[0]
+                                                        : '대표메뉴'
+                                                }`}
+                                            </Text>
+                                        </View>
+                                        {items && items.length ? (
+                                            items.slice(1).map((it, idx) => (
+                                                <View key={idx}>
+                                                    <Text variant="bodyMedium">
+                                                        {it}
+                                                    </Text>
+                                                </View>
+                                            ))
+                                        ) : (
+                                            <>
+                                                <View>
+                                                    <Text variant="bodyMedium">
+                                                        메뉴 정보가 없습니다
+                                                    </Text>
+                                                </View>
+                                                <View>
+                                                    <Text variant="bodyMedium">
+                                                        메뉴 정보가 없습니다
+                                                    </Text>
+                                                </View>
+                                                <View>
+                                                    <Text variant="bodyMedium">
+                                                        메뉴 정보가 없습니다
+                                                    </Text>
+                                                </View>
+                                            </>
+                                        )}
+                                    </View>
                                 </View>
-                                <View
-                                    style={{
-                                        flex: 5,
-                                    }}
-                                >
-                                    <View style={{}}>
-                                        <Text variant="bodyLarge">
-                                            {`${when}: 대표메뉴`}
-                                        </Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <Text variant="bodyMedium">나머지</Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <Text variant="bodyMedium">나머지</Text>
-                                    </View>
-                                    <View style={{}}>
-                                        <Text variant="bodyMedium">나머지</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        );
-                    })}
-                </View>
+                            );
+                        })}
+                    </View>
+                )}
                 <View style={{ marginVertical: 10 }}>
                     <Text variant="titleMedium">일주일식단표</Text>
                 </View>
                 <View
                     style={{
-                        height: 150,
+                        height: 300,
                     }}
                 >
                     <Image
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC"
+                        src={
+                            mealsData?.menu?.week_meal_picture_url ||
+                            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARMAAAC3CAMAAAAGjUrGAAAAOVBMVEXm6ezb3uGXoazq7e/Dyc/l6ey/xcyrs7vX3OCnr7jV2d6Zo63O09ibpa+5wMezusLv8fTP1NnIzdMlnmvOAAABdElEQVR4nO3Z0ZKaMBiAUUwQlsaIy/s/bAHdabXxdmn7n3PDCDeZb0JA0nUAAAAAAAAAAAAAAAAAAAAAAAAAAP+u3HT0qA6UT/3Q1J+iZslDemsIGmVJpY5NtaTl6NEdItcyt5eTnMdSY06UlD7eXMk/UvrWofwtzu+bdNGb5NPl4/VGCd4kz+tjZnq5FrxJn8pqfp4psZvkqVxvfUmabB5Naulvn78S3NsEbzKkMpYy3lvkft6PsZt03bSusfW8n8rXVPblNnqTfBkeL/JbkrJHid6k+1pe1yRp/txnSvgmD3uSnC9bFE129yTbrbRG0WTzleQepVZNfkuyR9HkOck9Svgmz0nW30uJ3uQ1iWdxI0n4Jo0k0Zu0kgRv0kwStsn23T63k4RtkmsZb+s/4euttb8zxdzfWbYvA7WO0x9qSZejR3eM3Ke0ZmnuF/cxp8m2s7MMfctyjpoEAAAAAAAAAAAAAAAAAAAAAAAAAPgPnHj1E96TDiAitj9wAAAAAElFTkSuQmCC'
+                        }
                         style={{ flex: 1 }}
+                        resizeMode="contain"
                     />
                 </View>
             </View>

@@ -60,9 +60,7 @@ export default function Footer({
                     onPress={() => {
                         navigation.navigate('ChatPage', {
                             facility_id: facilityData.id,
-                            guardian_id: loginInfo?.userId ?? 0,
-                            sender: loginInfo?.userId ?? 0,
-                            sender_type: 'guardian',
+                            facility_name: facilityData.name,
                         });
                     }}
                 >

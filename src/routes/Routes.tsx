@@ -164,8 +164,6 @@ export default function Routes() {
                     name="ReviewForm"
                     component={ReviewForm as React.ComponentType<any>}
                 />
-                {/* TODO: CommunityDetail (중복 네이밍 확인) 및 타입 정리 */}
-                {/* TODO: CommunityFormPage 타입 개선 */}
                 <Stack.Screen
                     name="CommunityFormPage"
                     component={CommunityFormPage as React.ComponentType<any>}

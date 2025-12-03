@@ -6,8 +6,8 @@ import { setLogoutCallback, setTokenRefreshCallback } from './utils/auth';
 const LocationInfoSchema = z.object({
     latitude: z.preprocess((val) => Number(val), z.number()).default(37.5665),
     longitude: z.preprocess((val) => Number(val), z.number()).default(126.978),
-    roadAddress: z.string().default(''),
-    displayName: z.string().default(''),
+    roadAddress: z.string().default('위치를 설정해주세요'),
+    displayName: z.string().default('위치를 설정해주세요'),
 });
 
 export const LoginInfoSchema = z.object({
