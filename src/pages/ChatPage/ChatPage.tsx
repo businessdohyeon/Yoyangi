@@ -1,6 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ScreenProps } from '../../types/Navigation';
-import { View, StyleSheet, FlatList, Alert } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    Keyboard,
+} from 'react-native';
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 import {
     TextInput,
     Button,
@@ -12,24 +20,13 @@ import io from 'socket.io-client';
 import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import apis from '../../apis';
-// import apis from '../../apis'; (not used — using direct URL for socket)
 
-// TODO: Define a proper Props type for ChatPage instead of using `any`.
-// - Define the expected route params interface (facility_id, guardian_id, sender, sender_type)
-// - Replace `{ route }: any` with `props: ChatPageProps` and use typed `route.params`
-// TODO: Move hard-coded socket URL to configuration or environment variables.
-// Define the expected route params for ChatPage
 import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     console.log(route.params);
     const { facility_id, guardian_id, sender, sender_type } =
         route.params as any;
-
-    const { isAuthenticated } = useRequireAuth();
-
-    // 인증이 안되면 로그인 페이지로 리다이렉션 (useRequireAuth에서 처리)
-    if (!isAuthenticated) return null;
 
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
@@ -38,6 +35,9 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     const [socketConnected, setSocketConnected] = useState(false);
     const [socketError, setSocketError] = useState<string | null>(null);
     const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [headerHeight, setHeaderHeight] = useState(0);
+
+    const { isAuthenticated } = useRequireAuth();
 
     useEffect(() => {
         // Use centralized socket URL from config
@@ -84,7 +84,6 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
             setTimeout(() => {
                 setSocketError('소켓 초기화 중 오류가 발생했습니다.');
                 setSnackbarVisible(true);
-                // TODO: auth guard
             }, 0);
         }
 
@@ -99,6 +98,9 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
             }
         };
     }, [facility_id, guardian_id]);
+
+    // 인증이 안되면 렌더링 중단 (훅은 이미 모두 호출됨)
+    if (!isAuthenticated) return null;
 
     const sendMessage = () => {
         if (!input.trim()) return;
@@ -122,99 +124,120 @@ export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
 
         socketRef.current?.emit('sendMessage', payload);
         setInput('');
+        Keyboard.dismiss();
     };
 
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
             <GoBackHeader title={'상담채팅'} />
-            <View style={styles.container}>
-                <FlatList
-                    data={messages}
-                    keyExtractor={(item) =>
-                        item.id?.toString() || Math.random().toString()
-                    }
-                    renderItem={({ item }) => (
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent:
-                                    item.sender === sender ||
-                                    item.sender_id === sender ||
-                                    item.sender_id?.toString() ===
-                                        String(sender)
-                                        ? 'flex-end'
-                                        : 'flex-start',
-                            }}
-                        >
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                // 헤더 높이만큼 오프셋을 주어 입력창이 키보드 바로 위에 붙도록 함
+            >
+                <View style={styles.container}>
+                    <KeyboardAwareFlatList
+                        data={messages}
+                        keyboardShouldPersistTaps="handled"
+                        enableOnAndroid={true}
+                        extraHeight={headerHeight + 30}
+                        contentContainerStyle={{
+                            flexGrow: 1,
+                            paddingBottom: 10,
+                        }}
+                        keyExtractor={(item) =>
+                            item.id?.toString() || Math.random().toString()
+                        }
+                        renderItem={({ item }) => (
                             <View
-                                style={
-                                    item.sender === sender ||
-                                    item.sender_id === sender ||
-                                    item.sender_id?.toString() ===
-                                        String(sender)
-                                        ? [
-                                              styles.bubble,
-                                              {
-                                                  backgroundColor:
-                                                      theme.colors.primary,
-                                              },
-                                          ]
-                                        : [styles.bubble, styles.bubbleOther]
-                                }
+                                style={{
+                                    flexDirection: 'row',
+                                    justifyContent:
+                                        item.sender === sender ||
+                                        item.sender_id === sender ||
+                                        item.sender_id?.toString() ===
+                                            String(sender)
+                                            ? 'flex-end'
+                                            : 'flex-start',
+                                }}
                             >
-                                {!(
-                                    item.sender === sender ||
-                                    item.sender_id === sender ||
-                                    item.sender_id?.toString() ===
-                                        String(sender)
-                                ) && (
-                                    <Text style={styles.sender}>
-                                        ({item.sender_type}) {item.sender_id}
-                                    </Text>
-                                )}
-                                <Text
+                                <View
                                     style={
                                         item.sender === sender ||
                                         item.sender_id === sender ||
                                         item.sender_id?.toString() ===
                                             String(sender)
-                                            ? styles.myText
-                                            : styles.otherText
+                                            ? [
+                                                  styles.bubble,
+                                                  {
+                                                      backgroundColor:
+                                                          theme.colors.primary,
+                                                  },
+                                              ]
+                                            : [
+                                                  styles.bubble,
+                                                  styles.bubbleOther,
+                                              ]
                                     }
                                 >
-                                    {item.content}
-                                </Text>
+                                    {!(
+                                        item.sender === sender ||
+                                        item.sender_id === sender ||
+                                        item.sender_id?.toString() ===
+                                            String(sender)
+                                    ) && (
+                                        <Text style={styles.sender}>
+                                            ({item.sender_type}){' '}
+                                            {item.sender_id}
+                                        </Text>
+                                    )}
+                                    <Text
+                                        style={
+                                            item.sender === sender ||
+                                            item.sender_id === sender ||
+                                            item.sender_id?.toString() ===
+                                                String(sender)
+                                                ? styles.myText
+                                                : styles.otherText
+                                        }
+                                    >
+                                        {item.content}
+                                    </Text>
+                                </View>
                             </View>
-                        </View>
-                    )}
-                />
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        mode="outlined"
-                        value={input}
-                        onChangeText={setInput}
-                        style={styles.input}
-                        placeholder="메시지를 입력하세요"
+                        )}
                     />
-                    <Button
-                        mode="contained"
-                        onPress={sendMessage}
-                        style={styles.sendButton}
+
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            mode="outlined"
+                            value={input}
+                            onChangeText={setInput}
+                            style={styles.input}
+                            placeholder="메시지를 입력하세요"
+                        />
+                        <Button
+                            mode="contained"
+                            onPress={sendMessage}
+                            style={styles.sendButton}
+                        >
+                            전송
+                        </Button>
+                    </View>
+
+                    <Snackbar
+                        visible={snackbarVisible}
+                        onDismiss={() => setSnackbarVisible(false)}
+                        action={{
+                            label: '닫기',
+                            onPress: () => setSnackbarVisible(false),
+                        }}
                     >
-                        전송
-                    </Button>
+                        {socketError ??
+                            (socketConnected ? '연결됨' : '연결 안됨')}
+                    </Snackbar>
                 </View>
-                <Snackbar
-                    visible={snackbarVisible}
-                    onDismiss={() => setSnackbarVisible(false)}
-                    action={{
-                        label: '닫기',
-                        onPress: () => setSnackbarVisible(false),
-                    }}
-                >
-                    {socketError ?? (socketConnected ? '연결됨' : '연결 안됨')}
-                </Snackbar>
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
