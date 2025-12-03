@@ -19,13 +19,17 @@ import apis from '../../apis';
 // - Replace `{ route }: any` with `props: ChatPageProps` and use typed `route.params`
 // TODO: Move hard-coded socket URL to configuration or environment variables.
 // Define the expected route params for ChatPage
+import { useRequireAuth } from '../../hooks/useRequireAuth';
+
 export default function ChatPage({ route }: ScreenProps<'ChatPage'>) {
     console.log(route.params);
     const { facility_id, guardian_id, sender, sender_type } =
         route.params as any;
 
+    const { isAuthenticated } = useRequireAuth();
 
-    // TODO: auth guard
+    // 인증이 안되면 로그인 페이지로 리다이렉션 (useRequireAuth에서 처리)
+    if (!isAuthenticated) return null;
 
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');

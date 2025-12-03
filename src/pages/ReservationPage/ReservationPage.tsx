@@ -61,7 +61,7 @@ export default function ReservationPage({
                 data,
                 {
                     headers: {
-                        Authorization: `Bearer ${loginInfo.token}`,
+                        Authorization: `Bearer ${loginInfo?.token ?? ''}`,
                     },
                 },
             );

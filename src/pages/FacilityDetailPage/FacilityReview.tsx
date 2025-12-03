@@ -18,7 +18,7 @@ export function FacilityReview({
     const theme = useTheme();
     const { width: viewportWidth } = useWindowDimensions();
     const { loginInfo } = useContext(LoginInfoContext);
-    const { userId } = loginInfo;
+    const userId = loginInfo?.userId ?? 0;
 
     const { data: reviewDataArray = [] } = useQuery({
         queryKey: ['facilityReviews', facilityData.id],

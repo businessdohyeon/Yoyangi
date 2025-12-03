@@ -67,13 +67,13 @@ export default function FacilityDetailPage({
     });
 
     const userLikeMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (vars: { userId: number; token: string }) => {
             const response = await axiosInstance.post(
-                apis.urls.userLike(loginInfo.userId, facilityData.id),
+                apis.urls.userLike(vars.userId, facilityData.id),
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${loginInfo.token}`,
+                        Authorization: `Bearer ${vars.token}`,
                     },
                 },
             );
@@ -92,7 +92,10 @@ export default function FacilityDetailPage({
             });
             return;
         }
-        userLikeMutation.mutate();
+        userLikeMutation.mutate({
+            userId: loginInfo.userId,
+            token: loginInfo.token,
+        });
     };
 
     return (
@@ -215,8 +218,8 @@ function Footer({ facilityData }: { facilityData: FacilityData_t }) {
                     onPress={() => {
                         navigation.navigate('ChatPage', {
                             facility_id: facilityData.id,
-                            guardian_id: loginInfo.userId,
-                            sender: loginInfo.userId,
+                            guardian_id: loginInfo?.userId ?? 0,
+                            sender: loginInfo?.userId ?? 0,
                             sender_type: 'guardian',
                         });
                     }}

@@ -87,7 +87,6 @@ function AdBanner() {
 function BigButtons() {
     const navigation =
         useNavigation<TabAndStackCompositeNav<'MainPage', 'Tabs'>>();
-    const theme = useTheme();
 
     return (
         <View
@@ -108,7 +107,6 @@ function BigButtons() {
                                 kind: ['요양병원'],
                             })
                         }
-                        theme={theme}
                     />
                 </View>
                 <View style={styles.cell}>
@@ -120,7 +118,6 @@ function BigButtons() {
                                 kind: ['요양원'],
                             })
                         }
-                        theme={theme}
                     />
                 </View>
                 <View style={styles.cell}>
@@ -132,7 +129,6 @@ function BigButtons() {
                                 kind: ['주간보호케어센터'],
                             })
                         }
-                        theme={theme}
                     />
                 </View>
             </View>
@@ -143,7 +139,6 @@ function BigButtons() {
                         icon="brain"
                         label="치매 자가 진단"
                         onPress={() => navigation.navigate('ExamDimentiaPage')}
-                        theme={theme}
                     />
                 </View>
                 <View style={[styles.cell, { flex: 1 }]}>
@@ -153,7 +148,6 @@ function BigButtons() {
                         onPress={() =>
                             navigation.navigate('PredictDiseasePage')
                         }
-                        theme={theme}
                     />
                 </View>
             </View>
@@ -165,13 +159,14 @@ function FeatureButton({
     icon,
     label,
     onPress,
-    theme,
 }: {
     icon: string;
     label: string;
     onPress: () => void;
-    theme: any;
 }) {
+    const theme = useTheme();
+
+
     return (
         <Pressable
             onPress={onPress}
@@ -192,7 +187,7 @@ function FeatureButton({
                 iconColor={theme.colors.primary}
             />
             <Text
-                style={[styles.featureLabel, { color: theme.colors.gray900 }]}
+                style={[styles.featureLabel, { color: theme.colors.onPrimaryContainer }]}
             >
                 {label}
             </Text>

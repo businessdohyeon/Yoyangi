@@ -238,35 +238,37 @@ function VoiceButton({
     const timerRef = useRef<number | null>(null);
 
     useEffect(() => {
-            if (!isListening && (transcript || listeningStarted)) {
+        if (!isListening && (transcript || listeningStarted)) {
             // show transcript preview
             setShowModal(true);
-                timerRef.current = setTimeout(async () => {
+            timerRef.current = setTimeout(async () => {
                 try {
-                    const searchQuery = transcript;
-                    const url = `${
-                        apis.urls.facilities
-                    }?keyword=${encodeURIComponent(searchQuery)}`;
-                    const response = await axiosInstance.get(url);
+                    const usersentence = transcript;
+                    const response = await axiosInstance.post(
+                        apis.urls.searchVoice,
+                        {
+                            usersentence,
+                        },
+                    );
                     const result = response.data?.Response ?? response.data;
 
                     setSearchResults(result);
                 } catch (e) {
                     console.error('voice search failed', e);
-                    } finally {
-                        setShowModal(false);
-                        setListeningStarted(false);
-                        timerRef.current = null;
-                    }
-                }, 1200);
-        } else if (!isListening && transcript === '' && listeningStarted) {
-            // nothing heard — briefly show modal then hide
-            setShowModal(true);
-                timerRef.current = setTimeout(() => {
+                } finally {
                     setShowModal(false);
                     setListeningStarted(false);
                     timerRef.current = null;
-                }, 800);
+                }
+            }, 1200);
+        } else if (!isListening && transcript === '' && listeningStarted) {
+            // nothing heard — briefly show modal then hide
+            setShowModal(true);
+            timerRef.current = setTimeout(() => {
+                setShowModal(false);
+                setListeningStarted(false);
+                timerRef.current = null;
+            }, 800);
         }
 
         return () => {
@@ -338,7 +340,6 @@ function VoiceButton({
                 iconColor={isListening ? theme.colors.primary : undefined}
                 onPress={isListening ? handleStop : handleStart}
             />
-
             <Portal>
                 <Dialog
                     visible={showModal}

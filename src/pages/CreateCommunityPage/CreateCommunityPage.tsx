@@ -28,6 +28,8 @@ export default function CommunityFormPage() {
     const queryClient = useQueryClient();
     const { isAuthenticated } = useRequireAuth();
 
+    const token = loginInfo?.token ?? '';
+
     const communityMutation = useMutation({
         mutationFn: async (data: any) => {
             const isForm = data && typeof data.append === 'function';
@@ -38,7 +40,7 @@ export default function CommunityFormPage() {
                     data,
                     {
                         headers: {
-                            Authorization: `Bearer ${loginInfo.token}`,
+                            Authorization: `Bearer ${token}`,
                             ...(isForm
                                 ? { 'Content-Type': 'multipart/form-data' }
                                 : {}),
@@ -54,7 +56,7 @@ export default function CommunityFormPage() {
                 data,
                 {
                     headers: {
-                        Authorization: `Bearer ${loginInfo.token}`,
+                        Authorization: `Bearer ${token}`,
                         ...(isForm
                             ? { 'Content-Type': 'multipart/form-data' }
                             : {}),

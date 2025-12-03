@@ -10,6 +10,7 @@ import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavProp } from '../../types/Navigation';
 import apis from '../../apis';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export default function LikedOrganizations() {
     const theme = useTheme();
@@ -17,13 +18,10 @@ export default function LikedOrganizations() {
     const { loginInfo } = ctx;
     const navigation = useNavigation<RootStackNavProp<'LikedOrganizations'>>();
     const nav = navigation;
+    const { isAuthenticated } = useRequireAuth();
 
-    useEffect(() => {
-        if (!loginInfo || !loginInfo.userId) {
-            // 로그인 정보가 없으면 로그인 페이지로 이동 (복귀 스크린 전달)
-            nav.navigate('LoginPage', { returnScreen: 'LikedOrganizations' });
-        }
-    }, [loginInfo, nav]);
+    // useRequireAuth가 로그인되지 않은 경우 LoginPage로 리다이렉션 처리함
+    if (!isAuthenticated) return null;
 
     const fetchFavorites = async () => {
         const res = await axiosInstance.get(

@@ -9,6 +9,7 @@ import GoBackHeader from '../FacilityDetailPage/GoBackHeader';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavProp } from '../../types/Navigation';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 // 타입 정의
 type ChatRoom = {
@@ -40,9 +41,12 @@ export default function ConsultationHistory() {
     const { loginInfo } = useContext(LoginInfoContext);
     const theme = useTheme();
     const navigation = useNavigation<RootStackNavProp<'ConsultationHistory'>>();
+    const { isAuthenticated } = useRequireAuth();
+
+    if (!isAuthenticated) return null;
 
     const { data, isLoading, isError } = useQuery<GetRoomsResponse>({
-        queryKey: ['chats', 'rooms', loginInfo.userId],
+        queryKey: ['chats', 'rooms', loginInfo?.userId ?? 0],
         queryFn: async () => {
             const res = await axiosInstance.get(apis.urls.getRooms);
             return res.data as GetRoomsResponse;
@@ -72,7 +76,7 @@ export default function ConsultationHistory() {
                     navigation.navigate('ChatPage', {
                         facility_id: item.facility_id!,
                         guardian_id: item.guardian_id!,
-                        sender: loginInfo.userId,
+                        sender: loginInfo?.userId ?? 0,
                         sender_type: 'guardian',
                     });
                 }}

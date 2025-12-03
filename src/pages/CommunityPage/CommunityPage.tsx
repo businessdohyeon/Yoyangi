@@ -152,7 +152,7 @@ function PostCard({ item }: { item: CommunityItem }) {
     const navigation =
         useNavigation<TabAndStackCompositeNav<'CommunityPage', 'Tabs'>>();
     const { loginInfo } = useContext(LoginInfoContext);
-    const { userId } = loginInfo;
+    const userId = loginInfo?.userId ?? 0;
     const queryClient = useQueryClient();
     const [reportVisible, setReportVisible] = useState(false);
     const snippet = item.content

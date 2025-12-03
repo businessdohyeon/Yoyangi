@@ -31,12 +31,12 @@ export const LocationInfoContext = createContext<{
 });
 
 export const LoginInfoContext = createContext<{
-    loginInfo: LoginInfo;
+    loginInfo: LoginInfo | null;
     storeLoginInfo: (value: LoginInfo) => void;
     clearLoginInfo: () => Promise<void>;
     reloadLoginInfo: () => Promise<void>;
 }>({
-    loginInfo: LoginInfoSchema.parse({}),
+    loginInfo: null,
     storeLoginInfo: async (value) => {
         console.log(value);
     },
@@ -56,9 +56,7 @@ export function TotalContextProvider({
     const [locationInfo, setLocationInfo] = useState<LocationInfo>(
         LocationInfoSchema.parse({}),
     );
-    const [loginInfo, setLoginInfo] = useState<LoginInfo>(
-        LoginInfoSchema.parse({}),
-    );
+    const [loginInfo, setLoginInfo] = useState<LoginInfo | null>(null);
 
     const loadLoginInfo = async () => {
         const data = await AsyncStorage.getItem('loginInfo');
@@ -73,10 +71,10 @@ export function TotalContextProvider({
                 console.log(parsed);
             } catch (e) {
                 console.error('Invalid loginInfo schema', e);
-                setLoginInfo(LoginInfoSchema.parse({}));
+                setLoginInfo(null);
             }
         } else {
-            setLoginInfo(LoginInfoSchema.parse({}));
+            setLoginInfo(null);
         }
 
         console.groupEnd();
@@ -93,7 +91,7 @@ export function TotalContextProvider({
 
     const clearLoginInfo = useCallback(async () => {
         await AsyncStorage.removeItem('loginInfo');
-        setLoginInfo(LoginInfoSchema.parse({}));
+        setLoginInfo(null);
     }, []);
 
     const reloadLoginInfo = useCallback(async () => {
@@ -105,10 +103,10 @@ export function TotalContextProvider({
                 setLoginInfo(parsed);
             } catch (e) {
                 console.error('Invalid loginInfo schema', e);
-                setLoginInfo(LoginInfoSchema.parse({}));
+                setLoginInfo(null);
             }
         } else {
-            setLoginInfo(LoginInfoSchema.parse({}));
+            setLoginInfo(null);
         }
     }, []);
 

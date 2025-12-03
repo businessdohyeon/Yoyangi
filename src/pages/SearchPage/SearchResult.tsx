@@ -24,13 +24,13 @@ export default function SearchResult({
     const queryClient = useQueryClient();
 
     const userLikeMutation = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (vars: { userId: number; token: string }) => {
             const response = await axiosInstance.post(
-                apis.urls.userLike(loginInfo.userId, facilityData.id),
+                apis.urls.userLike(vars.userId, facilityData.id),
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${loginInfo.token}`,
+                        Authorization: `Bearer ${vars.token}`,
                     },
                 },
             );
@@ -48,7 +48,10 @@ export default function SearchResult({
             });
             return;
         }
-        userLikeMutation.mutate();
+        userLikeMutation.mutate({
+            userId: loginInfo.userId,
+            token: loginInfo.token,
+        });
     };
 
     return (

@@ -45,7 +45,7 @@ export default function ReviewForm({
                     formData,
                     {
                         headers: {
-                            Authorization: `Bearer ${loginInfo.token}`,
+                            Authorization: `Bearer ${loginInfo?.token ?? ''}`,
                             'Content-Type': 'multipart/form-data',
                         },
                     },
@@ -57,7 +57,7 @@ export default function ReviewForm({
                 formData,
                 {
                     headers: {
-                        Authorization: `Bearer ${loginInfo.token}`,
+                        Authorization: `Bearer ${loginInfo?.token ?? ''}`,
                         'Content-Type': 'multipart/form-data',
                     },
                 },

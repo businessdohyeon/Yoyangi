@@ -14,6 +14,7 @@ import axiosInstance from '../../apis/axios';
 import { LoginInfoContext } from '../../Context';
 import apis from '../../apis';
 import { ScreenProps } from '../../types/Navigation';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 
 export default function ReservationDetailPage({
     route,
@@ -21,6 +22,9 @@ export default function ReservationDetailPage({
     const theme = useTheme();
     const ctx: any = useContext(LoginInfoContext as any);
     const { loginInfo } = ctx;
+    const { isAuthenticated } = useRequireAuth();
+
+    if (!isAuthenticated) return null;
 
     // route param 이름이 reservation_id 라고 가정
     const reservation_id = route.params?.reservation_id;

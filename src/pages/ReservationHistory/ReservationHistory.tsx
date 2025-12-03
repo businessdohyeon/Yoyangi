@@ -13,6 +13,7 @@ import axiosInstance from '../../apis/axios';
 import { useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LoginInfoContext } from '../../Context';
+import { useRequireAuth } from '../../hooks/useRequireAuth';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavProp } from '../../types/Navigation';
@@ -23,11 +24,16 @@ export default function ReservationHistory() {
     const theme = useTheme();
     const ctx = useContext(LoginInfoContext);
     const { loginInfo } = ctx;
+    const { isAuthenticated } = useRequireAuth();
+
+    if (!isAuthenticated) return null;
+
+    const token = loginInfo?.token ?? '';
 
     const fetchReservations = async () => {
         const res = await axiosInstance.get(apis.urls.reservationsList, {
             headers: {
-                Authorization: `Bearer ${loginInfo.token}`,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -37,7 +43,7 @@ export default function ReservationHistory() {
     };
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: ['reservations', loginInfo?.userId],
+        queryKey: ['reservations', loginInfo?.userId ?? 0],
         queryFn: fetchReservations,
         enabled: Boolean(
             loginInfo && loginInfo.userId && Number(loginInfo.userId) > 0,
@@ -47,19 +53,7 @@ export default function ReservationHistory() {
 
     const reservations: any[] = Array.isArray(data) ? data : [];
 
-    if (!loginInfo || !loginInfo.userId) {
-        return (
-            <SafeAreaView
-                edges={['left', 'right', 'bottom']}
-                style={{ flex: 1 }}
-            >
-                <GoBackHeader title={'예약 목록'} />
-                <View style={{ padding: 16 }}>
-                    <Text>로그인이 필요합니다.</Text>
-                </View>
-            </SafeAreaView>
-        );
-    }
+    // 로그인 여부는 useRequireAuth 훅에서 처리함
 
     return (
         <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1 }}>
@@ -117,7 +111,7 @@ export default function ReservationHistory() {
                                                 try {
                                                     console.log(
                                                         'token:',
-                                                        loginInfo.token,
+                                                        token,
                                                     );
                                                     // 예약 취소 API 호출 (백엔드 엔드포인트에 맞게 조정)
                                                     // NOTE: axios.patch(url, data, config)
@@ -130,7 +124,7 @@ export default function ReservationHistory() {
                                                         {},
                                                         {
                                                             headers: {
-                                                                Authorization: `Bearer ${loginInfo.token}`,
+                                                                Authorization: `Bearer ${token}`,
                                                                 'Content-Type':
                                                                     'application/json',
                                                             },

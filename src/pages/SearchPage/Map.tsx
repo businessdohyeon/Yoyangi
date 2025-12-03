@@ -37,7 +37,7 @@ export default function Map({
                     }}
                 >
                     {isMapShown &&
-                        facilityArray.map((facilityData) => {
+                        facilityArray.map((facilityData: any) => {
                             try {
                                 const parsed =
                                     FacilityDataSchema.parse(facilityData);
