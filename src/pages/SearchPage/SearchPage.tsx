@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { ActivityIndicator, Button, FAB, useTheme } from 'react-native-paper';
 
@@ -100,6 +100,16 @@ export default function SearchPage({ route }: ScreenProps<'SearchPage'>) {
     setSearchResults(null);
     refetch();
   };
+
+  // React to navigation param changes (e.g. when MainPage BigButtons navigates
+  // to SearchPage with a `kind` filter). If params change while this screen is
+  // already mounted, update `kind` and reset the results so the query runs again.
+  useEffect(() => {
+    const navKind = route?.params?.kind;
+    if (navKind && Array.isArray(navKind)) {
+      setKindAndReset(navKind);
+    }
+  }, [route?.params?.kind]);
 
   const onRefresh = async () => {
     setRefreshing(true);

@@ -101,7 +101,7 @@ function BigButtons() {
         <View style={styles.cell}>
           <FeatureButton
             icon="hospital-building"
-            label={tmp.one}
+            label={tmp.hospital}
             onPress={() =>
               navigation.navigate('SearchPage', {
                 kind: ['요양병원'],

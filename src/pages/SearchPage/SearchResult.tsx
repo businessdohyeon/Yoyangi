@@ -124,7 +124,7 @@ export default function SearchResult({
                                 >{`${facilityData.average_rating} (${facilityData.review_count})`}</Text>
                             </View>
                             <View style={{ marginRight: 10 }}>
-                                <Text>{`${facilityData.sggu_name} ${facilityData.sido_name}`}</Text>
+                                <Text>{`${facilityData.sido_name} ${facilityData.sggu_name}`}</Text>
                             </View>
                             <View style={{ marginRight: 10 }}>
                                 <Text>{facilityData.kind}</Text>

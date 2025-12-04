@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from 'react';
-import { Alert, Platform, ScrollView, ToastAndroid, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
   ActivityIndicator,
   Text,
@@ -149,14 +149,10 @@ export default function FacilityDetailPage({
                 gap: 30,
               }}
             >
-              <TouchableRipple
-                onPress={OnPressDev}
-              >
+              <TouchableRipple onPress={OnPressDev}>
                 <Text>알고계신 병원 정보와 다른가요?</Text>
               </TouchableRipple>
-              <TouchableRipple
-                onPress={OnPressDev}
-              >
+              <TouchableRipple onPress={OnPressDev}>
                 <Text>이 병원의 관계자이신가요?</Text>
               </TouchableRipple>
             </View>
