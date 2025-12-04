@@ -60,7 +60,7 @@ export default function SearchHeader({
   const searchMutation = useMutation({
     mutationFn: async (keyword: string) => {
       const response = await axiosInstance.get(apis.urls.facilities, {
-        params: { keyword },
+        params: { keyword: keyword.trim() },
       });
       return response.data.Response;
     },

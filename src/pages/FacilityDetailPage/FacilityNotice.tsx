@@ -124,7 +124,9 @@ export function FacilityNotice({
                       style={{
                         flex: 1,
                         borderRadius: 10,
+                        minHeight: 100,
                       }}
+                      resizeMode="contain"
                     />
                   </View>
                   <View

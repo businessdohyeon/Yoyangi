@@ -15,6 +15,7 @@ import PlainHeader from '../MainPage/PlainHeader';
 import { useContext, useState } from 'react';
 import { LoginInfoContext } from '../../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { OnPressDev } from '../../common';
 
 const HeartIcon = (props: React.ComponentProps<typeof List.Icon>) => (
   <List.Icon {...props} icon="heart" />
@@ -56,13 +57,7 @@ const ProfilePage = () => {
     nav.navigate('ConsultationHistory');
   };
 
-  const handleEditProfile = () => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.show('아직 준비 중인 기능입니다.', ToastAndroid.SHORT);
-    } else {
-      Alert.alert('개발중이에ㅕ요', '아직 준비 중인 기능입니다.');
-    }
-  };
+  const handleEditProfile = OnPressDev;
 
   const handleLogout = () => {
     Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
@@ -106,11 +101,11 @@ const ProfilePage = () => {
                   uri: loginInfo?.avatar || 'https://via.placeholder.com/80',
                 }}
               />
-              <Text variant="titleLarge" style={{ marginTop: 10 }}>
+              <Text variant="titleLarge" style={{ marginVertical: 10 }}>
                 {isLoggedIn ? '로그인 되었습니다' : '로그인이 필요해요'}
               </Text>
               {isLoggedIn ? (
-                <Text variant="bodyMedium">{`${loginInfo?.provider}를 통해 로그인되었습니다`}</Text>
+                <Text variant="bodyMedium">{`${loginInfo?.provider === "phone" ? "전화번호 인증" : loginInfo?.provider.toUpperCase()}를 통해 로그인되었습니다`}</Text>
               ) : (
                 <Button
                   mode="contained"

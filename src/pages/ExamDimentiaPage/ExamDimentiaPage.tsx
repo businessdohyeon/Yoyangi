@@ -85,7 +85,6 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>지남력</Text>
                         <SelectBlock
                             label="올해는 몇 년도입니까?"
                             value={orientationYear}
@@ -115,7 +114,7 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>장소</Text>
+                        <Text variant="titleMedium">현재 자신이 있는 장소는 어디입니까?</Text>
                         <SelectBlock
                             label="현재 있는 장소를 맞힘"
                             value={placeCorrect}
@@ -130,8 +129,8 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>기억 등록</Text>
-                        <Text>문장 따라하기</Text>
+                        <Text variant="bodyLarge">밑 문장을 따라말하도록 해주세요</Text>
+                        <Text>민수는 자전거를 타고 공원에 가서 11시부터 야구를 했다.</Text>
                         <SelectBlock
                             label="문장을 정확히 따라함"
                             value={memoryRegisterCorrect}
@@ -146,8 +145,7 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>주의력</Text>
-                        <Text>숫자 6-9-7-3 따라하기</Text>
+                        <Text variant="bodyLarge">숫자 6-9-7-3 따라하기</Text>
                         <SelectBlock
                             label="정확히 따라함"
                             value={attentionCorrect}
@@ -162,8 +160,7 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>집행기능</Text>
-                        <Text>패턴 문제 보기</Text>
+                        <Text variant="bodyLarge">아래 그림을 보여주고 각 빈칸에 들어갈 알맞은 내용은?</Text>
                         <Image
                             style={{ width: '100%' }}
                             resizeMode="contain"
@@ -183,7 +180,7 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>기억 회상</Text>
+                        <Text style={styles.section}>이전에 따라말했던 문장에 대해 기억하는지 물어보세요</Text>
 
                         <SelectBlock
                             label="민수"
@@ -219,8 +216,7 @@ export default function ExamDimentiaPage() {
                     ]}
                 >
                     <Card.Content>
-                        <Text style={styles.section}>언어 기능</Text>
-                        <Text>그림 이름 맞히기</Text>
+                        <Text variant="bodyLarge">그림 이름 맞히기</Text>
                         <Image
                             style={{ width: '100%' }}
                             resizeMode="contain"

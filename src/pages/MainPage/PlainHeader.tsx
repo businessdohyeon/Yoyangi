@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TabAndStackCompositeNav } from '../../types/Navigation';
 import { useContext } from 'react';
 import { LocationInfoContext, LoginInfoContext } from '../../Context';
+import { OnPressDev } from '../../common';
 
 export default function PlainHeader() {
     const navigation =
@@ -27,13 +28,12 @@ export default function PlainHeader() {
             <Appbar.Action
                 icon="magnify"
                 onPress={() => {
-                    // TODO: searchPage로 리다이렉션 할 때 seachbox에 focus된 채로?
                     navigation.navigate('SearchPage');
                 }}
             />
             <Appbar.Action
                 icon="bell"
-                onPress={() => navigation.navigate('NotificationPage')}
+                onPress={OnPressDev}
             />
         </Appbar.Header>
     );

@@ -25,6 +25,7 @@ import apis from '../../apis';
 import { FacilityInfo } from './FacilityInfo';
 import HeroSection from './HeroSection';
 import Footer from './Footer';
+import { OnPressDev } from '../../common';
 
 export default function FacilityDetailPage({
   route,
@@ -149,30 +150,12 @@ export default function FacilityDetailPage({
               }}
             >
               <TouchableRipple
-                onPress={() => {
-                  if (Platform.OS === 'android') {
-                    ToastAndroid.show(
-                      '아직 준비 중인 기능입니다.',
-                      ToastAndroid.SHORT,
-                    );
-                  } else {
-                    Alert.alert('개발중이에ㅕ요', '아직 준비 중인 기능입니다.');
-                  }
-                }}
+                onPress={OnPressDev}
               >
                 <Text>알고계신 병원 정보와 다른가요?</Text>
               </TouchableRipple>
               <TouchableRipple
-                onPress={() => {
-                  if (Platform.OS === 'android') {
-                    ToastAndroid.show(
-                      '아직 준비 중인 기능입니다.',
-                      ToastAndroid.SHORT,
-                    );
-                  } else {
-                    Alert.alert('개발중이에ㅕ요', '아직 준비 중인 기능입니다.');
-                  }
-                }}
+                onPress={OnPressDev}
               >
                 <Text>이 병원의 관계자이신가요?</Text>
               </TouchableRipple>
