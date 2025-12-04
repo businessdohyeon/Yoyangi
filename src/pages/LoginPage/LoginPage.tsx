@@ -329,7 +329,7 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
                   />
                   <TextInput
                     label="이름 (선택)"
-                    value={nameInput}
+                    defaultValue={nameInput}
                     onChangeText={setNameInput}
                     style={{ marginTop: 12 }}
                   />

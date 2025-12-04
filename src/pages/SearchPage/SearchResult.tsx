@@ -80,6 +80,7 @@ export default function SearchResult({
                 backgroundColor: theme.colors.background,
             }}
             onPress={() => {
+                console.log(facilityData.id)
                 navigation.navigate('FacilityDetailPage', {
                     id: facilityData.id,
                 });

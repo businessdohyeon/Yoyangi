@@ -50,7 +50,8 @@ export const FacilityDataSchema = z.object({
   facility_number: z.string().nullable(),
   created_at: z.string().nullable(),
   updated_at: z.string().nullable(),
-  facility_status: FacilityStatusSchema,
+  facility_status: FacilityStatusSchema.nullable(),
+  photo_url: z.string().nullable(),
 });
 
 export type FacilityData_t = z.infer<typeof FacilityDataSchema>;

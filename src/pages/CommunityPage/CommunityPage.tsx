@@ -407,9 +407,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     elevation: 2,
-    // backgroundColor set via theme
   },
-  // postCover removed: using thumbnail grid instead
   postHeader: {
     flexDirection: 'row',
     alignItems: 'center',
