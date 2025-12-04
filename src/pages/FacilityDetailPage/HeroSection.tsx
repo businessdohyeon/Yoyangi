@@ -15,15 +15,8 @@ export default function HeroSection({
   userLike: () => void;
 }) {
   const theme = useTheme();
-  type ExtendedFacility = FacilityData_t & {
-    user_like?: boolean;
-    is_liked?: boolean;
-  };
 
-  const initialLiked =
-    (facilityData as ExtendedFacility)?.user_like ??
-    (facilityData as ExtendedFacility)?.is_liked ??
-    false;
+  const initialLiked = facilityData.isLike;
   const [liked, setLiked] = useState<boolean>(initialLiked);
 
   return (

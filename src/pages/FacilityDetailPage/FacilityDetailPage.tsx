@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef, useState, useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import {
   ActivityIndicator,
@@ -45,13 +45,25 @@ export default function FacilityDetailPage({
 
   const [tabIndex, setTabIndex] = useState(0);
 
-  const { data: facilityData = {} as FacilityData_t, isLoading } = useQuery({
-    queryKey: ['facility', id],
+  const {
+    data: facilityData = {} as FacilityData_t,
+    isLoading,
+    refetch,
+  } = useQuery({
+    // include userId (or 'anon') so cache is separated per user and a change in login
+    // will cause React Query to fetch the appropriate data
+    queryKey: ['facility', id, loginInfo?.userId ?? 'anon'],
     queryFn: async () => {
-      const response = await axiosInstance.get(apis.urls.getFacilityById(id));
-      const { Response } = response.data;
+      if (!id) return {} as FacilityData_t;
+      // do not include token in the key; only use it for request headers
+      const headers = loginInfo?.token
+        ? { Authorization: `Bearer ${loginInfo.token}` }
+        : {};
 
-      console.log(Response);
+      const response = await axiosInstance.get(apis.urls.getFacilityById(id), {
+        headers,
+      });
+      const { Response } = response.data;
 
       let tmp;
       try {
@@ -66,8 +78,19 @@ export default function FacilityDetailPage({
 
       return tmp;
     },
+    enabled: !!id,
     staleTime: 5 * 60 * 1000,
   });
+
+  // In case the token changes for the same user (rare) or other login-state changes
+  // that should force refetching the current facility, invalidate the non-user-specific
+  // cache or directly refetch this query.
+  useEffect(() => {
+    if (!id) return;
+    // invalidate the facility query without the user suffix so server-driven
+    // differences (like whether the current user liked it) will be re-fetched.
+    queryClient.invalidateQueries({ queryKey: ['facility', id] });
+  }, [loginInfo?.token, id, queryClient]);
 
   const userLikeMutation = useMutation({
     mutationFn: async (vars: { userId: number; token: string }) => {

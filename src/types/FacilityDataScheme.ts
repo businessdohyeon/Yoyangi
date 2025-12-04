@@ -52,6 +52,7 @@ export const FacilityDataSchema = z.object({
   updated_at: z.string().nullable(),
   facility_status: FacilityStatusSchema.nullable(),
   photo_url: z.string().nullable(),
+  isLike: z.boolean(),
 });
 
 export type FacilityData_t = z.infer<typeof FacilityDataSchema>;
