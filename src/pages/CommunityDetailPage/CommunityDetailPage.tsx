@@ -220,12 +220,20 @@ export default function CommunityDetailScreen({
             backgroundColor: theme.colors.surface,
           }}
         >
-          <Card.Title
-            title={community.title}
-            subtitle={`${community.user?.name || '익명'} · ${formatDate(
-              community.createdAt,
-            )}`}
-          />
+          <Card.Content style={{ paddingVertical: 12 }}>
+            <Title numberOfLines={2} ellipsizeMode="tail">
+              {community.title}
+            </Title>
+            <Paragraph
+              style={{ color: theme.colors.placeholder, marginTop: 4 }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {`${community.user?.name || '익명'} · ${formatDate(
+                community.createdAt,
+              )}`}
+            </Paragraph>
+          </Card.Content>
           {community.images && community.images.length > 0 && (
             <View style={styles.imageGrid}>
               {community.images.map((uri, idx) => (

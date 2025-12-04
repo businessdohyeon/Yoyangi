@@ -53,7 +53,7 @@ export default function CommunityPage() {
       return items;
     },
     getNextPageParam: (lastPage, _allPages) => {
-      if (lastPage.length === 0) return undefined;
+      if (lastPage.length !== 10) return undefined;
       return lastPage[lastPage.length - 1]?.id;
     },
     initialPageParam: undefined,
@@ -66,6 +66,7 @@ export default function CommunityPage() {
 
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage) {
+      console.log('get more');
       fetchNextPage();
     }
   };
@@ -87,6 +88,7 @@ export default function CommunityPage() {
             renderItem={({ item }: { item: CommunityItem }) => (
               <PostCard item={item} />
             )}
+            contentContainerStyle={{ paddingBottom: 100 }}
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
             refreshing={refreshing}
