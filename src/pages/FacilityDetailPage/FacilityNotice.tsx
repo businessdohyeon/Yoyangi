@@ -183,7 +183,7 @@ export function FacilityNotice({
         </View>
       </View>
       {/* 병원소식 */}
-      <View
+      {/* <View
         style={{
           backgroundColor: theme.colors.background,
           paddingHorizontal: 10,
@@ -241,7 +241,7 @@ export function FacilityNotice({
             더보기
           </Button>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 }

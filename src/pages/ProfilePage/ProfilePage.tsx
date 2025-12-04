@@ -1,4 +1,4 @@
-import { ScrollView, View, Alert } from 'react-native';
+import { ScrollView, View, Alert, Platform, ToastAndroid } from 'react-native';
 import {
   Avatar,
   Button,
@@ -57,7 +57,11 @@ const ProfilePage = () => {
   };
 
   const handleEditProfile = () => {
-    nav.navigate('EditProfile');
+    if (Platform.OS === 'android') {
+      ToastAndroid.show('아직 준비 중인 기능입니다.', ToastAndroid.SHORT);
+    } else {
+      Alert.alert('개발중이에ㅕ요', '아직 준비 중인 기능입니다.');
+    }
   };
 
   const handleLogout = () => {
@@ -103,10 +107,10 @@ const ProfilePage = () => {
                 }}
               />
               <Text variant="titleLarge" style={{ marginTop: 10 }}>
-                {isLoggedIn ? loginInfo.name : '로그인이 필요함'}
+                {isLoggedIn ? '로그인 되었습니다' : '로그인이 필요해요'}
               </Text>
               {isLoggedIn ? (
-                <Text variant="bodyMedium">이메일: {loginInfo.email}</Text>
+                <Text variant="bodyMedium">{`${loginInfo?.provider}를 통해 로그인되었습니다`}</Text>
               ) : (
                 <Button
                   mode="contained"
@@ -190,7 +194,7 @@ const ProfilePage = () => {
           onPress={() => AsyncStorage.clear()}
           style={{ alignSelf: 'center', marginTop: 4 }}
         >
-          개발: AsyncStorage 초기화
+          로그인 및 위치 설정 초기화
         </Button>
       </ScrollView>
     </>

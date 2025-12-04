@@ -172,8 +172,6 @@ function PostCard({ item }: { item: CommunityItem }) {
     });
   };
 
-  // delete handled by handleDelete
-
   const reportMutation = useMutation({
     mutationFn: async (payload: { category: string; reason?: string }) => {
       return axiosInstance.post(apis.urls.reportCommunity(item.id), payload, {
@@ -237,18 +235,9 @@ function PostCard({ item }: { item: CommunityItem }) {
 
   return (
     <Card style={styles.postCard} onPress={onPress}>
-      {images.length > 0 && (
-        <View style={styles.imageGrid}>
-          {images.map((uri, idx) => (
-            <Image key={idx} source={{ uri }} style={styles.gridImage} />
-          ))}
-        </View>
-      )}
-
       <Card.Content>
         <View style={styles.postHeader}>
           <Avatar.Text size={44} label={(item.user?.name || 'U').slice(0, 2)} />
-
           <View style={styles.postTitleWrap}>
             <Text variant="titleMedium" numberOfLines={1}>
               {item.title}
@@ -257,7 +246,6 @@ function PostCard({ item }: { item: CommunityItem }) {
               {item.user?.name || '익명'} · {formatDate(item.createdAt)}
             </Text>
           </View>
-
           <View style={styles.postCountWrap}>
             <Text style={styles.commentCount}>
               {Number(item.totalComments) || 0}
@@ -265,12 +253,19 @@ function PostCard({ item }: { item: CommunityItem }) {
             <Text style={styles.meta}>댓글</Text>
           </View>
         </View>
-
+        <View>
+          {images.length > 0 && (
+            <View style={styles.imageGrid}>
+              {images.map((uri, idx) => (
+                <Image key={idx} source={{ uri }} style={styles.gridImage} />
+              ))}
+            </View>
+          )}
+        </View>
         <Text numberOfLines={3} style={styles.paragraph}>
           {snippet}
         </Text>
       </Card.Content>
-
       <Card.Actions style={styles.postActions}>
         <View style={styles.actionLeft}>
           {userId === item.user?.id && (
