@@ -23,7 +23,16 @@ import kakaoLoginBtnImg from './kakao_login_medium_narrow.png';
 import naverLoginBtnImg from './btnG_완성형.png';
 import googleLoginBtnImg from './web_light_sq_SI.png';
 
-function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
+// response body type for /api/user/phone/verify
+  type VerifyApiData = {
+    Message: string;
+    ResultCode: string;
+    user: { id: number; name: string; phone: string };
+    token: string;
+    refreshToken: string;
+  };
+
+export default function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const { storeLoginInfo } = useContext(LoginInfoContext);
@@ -75,14 +84,7 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
     },
   });
 
-  // response body type for /api/user/phone/verify
-  type VerifyApiData = {
-    Message: string;
-    ResultCode: string;
-    user: { id: number; name: string; phone: string };
-    token: string;
-    refreshToken: string;
-  };
+  
 
   const verifyMutation = useMutation<
     VerifyApiData,
@@ -380,4 +382,3 @@ function LoginPage({ navigation, route }: ScreenProps<'LoginPage'>) {
   );
 }
 
-export default LoginPage;

@@ -38,7 +38,6 @@ export default function SearchPage({ route }: ScreenProps<'SearchPage'>) {
     null,
   );
   const [refreshing, setRefreshing] = useState(false);
-  const [resetCounter, setResetCounter] = useState(0);
 
   const {
     data,
@@ -89,15 +88,6 @@ export default function SearchPage({ route }: ScreenProps<'SearchPage'>) {
     staleTime: 30 * 1000, // 30초 캐싱
   });
 
-  // If the auth token changes for the same user (rare) or other login-state changes
-  // that should force refetching the facilities, invalidate the non-user-specific
-  // cache so server-driven differences (like whether the current user liked it)
-  // will be re-fetched.
-  useEffect(() => {
-    if (!locationInfo) return;
-    queryClient.invalidateQueries({ queryKey: ['facilities'] });
-  }, [loginInfo?.token, locationInfo, kind, queryClient]);
-
   const facilityArray = useMemo(() => {
     return searchResults !== null ? searchResults : data?.pages.flat() || [];
   }, [searchResults, data]);
@@ -119,22 +109,10 @@ export default function SearchPage({ route }: ScreenProps<'SearchPage'>) {
     refetch();
   };
 
-  // React to navigation param changes (e.g. when MainPage BigButtons navigates
-  // to SearchPage with a `kind` filter). If params change while this screen is
-  // already mounted, update `kind` and reset the results so the query runs again.
-  useEffect(() => {
-    const navKind = route?.params?.kind;
-    if (navKind && Array.isArray(navKind)) {
-      setKindAndReset(navKind);
-    }
-  }, [route?.params?.kind]);
-
   const onRefresh = async () => {
     setRefreshing(true);
-    // reset filters and search results
     setSearchResults(null);
     setKindAndReset(KIND_DEFAULT_VALUE);
-    setResetCounter((c) => c + 1);
     try {
       await refetch();
     } catch (e) {
@@ -142,6 +120,18 @@ export default function SearchPage({ route }: ScreenProps<'SearchPage'>) {
     }
     setRefreshing(false);
   };
+
+  useEffect(() => {
+    const navKind = route?.params?.kind;
+    if (navKind && Array.isArray(navKind)) {
+      setKindAndReset(navKind);
+    }
+  }, [route?.params?.kind, setKindAndReset]);
+
+  useEffect(()=>{
+    console.log("!!!!");
+    refetch();
+  }, [loginInfo]);
 
   return (
     <>
@@ -176,8 +166,6 @@ export default function SearchPage({ route }: ScreenProps<'SearchPage'>) {
             }}
             refreshing={refreshing}
             onRefresh={onRefresh}
-            // onEndReached={getMore}
-            // onEndReachedThreshold={0.5}
             ListFooterComponent={
               isFetchingNextPage ? (
                 <ActivityIndicator
